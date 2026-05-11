@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Delegation Checklist</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface2: #242424;
+    --border: #2e2e2e;
+    --accent: #e8ff4a;
+    --accent2: #4af7e8;
+    --text: #f0f0f0;
+    --text-muted: #888;
+    --text-dim: #555;
+    --done: #4af7a0;
+    --consider: #f7c74a;
+    --na: #888;
+    --red: #ff4a4a;
+    --p1: #e8ff4a;
+    --p2: #4af7e8;
+    --p3: #b44af7;
+    --p4: #f74a8a;
+    --p5: #4ab4f7;
+    --p6: #f7974a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    padding: 40px 48px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .header-left .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .header-left h1 {
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+
+  .header-left h1 span {
+    color: var(--accent);
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .stat-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 8px 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+  }
+
+  .stat-pill .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .stat-pill .count {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  /* PROGRESS */
+  .progress-bar-wrap {
+    height: 2px;
+    background: var(--border);
+    width: 100%;
+    position: relative;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.5s ease;
+  }
+
+  /* MAIN LAYOUT */
+  .main {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: calc(100vh - 130px);
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    border-right: 1px solid var(--border);
+    padding: 32px 0;
+    position: sticky;
+    top: 0;
+    height: calc(100vh - 130px);
+    overflow-y: auto;
+  }
+
+  .sidebar-section {
+    padding: 0 24px;
+    margin-bottom: 32px;
+  }
+
+  .sidebar-section .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding-left: 4px;
+  }
+
+  .pillar-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: background 0.15s;
+    margin-bottom: 2px;
+  }
+
+  .pillar-nav-item:hover { background: var(--surface2); }
+  .pillar-nav-item.active { background: var(--surface2); }
+
+  .pillar-nav-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .pillar-nav-text {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.3;
+    flex: 1;
+  }
+
+  .pillar-nav-item.active .pillar-nav-text { color: var(--text); }
+
+  .pillar-nav-progress {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+
+  /* ROLE / PHASE FILTER */
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .filter-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-size: 11px;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--text-muted);
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .filter-chip:hover { border-color: var(--accent); color: var(--text); }
+  .filter-chip.selected { border-color: var(--accent); color: var(--accent); background: rgba(232,255,74,0.06); }
+
+  /* CONTENT */
+  .content {
+    padding: 40px 48px;
+  }
+
+  /* PILLAR SECTION */
+  .pillar-section {
+    margin-bottom: 56px;
+    scroll-margin-top: 32px;
+  }
+
+  .pillar-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pillar-color-bar {
+    width: 4px;
+    height: 40px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .pillar-header-text .pillar-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .pillar-header-text h2 {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .pillar-progress-mini {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  /* CARDS */
+  .cards-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    transition: border-color 0.2s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card:hover { border-color: #444; transform: translateY(-1px); }
+  .card.status-done { border-left: 3px solid var(--done); }
+  .card.status-consider { border-left: 3px solid var(--consider); }
+  .card.status-na { border-left: 3px solid var(--na); opacity: 0.6; }
+
+  .card-front {
+    padding: 20px 24px;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: start;
+  }
+
+  .card-item-id {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    letter-spacing: 0.1em;
+  }
+
+  .card-guideline {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .card-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .meta-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    padding: 3px 7px;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .meta-tag.phase-pre { border-color: #4a7ff7; color: #4a7ff7; }
+  .meta-tag.phase-at { border-color: #f7974a; color: #f7974a; }
+  .meta-tag.phase-post { border-color: #b44af7; color: #b44af7; }
+  .meta-tag.role-w { border-color: #4af7a0; color: #4af7a0; }
+  .meta-tag.role-m { border-color: #e8ff4a; color: #e8ff4a; }
+  .meta-tag.role-o { border-color: #f74a8a; color: #f74a8a; }
+
+  .card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-end;
+  }
+
+  .status-btn {
+    border: none;
+    padding: 5px 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+    width: 80px;
+    text-align: center;
+  }
+
+  .status-btn.btn-done {
+    background: transparent;
+    border: 1px solid var(--done);
+    color: var(--done);
+  }
+  .status-btn.btn-done:hover, .status-btn.btn-done.active {
+    background: var(--done);
+    color: #0f0f0f;
+  }
+
+  .status-btn.btn-consider {
+    background: transparent;
+    border: 1px solid var(--consider);
+    color: var(--consider);
+  }
+  .status-btn.btn-consider:hover, .status-btn.btn-consider.active {
+    background: var(--consider);
+    color: #0f0f0f;
+  }
+
+  .status-btn.btn-na {
+    background: transparent;
+    border: 1px solid var(--text-dim);
+    color: var(--text-dim);
+  }
+  .status-btn.btn-na:hover, .status-btn.btn-na.active {
+    background: var(--text-dim);
+    color: #0f0f0f;
+  }
+
+  /* CARD BACK (example) */
+  .card-back {
+    display: none;
+    padding: 0 24px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .card-back.open { display: block; }
+
+  .example-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin: 16px 0 8px;
+  }
+
+  .example-text {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    background: var(--surface2);
+    padding: 12px 16px;
+    border-left: 2px solid var(--border);
+    font-style: italic;
+  }
+
+  .notes-area {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 12px;
+    padding: 12px 14px;
+    resize: vertical;
+    min-height: 60px;
+    margin-top: 10px;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .notes-area::placeholder { color: var(--text-dim); }
+  .notes-area:focus { border-color: var(--accent); }
+
+  .expand-toggle {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    cursor: pointer;
+    padding: 4px 0;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .expand-toggle:hover { color: var(--accent); }
+
+  /* SUMMARY PANEL */
+  .summary-sticky {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(15,15,15,0.95);
+    border-top: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    padding: 14px 48px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    z-index: 100;
+    flex-wrap: wrap;
+  }
+
+  .summary-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-right: 8px;
+  }
+
+  .summary-stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+  }
+
+  .summary-num {
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .summary-desc {
+    font-size: 10px;
+    color: var(--text-dim);
+    max-width: 60px;
+    line-height: 1.3;
+  }
+
+  .download-btn {
+    margin-left: auto;
+    padding: 10px 20px;
+    background: var(--accent);
+    color: #0f0f0f;
+    border: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-weight: 600;
+    transition: opacity 0.15s;
+  }
+  .download-btn:hover { opacity: 0.85; }
+
+  /* hidden/filter */
+  .card.hidden { display: none; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); }
+
+  @media (max-width: 800px) {
+    .main { grid-template-columns: 1fr; }
+    .sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+    .content { padding: 24px 20px; }
+    .header { padding: 24px 20px; }
+    .summary-sticky { padding: 12px 20px; gap: 16px; }
+    .download-btn { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="label">Type 1 — Task Delegation Decision · Healthcare / Radiology</div>
+    <h1>AI Delegation Checklist<br><span>Should this task be delegated to AI?</span></h1>
+  </div>
+  <div class="header-right" id="headerStats">
+    <div class="stat-pill"><div class="dot" style="background:var(--done)"></div><span>Done</span><span class="count" id="statDone">0</span></div>
+    <div class="stat-pill"><div class="dot" style="background:var(--consider)"></div><span>Consider</span><span class="count" id="statConsider">0</span></div>
+    <div class="stat-pill"><div class="dot" style="background:var(--na)"></div><span>N/A</span><span class="count" id="statNA">0</span></div>
+    <div class="stat-pill"><div class="dot" style="background:var(--border)"></div><span>Pending</span><span class="count" id="statPending">30</span></div>
+  </div>
+</div>
+<div class="progress-bar-wrap">
+  <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+</div>
+
+<div class="main">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="label">Pillars</div>
+      <div id="pillarNav"></div>
+    </div>
+    <div class="sidebar-section">
+      <div class="label">Filter by Phase</div>
+      <div class="filter-group" id="phaseFilter">
+        <div class="filter-chip selected" data-filter="phase" data-value="all">◈ All phases</div>
+        <div class="filter-chip" data-filter="phase" data-value="PRE">◈ Pre-delegation</div>
+        <div class="filter-chip" data-filter="phase" data-value="AT">◈ At delegation</div>
+        <div class="filter-chip" data-filter="phase" data-value="POST">◈ Post-delegation</div>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="label">Filter by Role</div>
+      <div class="filter-group" id="roleFilter">
+        <div class="filter-chip selected" data-filter="role" data-value="all">◈ All roles</div>
+        <div class="filter-chip" data-filter="role" data-value="W">◈ Worker</div>
+        <div class="filter-chip" data-filter="role" data-value="M">◈ Manager</div>
+        <div class="filter-chip" data-filter="role" data-value="O">◈ Organization</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content" id="mainContent"></main>
+</div>
+
+<div class="summary-sticky">
+  <span class="summary-label">Progress</span>
+  <div class="summary-stat">
+    <span class="summary-num" style="color:var(--done)" id="sumDone">0</span>
+    <span class="summary-desc">Done</span>
+  </div>
+  <div class="summary-stat">
+    <span class="summary-num" style="color:var(--consider)" id="sumConsider">0</span>
+    <span class="summary-desc">To consider</span>
+  </div>
+  <div class="summary-stat">
+    <span class="summary-num" style="color:var(--text-dim)" id="sumNA">0</span>
+    <span class="summary-desc">N/A</span>
+  </div>
+  <div class="summary-stat">
+    <span class="summary-num" style="color:var(--text-muted)" id="sumPending">30</span>
+    <span class="summary-desc">Pending</span>
+  </div>
+  <button class="download-btn" onclick="downloadReport()">↓ Export Report</button>
+</div>
+
+<script>
+const PILLARS = [
+  { id: 'p1', color: 'var(--p1)', num: 'Pillar 01', name: 'Autonomy & Consent' },
+  { id: 'p2', color: 'var(--p2)', num: 'Pillar 02', name: 'Responsibility & Accountability' },
+  { id: 'p3', color: 'var(--p3)', num: 'Pillar 03', name: 'Transparency & Explainability' },
+  { id: 'p4', color: 'var(--p4)', num: 'Pillar 04', name: 'Fairness & Moral Distance' },
+  { id: 'p5', color: 'var(--p5)', num: 'Pillar 05', name: 'Human Dignity & Meaning of Work' },
+  { id: 'p6', color: 'var(--p6)', num: 'Pillar 06', name: 'Human-AI Collaboration & Governance' },
+];
+
+const ITEMS = [
+  // P1
+  { id:'1.1', pillar:'p1', guideline:'Obtain explicit, informed consent from workers before delegating a task to AI.', example:'Survey workers before rollout; document that they understand what will change and that they can raise objections.', phases:['PRE'], roles:['M','O'] },
+  { id:'1.2', pillar:'p1', guideline:'Establish a formal override mechanism that workers can use without career risk.', example:'Add an "override" option in the interface that logs the worker\'s justification without triggering disciplinary review.', phases:['AT'], roles:['O'] },
+  { id:'1.3', pillar:'p1', guideline:'Ensure worker participation in co-designing AI integration into their workflow.', example:'Include frontline workers in at least one design workshop before system deployment.', phases:['PRE'], roles:['M','O'] },
+  { id:'1.4', pillar:'p1', guideline:'Re-evaluate and renew worker consent at each significant system update.', example:'Notify workers and request re-acknowledgment when the AI model is retrained or its scope changes.', phases:['POST'], roles:['M','O'] },
+  { id:'1.5', pillar:'p1', guideline:'Verify that workers retain cognitive agency over the final decision output.', example:'Confirm that the AI output is a recommendation, not an automatic action, and that workers can modify it.', phases:['AT'], roles:['W','M'] },
+  // P2
+  { id:'2.1', pillar:'p2', guideline:'Define and document who is responsible for AI-driven errors before delegation begins.', example:'Create a responsibility matrix specifying liability for the worker, the manager, and the system provider.', phases:['PRE'], roles:['M','O'] },
+  { id:'2.2', pillar:'p2', guideline:'Ensure the AI system generates a traceable log of its outputs and the factors contributing to them.', example:'Require that each AI decision record includes input data, model version, confidence score, and flagged anomalies.', phases:['AT'], roles:['O'] },
+  { id:'2.3', pillar:'p2', guideline:'Verify that applicable regulations governing this task require or permit human oversight of AI decisions.', example:'Check compliance with EU AI Act Art. 14 (Human oversight) and any sector-specific regulation.', phases:['PRE'], roles:['M','O'] },
+  { id:'2.4', pillar:'p2', guideline:'Provide a safe channel for workers to report AI errors without professional repercussions.', example:'Implement an anonymous reporting system; ensure managers cannot link reports to individual workers.', phases:['AT','POST'], roles:['O'] },
+  { id:'2.5', pillar:'p2', guideline:'Establish a formal review process when AI outputs are systematically challenged by workers.', example:'Define a threshold (e.g., >5% override rate) that triggers an automatic audit of AI performance.', phases:['POST'], roles:['M','O'] },
+  // P3
+  { id:'3.1', pillar:'p3', guideline:'Ensure workers can identify the main causal factors behind each AI output.', example:'Display at minimum the top 3 features influencing the AI\'s recommendation in plain language.', phases:['AT'], roles:['O'] },
+  { id:'3.2', pillar:'p3', guideline:'Verify that workers can inspect whether the AI\'s decision criteria are appropriate for this task.', example:'Provide access to model documentation (e.g., model card) and at least one human-readable explanation per output type.', phases:['AT'], roles:['W','M'] },
+  { id:'3.3', pillar:'p3', guideline:'Accompany AI outputs with contextual information, not just statistical probabilities.', example:'Add flags such as "This patient\'s profile differs from training data" alongside confidence scores.', phases:['AT'], roles:['O'] },
+  { id:'3.4', pillar:'p3', guideline:'Confirm that workers understand the practical implications of each possible AI output.', example:'Run at least one training session illustrating what each output category means for downstream actions.', phases:['PRE'], roles:['M'] },
+  { id:'3.5', pillar:'p3', guideline:'Enable workers to anticipate the plausible range of AI outputs for their task domain.', example:'Share distribution summaries of past AI decisions (e.g., "In 80% of cases the system outputs X") before delegation.', phases:['PRE'], roles:['M','O'] },
+  // P4
+  { id:'4.1', pillar:'p4', guideline:'Verify that the AI has been evaluated for performance disparities across demographic groups.', example:'Report false positive/negative rates by age, gender, and ethnicity; require documented fairness metrics.', phases:['PRE'], roles:['O'] },
+  { id:'4.2', pillar:'p4', guideline:'Confirm that training data is representative of the deployment population.', example:'Cross-check dataset demographics against the target population; document gaps and their potential impact.', phases:['PRE'], roles:['O'] },
+  { id:'4.3', pillar:'p4', guideline:'Assess and document the moral distance introduced by AI delegation between the worker and affected parties.', example:'Ask: does the worker still encounter the consequences of the decision, or are they shielded from feedback?', phases:['PRE','AT'], roles:['W','M'] },
+  { id:'4.4', pillar:'p4', guideline:'Ensure that affected third parties can request a human review of AI-influenced decisions.', example:'Establish a formal appeals procedure accessible to patients, clients, or candidates.', phases:['AT','POST'], roles:['O'] },
+  { id:'4.5', pillar:'p4', guideline:'Identify and document historical biases in training data that may affect this task.', example:'Audit training data provenance; record known historical inequities and the mitigation strategies applied.', phases:['PRE'], roles:['O'] },
+  // P5
+  { id:'5.1', pillar:'p5', guideline:'Assess whether delegation preserves the professionally meaningful aspects of the worker\'s role.', example:'Identify which cognitive, relational, or creative components of the task remain with the worker after delegation.', phases:['PRE'], roles:['W','M'] },
+  { id:'5.2', pillar:'p5', guideline:'Evaluate the risk of deskilling: does sustained AI delegation erode skills necessary for worker competence?', example:'Plan periodic manual performance checks (e.g., quarterly case reviews without AI assistance).', phases:['AT','POST'], roles:['M','O'] },
+  { id:'5.3', pillar:'p5', guideline:'Verify that the AI is positioned as an augmentation tool, not a substitute for worker judgment.', example:'Confirm in system documentation and worker communication that final authority rests with the human.', phases:['AT'], roles:['M','O'] },
+  { id:'5.4', pillar:'p5', guideline:'Assess whether delegation reduces cognitive load in a way that frees workers for higher-value tasks.', example:'Evaluate whether time saved by AI is reallocated to relational or complex work — not simply to higher volume.', phases:['POST'], roles:['M'] },
+  { id:'5.5', pillar:'p5', guideline:'Confirm that workers\' professional identity is not systematically threatened by AI integration.', example:'Conduct a structured post-deployment check-in with workers 3 months after rollout to capture role perception changes.', phases:['POST'], roles:['M','O'] },
+  // P6
+  { id:'6.1', pillar:'p6', guideline:'Confirm that the workflow is designed for genuine human-AI collaboration, not passive human ratification.', example:'Verify that the UI requires active input from the worker, not just a default-confirm action.', phases:['AT'], roles:['O'] },
+  { id:'6.2', pillar:'p6', guideline:'Ensure a structural human-in-the-loop mechanism is built into every high-stakes AI decision.', example:'Define which decision types require mandatory human review before AI output takes effect.', phases:['AT'], roles:['M','O'] },
+  { id:'6.3', pillar:'p6', guideline:'Provide workers with sufficient time and resources to exercise real oversight.', example:'Set maximum AI-outputs-per-hour thresholds that allow meaningful review time per case.', phases:['AT'], roles:['M','O'] },
+  { id:'6.4', pillar:'p6', guideline:'Involve workers in the co-design of AI governance structures, not just in post-hoc training.', example:'Establish a standing worker advisory group with input rights over future AI updates.', phases:['PRE','POST'], roles:['O'] },
+  { id:'6.5', pillar:'p6', guideline:'Establish a formal process for withdrawing or suspending AI delegation if governance conditions deteriorate.', example:'Define measurable trigger conditions (e.g., sustained accuracy drop, worker override spike) that pause delegation.', phases:['POST'], roles:['M','O'] },
+];
+
+// State
+const state = {};
+ITEMS.forEach(item => { state[item.id] = { status: null, note: '' }; });
+
+let activePhaseFilter = 'all';
+let activeRoleFilter = 'all';
+
+// Build sidebar nav
+function buildSidebar() {
+  const nav = document.getElementById('pillarNav');
+  PILLARS.forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'pillar-nav-item';
+    el.id = 'nav-' + p.id;
+    el.innerHTML = `
+      <div class="pillar-nav-dot" style="background:${p.color}"></div>
+      <div class="pillar-nav-text">${p.name}</div>
+      <div class="pillar-nav-progress" id="navprog-${p.id}">0/5</div>
+    `;
+    el.onclick = () => {
+      document.getElementById('section-' + p.id).scrollIntoView({ behavior:'smooth' });
+    };
+    nav.appendChild(el);
+  });
+}
+
+// Build cards
+function buildContent() {
+  const content = document.getElementById('mainContent');
+  content.innerHTML = '';
+
+  PILLARS.forEach(pillar => {
+    const items = ITEMS.filter(i => i.pillar === pillar.id);
+    const section = document.createElement('div');
+    section.className = 'pillar-section';
+    section.id = 'section-' + pillar.id;
+
+    section.innerHTML = `
+      <div class="pillar-header">
+        <div class="pillar-color-bar" style="background:${pillar.color}"></div>
+        <div class="pillar-header-text">
+          <div class="pillar-num">${pillar.num}</div>
+          <h2>${pillar.name}</h2>
+        </div>
+        <div class="pillar-progress-mini" id="pprog-${pillar.id}">0 / ${items.length}</div>
+      </div>
+      <div class="cards-grid" id="grid-${pillar.id}"></div>
+    `;
+    content.appendChild(section);
+
+    const grid = section.querySelector('#grid-' + pillar.id);
+    items.forEach(item => {
+      const card = buildCard(item, pillar.color);
+      grid.appendChild(card);
+    });
+  });
+}
+
+function buildCard(item, color) {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.id = 'card-' + item.id;
+  card.dataset.phases = item.phases.join(',');
+  card.dataset.roles = item.roles.join(',');
+
+  const phaseTags = item.phases.map(p => `<span class="meta-tag phase-${p.toLowerCase()}">${p}</span>`).join('');
+  const roleTags = item.roles.map(r => `<span class="meta-tag role-${r.toLowerCase()}">${r === 'W' ? 'Worker' : r === 'M' ? 'Manager' : 'Org'}</span>`).join('');
+
+  card.innerHTML = `
+    <div class="card-front">
+      <div>
+        <div class="card-item-id">Item ${item.id}</div>
+        <div class="card-guideline">${item.guideline}</div>
+        <div class="card-meta">${phaseTags}${roleTags}</div>
+        <button class="expand-toggle" onclick="toggleBack('${item.id}')" id="toggle-${item.id}">
+          <span id="toggleicon-${item.id}">▸</span> Show example & notes
+        </button>
+      </div>
+      <div class="card-actions">
+        <button class="status-btn btn-done" onclick="setStatus('${item.id}','done')">✓ Done</button>
+        <button class="status-btn btn-consider" onclick="setStatus('${item.id}','consider')">⚑ Consider</button>
+        <button class="status-btn btn-na" onclick="setStatus('${item.id}','na')">— N/A</button>
+      </div>
+    </div>
+    <div class="card-back" id="back-${item.id}">
+      <div class="example-label">Example</div>
+      <div class="example-text">${item.example}</div>
+      <div class="example-label">Notes / Implementation</div>
+      <textarea class="notes-area" placeholder="Write how this guideline is addressed in your context…" id="note-${item.id}" oninput="saveNote('${item.id}', this.value)"></textarea>
+    </div>
+  `;
+  return card;
+}
+
+function toggleBack(id) {
+  const back = document.getElementById('back-' + id);
+  const icon = document.getElementById('toggleicon-' + id);
+  const toggle = document.getElementById('toggle-' + id);
+  const isOpen = back.classList.contains('open');
+  back.classList.toggle('open');
+  icon.textContent = isOpen ? '▸' : '▾';
+  toggle.innerHTML = `<span id="toggleicon-${id}">${isOpen ? '▸' : '▾'}</span> ${isOpen ? 'Show example & notes' : 'Hide'}`;
+}
+
+function setStatus(id, status) {
+  const prev = state[id].status;
+  state[id].status = (prev === status) ? null : status;
+  updateCardUI(id);
+  updateStats();
+}
+
+function saveNote(id, val) {
+  state[id].note = val;
+}
+
+function updateCardUI(id) {
+  const card = document.getElementById('card-' + id);
+  const s = state[id].status;
+  card.className = 'card' + (s ? ' status-' + s : '');
+  // recheck visibility
+  applyFilters();
+
+  ['done','consider','na'].forEach(st => {
+    const btn = card.querySelector('.btn-' + st);
+    if (btn) btn.classList.toggle('active', s === st);
+  });
+}
+
+function updateStats() {
+  const counts = { done:0, consider:0, na:0, pending:0 };
+  ITEMS.forEach(item => {
+    const s = state[item.id].status;
+    if (s) counts[s]++;
+    else counts.pending++;
+  });
+  document.getElementById('statDone').textContent = counts.done;
+  document.getElementById('statConsider').textContent = counts.consider;
+  document.getElementById('statNA').textContent = counts.na;
+  document.getElementById('statPending').textContent = counts.pending;
+  document.getElementById('sumDone').textContent = counts.done;
+  document.getElementById('sumConsider').textContent = counts.consider;
+  document.getElementById('sumNA').textContent = counts.na;
+  document.getElementById('sumPending').textContent = counts.pending;
+
+  const total = ITEMS.length;
+  const answered = total - counts.pending;
+  document.getElementById('progressFill').style.width = (answered / total * 100) + '%';
+
+  // Per-pillar progress
+  PILLARS.forEach(p => {
+    const items = ITEMS.filter(i => i.pillar === p.id);
+    const done = items.filter(i => state[i.id].status).length;
+    const el = document.getElementById('pprog-' + p.id);
+    const nav = document.getElementById('navprog-' + p.id);
+    if (el) el.textContent = `${done} / ${items.length}`;
+    if (nav) nav.textContent = `${done}/${items.length}`;
+  });
+}
+
+// Filters
+function applyFilters() {
+  ITEMS.forEach(item => {
+    const card = document.getElementById('card-' + item.id);
+    if (!card) return;
+    const phases = item.phases;
+    const roles = item.roles;
+    const phaseOk = activePhaseFilter === 'all' || phases.includes(activePhaseFilter);
+    const roleOk = activeRoleFilter === 'all' || roles.includes(activeRoleFilter);
+    card.classList.toggle('hidden', !(phaseOk && roleOk));
+  });
+}
+
+document.querySelectorAll('.filter-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const filter = chip.dataset.filter;
+    const value = chip.dataset.value;
+    document.querySelectorAll(`.filter-chip[data-filter="${filter}"]`).forEach(c => c.classList.remove('selected'));
+    chip.classList.add('selected');
+    if (filter === 'phase') activePhaseFilter = value;
+    else activeRoleFilter = value;
+    applyFilters();
+  });
+});
+
+// Export
+function downloadReport() {
+  const lines = [];
+  lines.push('AI DELEGATION CHECKLIST — REPORT');
+  lines.push('Generated: ' + new Date().toLocaleString());
+  lines.push('='.repeat(60));
+
+  PILLARS.forEach(p => {
+    lines.push('');
+    lines.push('── ' + p.num.toUpperCase() + ' · ' + p.name.toUpperCase());
+    const items = ITEMS.filter(i => i.pillar === p.id);
+    items.forEach(item => {
+      const s = state[item.id].status || 'PENDING';
+      const statusLabel = s === 'done' ? '[✓ DONE]' : s === 'consider' ? '[⚑ CONSIDER]' : s === 'na' ? '[— N/A]' : '[  PENDING]';
+      lines.push(`  ${item.id}  ${statusLabel}  ${item.guideline}`);
+      if (state[item.id].note) lines.push(`       Note: ${state[item.id].note}`);
+    });
+  });
+
+  lines.push('');
+  lines.push('='.repeat(60));
+  const counts = { done:0, consider:0, na:0, pending:0 };
+  ITEMS.forEach(item => { const s = state[item.id].status; if (s) counts[s]++; else counts.pending++; });
+  lines.push(`SUMMARY: Done: ${counts.done}  |  To Consider: ${counts.consider}  |  N/A: ${counts.na}  |  Pending: ${counts.pending}`);
+
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url;
+  a.download = 'ai-delegation-checklist-report.txt'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Init
+buildSidebar();
+buildContent();
+updateStats();
+</script>
+</body>
+</html>
