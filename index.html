@@ -4,390 +4,218 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Delegation Checklist</title>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>emailjs.init('D2o-gKXMSKYU2JqdQ');</script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
 
   :root {
-    --bg: #f7f7f5;
-    --surface: #ffffff;
-    --surface2: #f2f2f0;
-    --border: #e0e0dc;
-    --border-strong: #c8c8c2;
-    --text: #1a1a1a;
-    --text-muted: #666;
-    --text-dim: #aaa;
-    --done-bg: #edfaf3;
-    --done-border: #22c55e;
-    --done-text: #16a34a;
-    --consider-bg: #fffbeb;
-    --consider-border: #f59e0b;
-    --consider-text: #b45309;
-    --na-bg: #f5f5f5;
-    --na-border: #aaa;
-    --na-text: #666;
-    --p1: #2563eb; --p2: #7c3aed; --p3: #db2777;
-    --p4: #ea580c; --p5: #0891b2; --p6: #16a34a;
+    --bg:#f7f7f5; --surface:#fff; --surface2:#f2f2f0;
+    --border:#e0e0dc; --border-strong:#c8c8c2;
+    --text:#1a1a1a; --text-muted:#666; --text-dim:#aaa;
+    --done-bg:#edfaf3; --done-border:#22c55e; --done-text:#16a34a;
+    --consider-bg:#fffbeb; --consider-border:#f59e0b; --consider-text:#b45309;
+    --na-bg:#f5f5f5; --na-border:#aaa; --na-text:#666;
+    --p1:#2563eb; --p2:#7c3aed; --p3:#db2777;
+    --p4:#ea580c; --p5:#0891b2; --p6:#16a34a;
   }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'IBM Plex Sans', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
 
   /* HEADER */
-  .header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 28px 44px 0;
-  }
+  .header{background:var(--surface);border-bottom:1px solid var(--border);padding:28px 44px 0;}
+  .header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;padding-bottom:20px;}
+  .header-kicker{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:var(--text-dim);text-transform:uppercase;margin-bottom:6px;}
+  .header h1{font-size:clamp(17px,2.2vw,22px);font-weight:600;letter-spacing:-.02em;line-height:1.2;}
+  .header h1 em{font-style:normal;color:var(--text-muted);font-weight:400;}
+  .stat-pills{display:flex;gap:7px;flex-wrap:wrap;align-items:center;}
+  .stat-pill{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);padding:5px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-muted);}
+  .stat-pill .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+  .stat-pill .count{font-weight:600;color:var(--text);}
 
-  .header-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 20px;
-    flex-wrap: wrap;
-    padding-bottom: 20px;
-  }
-
-  .header-kicker {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.16em;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-
-  .header h1 {
-    font-size: clamp(17px, 2.2vw, 22px);
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    line-height: 1.2;
-  }
-
-  .header h1 em {
-    font-style: normal;
-    color: var(--text-muted);
-    font-weight: 400;
-  }
-
-  .stat-pills { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
-
-  .stat-pill {
-    display: flex; align-items: center; gap: 6px;
-    background: var(--surface2); border: 1px solid var(--border);
-    padding: 5px 11px;
-    font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-muted);
-  }
-  .stat-pill .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-  .stat-pill .count { font-weight: 600; color: var(--text); }
-
-  /* HOW TO USE */
-  .how-to {
-    background: #f0f4ff;
-    border-top: 1px solid #c7d7fe;
-    padding: 14px 0;
-    display: flex;
-    gap: 0;
-    overflow: hidden;
-  }
-
-  .how-to-label {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: #3b5bdb;
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    padding: 0 12px;
-    border-right: 1px solid #c7d7fe;
-    margin-right: 16px;
-    display: flex;
-    align-items: center;
-    white-space: nowrap;
-  }
-
-  .how-to-steps {
-    display: flex; gap: 0; flex: 1; flex-wrap: wrap;
-  }
-
-  .how-to-step {
-    display: flex; align-items: flex-start; gap: 10px;
-    padding: 4px 20px 4px 0;
-    border-right: 1px solid #c7d7fe;
-    margin-right: 20px;
-    flex: 1; min-width: 160px;
-  }
-  .how-to-step:last-child { border-right: none; margin-right: 0; }
-
-  .step-num {
-    width: 22px; height: 22px; border-radius: 50%;
-    background: #3b5bdb; color: #fff;
-    font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; margin-top: 1px;
-  }
-
-  .step-text strong { display: block; font-size: 12px; font-weight: 600; color: #1e3a8a; margin-bottom: 2px; }
-  .step-text span { font-size: 11px; color: #3b5bdb; line-height: 1.4; }
+  /* HOW TO */
+  .how-to{background:#f0f4ff;border-top:1px solid #c7d7fe;padding:14px 0;display:flex;gap:0;overflow:hidden;}
+  .how-to-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:#3b5bdb;writing-mode:vertical-rl;transform:rotate(180deg);padding:0 12px;border-right:1px solid #c7d7fe;margin-right:16px;display:flex;align-items:center;white-space:nowrap;}
+  .how-to-steps{display:flex;gap:0;flex:1;flex-wrap:wrap;}
+  .how-to-step{display:flex;align-items:flex-start;gap:10px;padding:4px 20px 4px 0;border-right:1px solid #c7d7fe;margin-right:20px;flex:1;min-width:160px;}
+  .how-to-step:last-child{border-right:none;margin-right:0;}
+  .step-num{width:22px;height:22px;border-radius:50%;background:#3b5bdb;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+  .step-text strong{display:block;font-size:12px;font-weight:600;color:#1e3a8a;margin-bottom:2px;}
+  .step-text span{font-size:11px;color:#3b5bdb;line-height:1.4;}
 
   /* BUTTON LEGEND */
-  .btn-legend-bar {
-    display: flex; gap: 12px; flex-wrap: wrap;
-    padding: 14px 0;
-    border-top: 1px solid var(--border);
-  }
-
-  .bl-item {
-    display: flex; align-items: flex-start; gap: 10px;
-    flex: 1; min-width: 180px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 10px 14px;
-  }
-
-  .bl-badge {
-    flex-shrink: 0;
-    padding: 3px 10px;
-    border-radius: 2px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px; font-weight: 600;
-    white-space: nowrap;
-    margin-top: 1px;
-  }
-  .bl-done    { background: var(--done-bg);    color: var(--done-text);    border: 1px solid var(--done-border); }
-  .bl-consider{ background: var(--consider-bg); color: var(--consider-text); border: 1px solid var(--consider-border); }
-  .bl-na      { background: var(--na-bg);       color: var(--na-text);       border: 1px solid var(--na-border); }
-
-  .bl-body strong { font-size: 12px; font-weight: 600; display: block; margin-bottom: 2px; }
-  .bl-body span   { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+  .btn-legend-bar{display:flex;gap:12px;flex-wrap:wrap;padding:14px 0;border-top:1px solid var(--border);}
+  .bl-item{display:flex;align-items:flex-start;gap:10px;flex:1;min-width:180px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:10px 14px;}
+  .bl-badge{flex-shrink:0;padding:3px 10px;border-radius:2px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;white-space:nowrap;margin-top:1px;}
+  .bl-done{background:var(--done-bg);color:var(--done-text);border:1px solid var(--done-border);}
+  .bl-consider{background:var(--consider-bg);color:var(--consider-text);border:1px solid var(--consider-border);}
+  .bl-na{background:var(--na-bg);color:var(--na-text);border:1px solid var(--na-border);}
+  .bl-body strong{font-size:12px;font-weight:600;display:block;margin-bottom:2px;}
+  .bl-body span{font-size:11px;color:var(--text-muted);line-height:1.4;}
 
   /* PROGRESS */
-  .progress-wrap { height: 3px; background: var(--border); }
-  .progress-fill { height: 100%; background: #2563eb; transition: width 0.4s ease; }
+  .progress-wrap{height:3px;background:var(--border);}
+  .progress-fill{height:100%;background:#2563eb;transition:width .4s ease;}
 
   /* LAYOUT */
-  .main { display: grid; grid-template-columns: 230px 1fr; min-height: calc(100vh - 280px); }
+  .main{display:grid;grid-template-columns:230px 1fr;min-height:calc(100vh - 280px);}
 
   /* SIDEBAR */
-  .sidebar {
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    padding: 24px 0;
-    position: sticky; top: 0;
-    height: calc(100vh - 280px);
-    overflow-y: auto;
-  }
-
-  .sidebar-section { padding: 0 18px; margin-bottom: 24px; }
-  .sidebar-label {
-    font-family: 'IBM Plex Mono', monospace; font-size: 9px;
-    letter-spacing: 0.18em; color: var(--text-dim);
-    text-transform: uppercase; margin-bottom: 8px; padding-left: 2px;
-  }
-
-  .pillar-nav-item {
-    display: flex; align-items: center; gap: 8px;
-    padding: 7px 8px; cursor: pointer;
-    border-radius: 4px; margin-bottom: 1px;
-    transition: background 0.1s;
-  }
-  .pillar-nav-item:hover { background: var(--surface2); }
-  .pillar-nav-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-  .pillar-nav-text { font-size: 11.5px; color: var(--text-muted); line-height: 1.3; flex: 1; }
-  .pillar-nav-prog { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-dim); }
-
-  .filter-chip {
-    display: flex; align-items: center; gap: 6px;
-    padding: 6px 10px; border: 1px solid var(--border);
-    cursor: pointer; font-size: 11px;
-    font-family: 'IBM Plex Mono', monospace; color: var(--text-muted);
-    transition: all 0.12s; user-select: none;
-    border-radius: 3px; margin-bottom: 5px; background: var(--surface);
-  }
-  .filter-chip:hover { border-color: #2563eb; color: #2563eb; }
-  .filter-chip.selected { border-color: #2563eb; color: #2563eb; background: #eff4ff; }
+  .sidebar{background:var(--surface);border-right:1px solid var(--border);padding:24px 0;position:sticky;top:0;height:calc(100vh - 280px);overflow-y:auto;}
+  .sidebar-section{padding:0 18px;margin-bottom:24px;}
+  .sidebar-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.18em;color:var(--text-dim);text-transform:uppercase;margin-bottom:8px;padding-left:2px;}
+  .pillar-nav-item{display:flex;align-items:center;gap:8px;padding:7px 8px;cursor:pointer;border-radius:4px;margin-bottom:1px;transition:background .1s;}
+  .pillar-nav-item:hover{background:var(--surface2);}
+  .pillar-nav-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+  .pillar-nav-text{font-size:11.5px;color:var(--text-muted);line-height:1.3;flex:1;}
+  .pillar-nav-prog{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-dim);}
+  .filter-chip{display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border);cursor:pointer;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--text-muted);transition:all .12s;user-select:none;border-radius:3px;margin-bottom:5px;background:var(--surface);}
+  .filter-chip:hover{border-color:#2563eb;color:#2563eb;}
+  .filter-chip.selected{border-color:#2563eb;color:#2563eb;background:#eff4ff;}
 
   /* CONTENT */
-  .content { padding: 32px 40px 110px; }
+  .content{padding:32px 40px 120px;}
+  .pillar-section{margin-bottom:48px;scroll-margin-top:24px;}
+  .pillar-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--border);}
+  .pillar-stripe{width:4px;height:34px;border-radius:2px;flex-shrink:0;}
+  .pillar-num{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:var(--text-dim);text-transform:uppercase;margin-bottom:2px;}
+  .pillar-name{font-size:16px;font-weight:600;letter-spacing:-.01em;}
+  .pillar-prog{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-dim);}
 
-  .pillar-section { margin-bottom: 48px; scroll-margin-top: 24px; }
+  /* CARD FLIP */
+  .cards-grid{display:flex;flex-direction:column;gap:8px;}
+  .card-scene{height:112px;perspective:1200px;transition:height .05s;}
+  .card-scene.flipped{height:300px;}
+  .card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,0,.2,1);cursor:pointer;}
+  .card-scene.flipped .card-inner{transform:rotateY(180deg);}
+  .card-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+  .card-face.back{transform:rotateY(180deg);}
+  .card-scene.status-done .card-face{border-left:3px solid var(--done-border);}
+  .card-scene.status-consider .card-face{border-left:3px solid var(--consider-border);}
+  .card-scene.status-na .card-face{border-left:3px solid var(--na-border);}
 
-  .pillar-header {
-    display: flex; align-items: center; gap: 12px;
-    margin-bottom: 16px; padding-bottom: 12px;
-    border-bottom: 2px solid var(--border);
-  }
-  .pillar-stripe { width: 4px; height: 34px; border-radius: 2px; flex-shrink: 0; }
-  .pillar-num { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 2px; }
-  .pillar-name { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
-  .pillar-prog { margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); }
+  .front-content{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start;padding:14px 18px;height:100%;}
+  .card-id{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;}
+  .card-guideline{font-size:13px;font-weight:500;line-height:1.5;color:var(--text);margin-bottom:7px;}
+  .card-meta{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px;}
+  .meta-tag{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.08em;padding:2px 6px;border-radius:2px;text-transform:uppercase;border:1px solid;}
+  .phase-pre{border-color:#93c5fd;color:#1d4ed8;background:#eff6ff;}
+  .phase-at{border-color:#fcd34d;color:#92400e;background:#fffbeb;}
+  .phase-post{border-color:#c4b5fd;color:#6d28d9;background:#f5f3ff;}
+  .role-w{border-color:#6ee7b7;color:#065f46;background:#ecfdf5;}
+  .role-m{border-color:#fca5a5;color:#991b1b;background:#fef2f2;}
+  .role-o{border-color:#a5b4fc;color:#3730a3;background:#eef2ff;}
+  .flip-hint{font-size:10px;color:var(--text-dim);font-style:italic;}
 
-  /* ── CARD FLIP ── */
-  .cards-grid { display: flex; flex-direction: column; gap: 8px; }
+  .card-buttons{display:flex;flex-direction:column;gap:5px;align-items:stretch;min-width:86px;}
+  .status-btn{border:1px solid;padding:5px 7px;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .13s;text-align:center;border-radius:3px;background:transparent;font-weight:500;}
+  .btn-done{border-color:var(--done-border);color:var(--done-text);}
+  .btn-consider{border-color:var(--consider-border);color:var(--consider-text);}
+  .btn-na{border-color:var(--na-border);color:var(--na-text);}
+  .btn-done:hover,.btn-done.active{background:var(--done-bg);border-width:2px;}
+  .btn-consider:hover,.btn-consider.active{background:var(--consider-bg);border-width:2px;}
+  .btn-na:hover,.btn-na.active{background:var(--na-bg);border-width:2px;}
 
-  .card-scene {
-    height: 112px;
-    perspective: 1200px;
-    transition: height 0.05s;
-  }
-  .card-scene.flipped { height: 300px; }
+  .back-content{padding:16px 18px;height:100%;overflow-y:auto;}
+  .back-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .flip-back-btn{background:none;border:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text-muted);cursor:pointer;padding:3px 9px;border-radius:2px;letter-spacing:.1em;text-transform:uppercase;transition:all .12s;}
+  .flip-back-btn:hover{border-color:var(--text);color:var(--text);}
+  .back-guideline{font-size:12.5px;font-weight:500;color:var(--text);margin-bottom:10px;line-height:1.45;}
+  .back-lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:var(--text-dim);text-transform:uppercase;margin-bottom:5px;}
+  .example-box{background:#f0f4ff;border:1px solid #c7d7fe;border-left:3px solid #2563eb;padding:9px 13px;font-size:12px;color:#1e3a8a;line-height:1.55;font-style:italic;margin-bottom:12px;border-radius:0 3px 3px 0;}
+  .notes-area{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:12px;padding:9px 12px;resize:vertical;min-height:52px;border-radius:3px;outline:none;transition:border-color .15s;}
+  .notes-area::placeholder{color:var(--text-dim);font-style:italic;}
+  .notes-area:focus{border-color:#2563eb;}
 
-  .card-inner {
-    position: relative; width: 100%; height: 100%;
-    transform-style: preserve-3d;
-    transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-  }
-  .card-scene.flipped .card-inner { transform: rotateY(180deg); }
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+  .modal-overlay.open{opacity:1;pointer-events:all;}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:32px;width:min(480px,92vw);box-shadow:0 20px 60px rgba(0,0,0,.15);transform:translateY(16px);transition:transform .25s;}
+  .modal-overlay.open .modal{transform:translateY(0);}
+  .modal h2{font-size:17px;font-weight:600;margin-bottom:6px;}
+  .modal p{font-size:13px;color:var(--text-muted);margin-bottom:20px;line-height:1.5;}
+  .modal-field{margin-bottom:14px;}
+  .modal-field label{display:block;font-size:11px;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:5px;}
+  .modal-field input{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:13px;padding:9px 12px;border-radius:3px;outline:none;transition:border-color .15s;}
+  .modal-field input:focus{border-color:#2563eb;}
+  .modal-field input::placeholder{color:var(--text-dim);}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
+  .modal-cancel{background:none;border:1px solid var(--border);color:var(--text-muted);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:8px 16px;border-radius:3px;cursor:pointer;transition:all .12s;}
+  .modal-cancel:hover{border-color:var(--text);color:var(--text);}
+  .modal-send{background:#2563eb;color:#fff;border:none;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:9px 20px;border-radius:3px;cursor:pointer;font-weight:600;transition:all .15s;display:flex;align-items:center;gap:8px;}
+  .modal-send:hover:not(:disabled){background:#1d4ed8;}
+  .modal-send:disabled{opacity:.6;cursor:not-allowed;}
+  .spinner{width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+  .modal-send.loading .spinner{display:block;}
+  @keyframes spin{to{transform:rotate(360deg);}}
 
-  .card-face {
-    position: absolute; width: 100%; height: 100%;
-    backface-visibility: hidden; -webkit-backface-visibility: hidden;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-  .card-face.back { transform: rotateY(180deg); }
-
-  .card-scene.status-done     .card-face { border-left: 3px solid var(--done-border); }
-  .card-scene.status-consider .card-face { border-left: 3px solid var(--consider-border); }
-  .card-scene.status-na       .card-face { border-left: 3px solid var(--na-border); }
-
-  /* FRONT FACE */
-  .front-content {
-    display: grid; grid-template-columns: 1fr auto;
-    gap: 12px; align-items: start;
-    padding: 14px 18px; height: 100%;
-  }
-
-  .card-id {
-    font-family: 'IBM Plex Mono', monospace; font-size: 9px;
-    color: var(--text-dim); letter-spacing: 0.1em;
-    text-transform: uppercase; margin-bottom: 4px;
-  }
-  .card-guideline { font-size: 13px; font-weight: 500; line-height: 1.5; color: var(--text); margin-bottom: 7px; }
-  .card-meta { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 5px; }
-
-  .meta-tag {
-    font-family: 'IBM Plex Mono', monospace; font-size: 9px;
-    letter-spacing: 0.08em; padding: 2px 6px;
-    border-radius: 2px; text-transform: uppercase; border: 1px solid;
-  }
-  .phase-pre  { border-color: #93c5fd; color: #1d4ed8; background: #eff6ff; }
-  .phase-at   { border-color: #fcd34d; color: #92400e; background: #fffbeb; }
-  .phase-post { border-color: #c4b5fd; color: #6d28d9; background: #f5f3ff; }
-  .role-w     { border-color: #6ee7b7; color: #065f46; background: #ecfdf5; }
-  .role-m     { border-color: #fca5a5; color: #991b1b; background: #fef2f2; }
-  .role-o     { border-color: #a5b4fc; color: #3730a3; background: #eef2ff; }
-
-  .flip-hint { font-size: 10px; color: var(--text-dim); font-style: italic; }
-
-  .card-buttons {
-    display: flex; flex-direction: column; gap: 5px;
-    align-items: stretch; min-width: 86px;
-  }
-
-  .status-btn {
-    border: 1px solid; padding: 5px 7px;
-    font-family: 'IBM Plex Mono', monospace; font-size: 9px;
-    letter-spacing: 0.08em; text-transform: uppercase;
-    cursor: pointer; transition: all 0.13s;
-    text-align: center; border-radius: 3px;
-    background: transparent; font-weight: 500;
-  }
-  .btn-done    { border-color: var(--done-border);    color: var(--done-text); }
-  .btn-consider{ border-color: var(--consider-border); color: var(--consider-text); }
-  .btn-na      { border-color: var(--na-border);       color: var(--na-text); }
-  .btn-done:hover,     .btn-done.active     { background: var(--done-bg);    border-width: 2px; }
-  .btn-consider:hover, .btn-consider.active { background: var(--consider-bg); border-width: 2px; }
-  .btn-na:hover,       .btn-na.active       { background: var(--na-bg);      border-width: 2px; }
-
-  /* BACK FACE */
-  .back-content {
-    padding: 16px 18px; height: 100%; overflow-y: auto;
-  }
-  .back-header {
-    display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
-  }
-  .flip-back-btn {
-    background: none; border: 1px solid var(--border);
-    font-family: 'IBM Plex Mono', monospace; font-size: 9px;
-    color: var(--text-muted); cursor: pointer; padding: 3px 9px;
-    border-radius: 2px; letter-spacing: 0.1em; text-transform: uppercase;
-    transition: all 0.12s;
-  }
-  .flip-back-btn:hover { border-color: var(--text); color: var(--text); }
-  .back-guideline { font-size: 12.5px; font-weight: 500; color: var(--text); margin-bottom: 10px; line-height: 1.45; }
-  .back-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 5px; }
-  .example-box {
-    background: #f0f4ff; border: 1px solid #c7d7fe;
-    border-left: 3px solid #2563eb;
-    padding: 9px 13px; font-size: 12px; color: #1e3a8a;
-    line-height: 1.55; font-style: italic; margin-bottom: 12px;
-    border-radius: 0 3px 3px 0;
-  }
-  .notes-area {
-    width: 100%; background: var(--surface2); border: 1px solid var(--border);
-    color: var(--text); font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 12px; padding: 9px 12px; resize: vertical; min-height: 52px;
-    border-radius: 3px; outline: none; transition: border-color 0.15s;
-  }
-  .notes-area::placeholder { color: var(--text-dim); font-style: italic; }
-  .notes-area:focus { border-color: #2563eb; }
+  /* TOAST */
+  .toast{position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-90px);background:var(--surface);border:1px solid var(--done-border);border-left:4px solid var(--done-border);padding:14px 22px;border-radius:6px;box-shadow:0 8px 32px rgba(0,0,0,.12);display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:var(--done-text);z-index:9999;transition:transform .4s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;}
+  .toast.show{transform:translateX(-50%) translateY(0);}
+  .toast.error{border-color:#ef4444;border-left-color:#ef4444;color:#b91c1c;}
+  .toast-sub{font-size:11px;font-weight:400;color:var(--text-muted);}
 
   /* SUMMARY BAR */
-  .summary-bar {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: rgba(255,255,255,0.97);
-    border-top: 1px solid var(--border);
-    backdrop-filter: blur(10px);
-    padding: 11px 44px;
-    display: flex; align-items: center; gap: 24px; z-index: 100; flex-wrap: wrap;
-  }
-  .sum-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.15em; color: var(--text-dim); text-transform: uppercase; }
-  .sum-stat  { display: flex; align-items: baseline; gap: 5px; }
-  .sum-num   { font-family: 'IBM Plex Mono', monospace; font-size: 19px; font-weight: 600; line-height: 1; }
-  .sum-desc  { font-size: 11px; color: var(--text-muted); }
-  .export-btn {
-    margin-left: auto; padding: 8px 18px;
-    background: var(--text); color: #fff; border: none;
-    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-    letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer;
-    font-weight: 600; border-radius: 3px; transition: opacity 0.15s;
-  }
-  .export-btn:hover { opacity: 0.8; }
+  .summary-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.97);border-top:1px solid var(--border);backdrop-filter:blur(10px);padding:11px 44px;display:flex;align-items:center;gap:20px;z-index:100;flex-wrap:wrap;}
+  .sum-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.15em;color:var(--text-dim);text-transform:uppercase;}
+  .sum-stat{display:flex;align-items:baseline;gap:5px;}
+  .sum-num{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;line-height:1;}
+  .sum-desc{font-size:11px;color:var(--text-muted);}
+  .bar-actions{margin-left:auto;display:flex;align-items:center;gap:10px;}
+  .submit-btn{padding:9px 22px;background:#2563eb;color:#fff;border:none;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;font-weight:600;border-radius:3px;transition:all .2s;}
+  .submit-btn:hover{background:#1d4ed8;}
 
-  .card-scene.hidden { display: none; }
+  .card-scene.hidden{display:none;}
+  ::-webkit-scrollbar{width:4px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:2px;}
 
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
-
-  @media (max-width: 760px) {
-    .main { grid-template-columns: 1fr; }
-    .sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
-    .content { padding: 20px 14px 110px; }
-    .header { padding: 20px 14px 0; }
-    .summary-bar { padding: 10px 14px; gap: 12px; }
-    .export-btn { margin-left: 0; }
-    .how-to-label { display: none; }
-    .how-to { padding: 12px 14px; }
-    .btn-legend-bar { flex-direction: column; }
+  @media(max-width:760px){
+    .main{grid-template-columns:1fr;}
+    .sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border);}
+    .content{padding:20px 14px 120px;}
+    .header{padding:20px 14px 0;}
+    .summary-bar{padding:10px 14px;gap:10px;}
+    .bar-actions{margin-left:0;width:100%;}
+    .submit-btn{flex:1;justify-content:center;}
+    .how-to-label{display:none;}
+    .how-to{padding:12px 14px;}
+    .btn-legend-bar{flex-direction:column;}
   }
 </style>
 </head>
 <body>
 
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span id="toastIcon">✓</span>
+  <div><div id="toastMsg">Report inviato!</div><div class="toast-sub" id="toastSub"></div></div>
+</div>
+
+<!-- SUBMIT MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2>Invia il tuo Report</h2>
+    <p>Inserisci il tuo nome e la tua email. Riceverai una copia del report e noi riceveremo la tua compilazione.</p>
+    <div class="modal-field">
+      <label>Nome e Cognome</label>
+      <input type="text" id="modalName" placeholder="es. Mario Rossi">
+    </div>
+    <div class="modal-field">
+      <label>Email</label>
+      <input type="email" id="modalEmail" placeholder="es. mario.rossi@email.com">
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal()">Annulla</button>
+      <button class="modal-send" id="modalSendBtn" onclick="sendReport()">
+        <div class="spinner"></div>
+        <span id="modalSendLabel">↑ Invia il Report</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
 <div class="header">
   <div class="header-top">
     <div>
@@ -401,71 +229,44 @@
       <div class="stat-pill"><div class="dot" style="background:#d1d5db"></div><span>Pending</span><span class="count" id="statPending">30</span></div>
     </div>
   </div>
-
-  <!-- HOW TO USE -->
   <div class="how-to">
     <div class="how-to-label">How to use</div>
     <div class="how-to-steps">
       <div class="how-to-step">
         <div class="step-num">1</div>
-        <div class="step-text">
-          <strong>Read each guideline</strong>
-          <span>Click anywhere on the card — it flips to show a practical example and a notes field.</span>
-        </div>
+        <div class="step-text"><strong>Read each guideline</strong><span>Click anywhere on the card — it flips to show a practical example and a notes field.</span></div>
       </div>
       <div class="how-to-step">
         <div class="step-num">2</div>
-        <div class="step-text">
-          <strong>Mark its status</strong>
-          <span>Use the three buttons on the right to classify the guideline for your context.</span>
-        </div>
+        <div class="step-text"><strong>Mark its status</strong><span>Use the three buttons on the right to classify the guideline for your context.</span></div>
       </div>
       <div class="how-to-step">
         <div class="step-num">3</div>
-        <div class="step-text">
-          <strong>Add implementation notes</strong>
-          <span>On the back of each card, describe how the guideline is addressed.</span>
-        </div>
+        <div class="step-text"><strong>Add implementation notes</strong><span>On the back of each card, describe how the guideline is addressed.</span></div>
       </div>
       <div class="how-to-step">
         <div class="step-num">4</div>
-        <div class="step-text">
-          <strong>Export your report</strong>
-          <span>Click "Export Report" at the bottom to download all statuses and notes.</span>
-        </div>
+        <div class="step-text"><strong>Send your report</strong><span>Click "Invia il Report" — the report will be sent directly to your email.</span></div>
       </div>
     </div>
   </div>
-
-  <!-- BUTTON LEGEND -->
   <div class="btn-legend-bar">
     <div class="bl-item">
       <div class="bl-badge bl-done">✓ Done</div>
-      <div class="bl-body">
-        <strong>This condition is met</strong>
-        <span>The guideline is already addressed in your current workflow or system design. No further action needed at this time.</span>
-      </div>
+      <div class="bl-body"><strong>This condition is met</strong><span>The guideline is already addressed in your current workflow or system design. No further action needed at this time.</span></div>
     </div>
     <div class="bl-item">
       <div class="bl-badge bl-consider">⚑ Consider</div>
-      <div class="bl-body">
-        <strong>Relevant but not yet addressed</strong>
-        <span>The guideline applies to your context but has not been implemented. Flag it for future action or ongoing discussion.</span>
-      </div>
+      <div class="bl-body"><strong>Relevant but not yet addressed</strong><span>The guideline applies to your context but has not been implemented. Flag it for future action or ongoing discussion.</span></div>
     </div>
     <div class="bl-item">
       <div class="bl-badge bl-na">— N/A</div>
-      <div class="bl-body">
-        <strong>Not applicable</strong>
-        <span>The guideline does not apply to this specific task, system, or deployment context. Mark it to keep your checklist clean.</span>
-      </div>
+      <div class="bl-body"><strong>Not applicable</strong><span>The guideline does not apply to this specific task, system, or deployment context. Mark it to keep your checklist clean.</span></div>
     </div>
   </div>
 </div>
 
-<div class="progress-wrap">
-  <div class="progress-fill" id="progressFill" style="width:0%"></div>
-</div>
+<div class="progress-wrap"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
 
 <div class="main">
   <aside class="sidebar">
@@ -492,7 +293,6 @@
       </div>
     </div>
   </aside>
-
   <main class="content" id="mainContent"></main>
 </div>
 
@@ -502,11 +302,13 @@
   <div class="sum-stat"><span class="sum-num" style="color:var(--consider-text)" id="sumConsider">0</span><span class="sum-desc">To consider</span></div>
   <div class="sum-stat"><span class="sum-num" style="color:var(--na-text)" id="sumNA">0</span><span class="sum-desc">N/A</span></div>
   <div class="sum-stat"><span class="sum-num" style="color:#9ca3af" id="sumPending">30</span><span class="sum-desc">Pending</span></div>
-  <button class="export-btn" onclick="downloadReport()">↓ Export Report</button>
+  <div class="bar-actions">
+    <button class="submit-btn" onclick="openModal()">↑ Invia il Report</button>
+  </div>
 </div>
 
 <script>
-const PILLARS = [
+const PILLARS=[
   {id:'p1',color:'var(--p1)',num:'Pillar 01',name:'Autonomy & Consent'},
   {id:'p2',color:'var(--p2)',num:'Pillar 02',name:'Responsibility & Accountability'},
   {id:'p3',color:'var(--p3)',num:'Pillar 03',name:'Transparency & Explainability'},
@@ -514,8 +316,7 @@ const PILLARS = [
   {id:'p5',color:'var(--p5)',num:'Pillar 05',name:'Human Dignity & Meaning of Work'},
   {id:'p6',color:'var(--p6)',num:'Pillar 06',name:'Human-AI Collaboration & Governance'},
 ];
-
-const ITEMS = [
+const ITEMS=[
   {id:'1.1',pillar:'p1',guideline:'Obtain explicit, informed consent from workers before delegating a task to AI.',example:'Survey workers before rollout; document that they understand what will change and that they can raise objections.',phases:['PRE'],roles:['M','O']},
   {id:'1.2',pillar:'p1',guideline:'Establish a formal override mechanism that workers can use without career risk.',example:'Add an "override" option in the interface that logs the worker\'s justification without triggering disciplinary review.',phases:['AT'],roles:['O']},
   {id:'1.3',pillar:'p1',guideline:'Ensure worker participation in co-designing AI integration into their workflow.',example:'Include frontline workers in at least one design workshop before system deployment.',phases:['PRE'],roles:['M','O']},
@@ -548,169 +349,226 @@ const ITEMS = [
   {id:'6.5',pillar:'p6',guideline:'Establish a formal process for withdrawing or suspending AI delegation if governance conditions deteriorate.',example:'Define measurable trigger conditions (e.g., sustained accuracy drop, worker override spike) that pause delegation.',phases:['POST'],roles:['M','O']},
 ];
 
-const state = {};
-ITEMS.forEach(i => { state[i.id] = {status:null, note:'', flipped:false}; });
-let activePhase = 'all', activeRole = 'all';
+const state={};
+ITEMS.forEach(i=>{state[i.id]={status:null,note:'',flipped:false};});
+let activePhase='all',activeRole='all';
 
-function buildSidebar() {
-  const nav = document.getElementById('pillarNav');
-  PILLARS.forEach(p => {
-    const el = document.createElement('div');
-    el.className = 'pillar-nav-item';
-    el.innerHTML = `<div class="pillar-nav-dot" style="background:${p.color}"></div>
-      <div class="pillar-nav-text">${p.name}</div>
-      <div class="pillar-nav-prog" id="navprog-${p.id}">0/5</div>`;
-    el.onclick = () => document.getElementById('section-'+p.id).scrollIntoView({behavior:'smooth'});
+function buildSidebar(){
+  const nav=document.getElementById('pillarNav');
+  PILLARS.forEach(p=>{
+    const el=document.createElement('div');
+    el.className='pillar-nav-item';
+    el.innerHTML=`<div class="pillar-nav-dot" style="background:${p.color}"></div><div class="pillar-nav-text">${p.name}</div><div class="pillar-nav-prog" id="navprog-${p.id}">0/5</div>`;
+    el.onclick=()=>document.getElementById('section-'+p.id).scrollIntoView({behavior:'smooth'});
     nav.appendChild(el);
   });
 }
 
-function buildContent() {
-  const content = document.getElementById('mainContent');
-  PILLARS.forEach(pillar => {
-    const items = ITEMS.filter(i => i.pillar === pillar.id);
-    const sec = document.createElement('div');
-    sec.className = 'pillar-section';
-    sec.id = 'section-' + pillar.id;
-    sec.innerHTML = `
-      <div class="pillar-header">
-        <div class="pillar-stripe" style="background:${pillar.color}"></div>
-        <div>
-          <div class="pillar-num">${pillar.num}</div>
-          <div class="pillar-name">${pillar.name}</div>
-        </div>
-        <div class="pillar-prog" id="pprog-${pillar.id}">0 / ${items.length}</div>
-      </div>
-      <div class="cards-grid" id="grid-${pillar.id}"></div>`;
+function buildContent(){
+  const content=document.getElementById('mainContent');
+  PILLARS.forEach(pillar=>{
+    const items=ITEMS.filter(i=>i.pillar===pillar.id);
+    const sec=document.createElement('div');
+    sec.className='pillar-section';sec.id='section-'+pillar.id;
+    sec.innerHTML=`<div class="pillar-header"><div class="pillar-stripe" style="background:${pillar.color}"></div><div><div class="pillar-num">${pillar.num}</div><div class="pillar-name">${pillar.name}</div></div><div class="pillar-prog" id="pprog-${pillar.id}">0 / ${items.length}</div></div><div class="cards-grid" id="grid-${pillar.id}"></div>`;
     content.appendChild(sec);
-    const grid = sec.querySelector('#grid-'+pillar.id);
-    items.forEach(item => grid.appendChild(buildCard(item)));
+    items.forEach(item=>sec.querySelector('#grid-'+pillar.id).appendChild(buildCard(item)));
   });
 }
 
-function buildCard(item) {
-  const scene = document.createElement('div');
-  scene.className = 'card-scene';
-  scene.id = 'scene-' + item.id;
-  scene.dataset.phases = item.phases.join(',');
-  scene.dataset.roles  = item.roles.join(',');
-
-  const phaseTags = item.phases.map(p => `<span class="meta-tag phase-${p.toLowerCase()}">${p}</span>`).join('');
-  const roleTags  = item.roles.map(r  => `<span class="meta-tag role-${r.toLowerCase()}">${r==='W'?'Worker':r==='M'?'Manager':'Org'}</span>`).join('');
-
-  scene.innerHTML = `
-    <div class="card-inner" id="inner-${item.id}">
-      <div class="card-face front" onclick="flipCard('${item.id}')">
-        <div class="front-content">
-          <div>
-            <div class="card-id">Item ${item.id}</div>
-            <div class="card-guideline">${item.guideline}</div>
-            <div class="card-meta">${phaseTags}${roleTags}</div>
-            <div class="flip-hint">↩ Click card to see example &amp; add notes</div>
-          </div>
-          <div class="card-buttons" onclick="event.stopPropagation()">
-            <button class="status-btn btn-done"     id="bdone-${item.id}"     onclick="setStatus('${item.id}','done')">✓ Done</button>
-            <button class="status-btn btn-consider" id="bconsider-${item.id}" onclick="setStatus('${item.id}','consider')">⚑ Consider</button>
-            <button class="status-btn btn-na"       id="bna-${item.id}"       onclick="setStatus('${item.id}','na')">— N/A</button>
-          </div>
+function buildCard(item){
+  const scene=document.createElement('div');
+  scene.className='card-scene';scene.id='scene-'+item.id;
+  scene.dataset.phases=item.phases.join(',');scene.dataset.roles=item.roles.join(',');
+  const pt=item.phases.map(p=>`<span class="meta-tag phase-${p.toLowerCase()}">${p}</span>`).join('');
+  const rt=item.roles.map(r=>`<span class="meta-tag role-${r.toLowerCase()}">${r==='W'?'Worker':r==='M'?'Manager':'Org'}</span>`).join('');
+  scene.innerHTML=`<div class="card-inner" id="inner-${item.id}">
+    <div class="card-face front" onclick="flipCard('${item.id}')">
+      <div class="front-content">
+        <div><div class="card-id">Item ${item.id}</div><div class="card-guideline">${item.guideline}</div><div class="card-meta">${pt}${rt}</div><div class="flip-hint">↩ Click card to see example &amp; add notes</div></div>
+        <div class="card-buttons" onclick="event.stopPropagation()">
+          <button class="status-btn btn-done" id="bdone-${item.id}" onclick="setStatus('${item.id}','done')">✓ Done</button>
+          <button class="status-btn btn-consider" id="bconsider-${item.id}" onclick="setStatus('${item.id}','consider')">⚑ Consider</button>
+          <button class="status-btn btn-na" id="bna-${item.id}" onclick="setStatus('${item.id}','na')">— N/A</button>
         </div>
       </div>
-      <div class="card-face back">
-        <div class="back-content">
-          <div class="back-header">
-            <div class="card-id">Item ${item.id} — Example &amp; Notes</div>
-            <button class="flip-back-btn" onclick="flipCard('${item.id}')">↩ Back to guideline</button>
-          </div>
-          <div class="back-guideline">${item.guideline}</div>
-          <div class="back-lbl">Practical example</div>
-          <div class="example-box">${item.example}</div>
-          <div class="back-lbl">Your notes / implementation</div>
-          <textarea class="notes-area" id="note-${item.id}" placeholder="Write how this guideline is addressed in your context…" oninput="state['${item.id}'].note=this.value"></textarea>
-        </div>
+    </div>
+    <div class="card-face back">
+      <div class="back-content">
+        <div class="back-header"><div class="card-id">Item ${item.id} — Example &amp; Notes</div><button class="flip-back-btn" onclick="flipCard('${item.id}')">↩ Back</button></div>
+        <div class="back-guideline">${item.guideline}</div>
+        <div class="back-lbl">Practical example</div>
+        <div class="example-box">${item.example}</div>
+        <div class="back-lbl">Your notes / implementation</div>
+        <textarea class="notes-area" id="note-${item.id}" placeholder="Write how this guideline is addressed in your context…" oninput="state['${item.id}'].note=this.value"></textarea>
       </div>
-    </div>`;
+    </div>
+  </div>`;
   return scene;
 }
 
-function flipCard(id) {
-  const scene = document.getElementById('scene-'+id);
-  state[id].flipped = !state[id].flipped;
-  scene.classList.toggle('flipped', state[id].flipped);
-  scene.style.height = state[id].flipped ? '300px' : '112px';
+function flipCard(id){
+  state[id].flipped=!state[id].flipped;
+  const scene=document.getElementById('scene-'+id);
+  scene.classList.toggle('flipped',state[id].flipped);
+  scene.style.height=state[id].flipped?'300px':'112px';
 }
 
-function setStatus(id, status) {
-  state[id].status = (state[id].status === status) ? null : status;
-  const scene = document.getElementById('scene-'+id);
-  scene.className = scene.className.replace(/\bstatus-\S+/g,'').trim();
-  if (state[id].status) scene.classList.add('status-'+state[id].status);
+function setStatus(id,status){
+  state[id].status=(state[id].status===status)?null:status;
+  const scene=document.getElementById('scene-'+id);
+  scene.className=scene.className.replace(/\bstatus-\S+/g,'').trim();
+  if(state[id].status) scene.classList.add('status-'+state[id].status);
   applyFilters();
-  ['done','consider','na'].forEach(st => {
-    const b = document.getElementById('b'+st+'-'+id);
-    if (b) b.classList.toggle('active', state[id].status === st);
+  ['done','consider','na'].forEach(st=>{
+    const b=document.getElementById('b'+st+'-'+id);
+    if(b) b.classList.toggle('active',state[id].status===st);
   });
   updateStats();
 }
 
-function updateStats() {
-  const c = {done:0,consider:0,na:0,pending:0};
-  ITEMS.forEach(i => { const s=state[i.id].status; s?c[s]++:c.pending++; });
-  ['Done','Consider','NA','Pending'].forEach(k => {
-    const lk = k.toLowerCase() === 'na' ? 'na' : k.toLowerCase() === 'pending' ? 'pending' : k.toLowerCase() === 'done' ? 'done' : 'consider';
-    document.getElementById('stat'+k).textContent = c[lk];
-    document.getElementById('sum'+k).textContent  = c[lk];
+function updateStats(){
+  const c={done:0,consider:0,na:0,pending:0};
+  ITEMS.forEach(i=>{const s=state[i.id].status;s?c[s]++:c.pending++;});
+  ['Done','Consider','NA','Pending'].forEach(k=>{
+    const lk=k==='NA'?'na':k.toLowerCase();
+    document.getElementById('stat'+k).textContent=c[lk];
+    document.getElementById('sum'+k).textContent=c[lk];
   });
-  document.getElementById('progressFill').style.width = ((ITEMS.length - c.pending) / ITEMS.length * 100) + '%';
-  PILLARS.forEach(p => {
-    const items = ITEMS.filter(i => i.pillar === p.id);
-    const done  = items.filter(i => state[i.id].status).length;
-    const pp = document.getElementById('pprog-'+p.id);
-    const np = document.getElementById('navprog-'+p.id);
-    if (pp) pp.textContent = done+' / '+items.length;
-    if (np) np.textContent = done+'/'+items.length;
-  });
-}
-
-function applyFilters() {
-  ITEMS.forEach(item => {
-    const scene = document.getElementById('scene-'+item.id);
-    if (!scene) return;
-    const phOk = activePhase==='all' || item.phases.includes(activePhase);
-    const roOk = activeRole ==='all' || item.roles.includes(activeRole);
-    scene.classList.toggle('hidden', !(phOk && roOk));
+  document.getElementById('progressFill').style.width=((ITEMS.length-c.pending)/ITEMS.length*100)+'%';
+  PILLARS.forEach(p=>{
+    const items=ITEMS.filter(i=>i.pillar===p.id);
+    const done=items.filter(i=>state[i.id].status).length;
+    const pp=document.getElementById('pprog-'+p.id);
+    const np=document.getElementById('navprog-'+p.id);
+    if(pp) pp.textContent=done+' / '+items.length;
+    if(np) np.textContent=done+'/'+items.length;
   });
 }
 
-document.querySelectorAll('.filter-chip').forEach(chip => {
-  chip.addEventListener('click', () => {
-    const f=chip.dataset.filter, v=chip.dataset.value;
+function applyFilters(){
+  ITEMS.forEach(item=>{
+    const scene=document.getElementById('scene-'+item.id);if(!scene)return;
+    const phOk=activePhase==='all'||item.phases.includes(activePhase);
+    const roOk=activeRole==='all'||item.roles.includes(activeRole);
+    scene.classList.toggle('hidden',!(phOk&&roOk));
+  });
+}
+
+document.querySelectorAll('.filter-chip').forEach(chip=>{
+  chip.addEventListener('click',()=>{
+    const f=chip.dataset.filter,v=chip.dataset.value;
     document.querySelectorAll(`.filter-chip[data-filter="${f}"]`).forEach(c=>c.classList.remove('selected'));
     chip.classList.add('selected');
-    if (f==='phase') activePhase=v; else activeRole=v;
+    if(f==='phase') activePhase=v; else activeRole=v;
     applyFilters();
   });
 });
 
-function downloadReport() {
-  const lines = ['AI DELEGATION CHECKLIST — EXPORT REPORT','Generated: '+new Date().toLocaleString(),'='.repeat(64)];
-  PILLARS.forEach(p => {
-    lines.push('','── '+p.num.toUpperCase()+' · '+p.name.toUpperCase());
-    ITEMS.filter(i=>i.pillar===p.id).forEach(item=>{
-      const s=state[item.id].status||'PENDING';
-      const lbl=s==='done'?'[✓ DONE    ]':s==='consider'?'[⚑ CONSIDER]':s==='na'?'[— N/A     ]':'[  PENDING ]';
-      lines.push('  '+item.id+'  '+lbl+'  '+item.guideline);
-      if (state[item.id].note) lines.push('           Note: '+state[item.id].note);
-    });
-  });
+// MODAL
+function openModal(){
+  document.getElementById('modalOverlay').classList.add('open');
+  document.getElementById('modalName').focus();
+}
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+document.getElementById('modalOverlay').addEventListener('click',function(e){
+  if(e.target===this) closeModal();
+});
+
+// GENERATE TEXT REPORT
+function generateReport(name){
+  const now=new Date();
+  const dateStr=now.toLocaleString('it-IT',{dateStyle:'long',timeStyle:'short'});
   const c={done:0,consider:0,na:0,pending:0};
   ITEMS.forEach(i=>{const s=state[i.id].status;s?c[s]++:c.pending++;});
-  lines.push('','='.repeat(64),`SUMMARY  Done: ${c.done}  |  To Consider: ${c.consider}  |  N/A: ${c.na}  |  Pending: ${c.pending}`);
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/plain'}));
-  a.download='ai-delegation-checklist-report.txt'; a.click();
+  const pct=Math.round((ITEMS.length-c.pending)/ITEMS.length*100);
+
+  let txt=`AI DELEGATION CHECKLIST — REPORT\n`;
+  txt+=`Compilato da: ${name}\n`;
+  txt+=`Data: ${dateStr}\n`;
+  txt+=`Contesto: Healthcare / Radiology — Politecnico di Torino 2026\n`;
+  txt+=`Completamento: ${pct}% (${ITEMS.length-c.pending}/${ITEMS.length} item)\n`;
+  txt+=`${'─'.repeat(56)}\n\n`;
+  txt+=`RIEPILOGO\n`;
+  txt+=`  ✅ Done:       ${c.done}\n`;
+  txt+=`  ⚑  Consider:  ${c.consider}\n`;
+  txt+=`  —  N/A:        ${c.na}\n`;
+  txt+=`  ⬜ Pending:    ${c.pending}\n\n`;
+  txt+=`${'─'.repeat(56)}\n\n`;
+
+  PILLARS.forEach(p=>{
+    txt+=`${p.num.toUpperCase()} — ${p.name.toUpperCase()}\n\n`;
+    ITEMS.filter(i=>i.pillar===p.id).forEach(item=>{
+      const s=state[item.id].status;
+      const lbl=s==='done'?'[✅ DONE    ]':s==='consider'?'[⚑  CONSIDER]':s==='na'?'[—  N/A    ]':'[⬜ PENDING ]';
+      txt+=`  ${item.id}  ${lbl}  ${item.guideline}\n`;
+      if(state[item.id].note&&state[item.id].note.trim())
+        txt+=`          Note: ${state[item.id].note.trim()}\n`;
+      txt+='\n';
+    });
+    txt+=`${'─'.repeat(56)}\n\n`;
+  });
+  return txt;
 }
 
-buildSidebar(); buildContent(); updateStats();
+// SEND VIA EMAILJS
+async function sendReport(){
+  const name=document.getElementById('modalName').value.trim();
+  const email=document.getElementById('modalEmail').value.trim();
+  if(!name||!email){
+    showToast('error','Inserisci nome e email per continuare.','');
+    return;
+  }
+  const emailRe=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if(!emailRe.test(email)){
+    showToast('error','Email non valida.','');
+    return;
+  }
+
+  const btn=document.getElementById('modalSendBtn');
+  btn.disabled=true;
+  btn.classList.add('loading');
+  document.getElementById('modalSendLabel').textContent='Invio in corso…';
+
+  const reportText=generateReport(name);
+
+  try{
+    await emailjs.send('service_yguijtb','template_8u6pe5j',{
+      from_name: name,
+      name: name,
+      email: email,
+      report_content: reportText,
+      tempo: new Date().toLocaleString('it-IT',{dateStyle:'long',timeStyle:'short'}),
+    });
+
+    closeModal();
+    showToast('success','✓ Report inviato!',`Inviato a s325651@studenti.polito.it`);
+
+    // Update button permanently
+    document.querySelector('.submit-btn').textContent='✓ Report inviato!';
+    document.querySelector('.submit-btn').style.background='#16a34a';
+    document.querySelector('.submit-btn').disabled=true;
+
+  }catch(err){
+    showToast('error','Errore nell\'invio. Riprova.','');
+    btn.disabled=false;
+    btn.classList.remove('loading');
+    document.getElementById('modalSendLabel').textContent='↑ Invia il Report';
+  }
+}
+
+function showToast(type,msg,sub){
+  const toast=document.getElementById('toast');
+  toast.className='toast'+(type==='error'?' error':'');
+  document.getElementById('toastMsg').textContent=msg;
+  document.getElementById('toastSub').textContent=sub||'';
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),4500);
+}
+
+buildSidebar();buildContent();updateStats();
 </script>
 </body>
 </html>
