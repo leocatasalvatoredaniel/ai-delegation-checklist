@@ -12,7 +12,7 @@
   :root {
     --bg:#f7f7f5; --surface:#fff; --surface2:#f2f2f0;
     --border:#e0e0dc; --border-strong:#c8c8c2;
-    --text:#1a1a1a; --text-muted:#666; --text-dim:#aaa;
+    --text:#1a1a1a; --text-muted:#57534e; --text-dim:#78716c;
     --done-bg:#edfaf3; --done-border:#22c55e; --done-text:#16a34a;
     --consider-bg:#fffbeb; --consider-border:#f59e0b; --consider-text:#b45309;
     --na-bg:#f5f5f5; --na-border:#aaa; --na-text:#666;
@@ -84,12 +84,12 @@
 
   /* CARD FLIP */
   .cards-grid{display:flex;flex-direction:column;gap:8px;}
-  .card-scene{height:112px;transition:height .3s ease;overflow:hidden;}
-  .card-scene.flipped{height:300px;}
-  .card-inner{position:relative;width:100%;height:100%;cursor:pointer;}
-  .card-face{position:absolute;top:0;left:0;width:100%;height:100%;background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:opacity .25s ease, transform .25s ease;}
-  .card-face.front{opacity:1;transform:translateY(0);pointer-events:all;}
-  .card-face.back{opacity:0;transform:translateY(6px);pointer-events:none;}
+  .card-scene{min-height:112px;transition:min-height .3s ease;}
+  .card-scene.flipped{min-height:300px;}
+  .card-inner{position:relative;width:100%;cursor:pointer;}
+  .card-face{position:relative;width:100%;background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:opacity .25s ease, transform .25s ease;}
+  .card-face.front{opacity:1;transform:translateY(0);pointer-events:all;display:block;}
+  .card-face.back{opacity:0;transform:translateY(6px);pointer-events:none;position:absolute;top:0;left:0;height:100%;}
   .card-scene.flipped .card-face.front{opacity:0;transform:translateY(-6px);pointer-events:none;}
   .card-scene.flipped .card-face.back{opacity:1;transform:translateY(0);pointer-events:all;}
   .card-scene.status-done .card-face{border-left:3px solid var(--done-border);}
@@ -409,7 +409,6 @@ function flipCard(id){
   state[id].flipped=!state[id].flipped;
   const scene=document.getElementById('scene-'+id);
   scene.classList.toggle('flipped',state[id].flipped);
-  scene.style.height=state[id].flipped?'300px':'112px';
 }
 
 function setStatus(id,status){
