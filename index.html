@@ -394,7 +394,7 @@ function buildCard(item){
     </div>
     <div class="card-face back" onclick="flipCard('${item.id}')">
       <div class="back-content">
-        <div class="back-header"><div class="card-id">Item ${item.id} — Example &amp; Notes</div>
+        <div class="back-header"><div class="card-id">Item ${item.id} — Example &amp; Notes</div>  <button class="flip-back-btn" onclick="event.stopPropagation(); flipCard('${item.id}')">↩ Back</button>
         <div class="back-guideline">${item.guideline}</div>
         <div class="back-lbl">Practical example</div>
         <div class="example-box">${item.example}</div>
