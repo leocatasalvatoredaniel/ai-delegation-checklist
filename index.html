@@ -119,9 +119,7 @@
   .btn-na:hover,.btn-na.active{background:var(--na-bg);border-width:2px;}
 
   .back-content{padding:16px 18px;height:100%;overflow-y:auto;}
-  .back-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-  .flip-back-btn{background:none;border:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text-muted);cursor:pointer;padding:3px 9px;border-radius:2px;letter-spacing:.1em;text-transform:uppercase;transition:all .12s;}
-  .flip-back-btn:hover{border-color:var(--text);color:var(--text);}
+  .back-header{display:flex;align-items:center;margin-bottom:10px;}
   .back-guideline{font-size:12.5px;font-weight:500;color:var(--text);margin-bottom:10px;line-height:1.45;}
   .back-lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:var(--text-dim);text-transform:uppercase;margin-bottom:5px;}
   .example-box{background:#f0f4ff;border:1px solid #c7d7fe;border-left:3px solid #2563eb;padding:9px 13px;font-size:12px;color:#1e3a8a;line-height:1.55;font-style:italic;margin-bottom:12px;border-radius:0 3px 3px 0;}
@@ -394,7 +392,7 @@ function buildCard(item){
     </div>
     <div class="card-face back" onclick="flipCard('${item.id}')">
       <div class="back-content">
-        <div class="back-header"><div class="card-id">Item ${item.id} — Example &amp; Notes</div><button class="flip-back-btn" onclick="flipCard('${item.id}')">↩ Back</button></div>
+        <div class="back-header"><div class="card-id">Item ${item.id} — Example &amp; Notes &nbsp;·&nbsp; <span style="font-style:italic;color:var(--text-dim)">click to go back</span></div></div>
         <div class="back-guideline">${item.guideline}</div>
         <div class="back-lbl">Practical example</div>
         <div class="example-box">${item.example}</div>
