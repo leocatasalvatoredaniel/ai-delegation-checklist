@@ -10,8 +10,8 @@
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
 
   :root {
-    --bg:#f7f7f5; --surface:#fff; --surface2:#f2f2f0;
-    --border:#e0e0dc; --border-strong:#c8c8c2;
+    --bg:#e8e4df; --surface:#faf9f7; --surface2:#f0ede9;
+    --border:#d4cfc9; --border-strong:#b8b2ab;
     --text:#1a1a1a; --text-muted:#57534e; --text-dim:#78716c;
     --done-bg:#edfaf3; --done-border:#22c55e; --done-text:#16a34a;
     --consider-bg:#fffbeb; --consider-border:#f59e0b; --consider-text:#b45309;
@@ -86,12 +86,12 @@
   .cards-grid{display:flex;flex-direction:column;gap:8px;}
   .card-scene{}
   
-  .card-inner{width:100%;cursor:pointer;}
-  .card-face{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
-  .card-face.front{display:block;}
-  .card-face.back{display:none;}
-  .card-scene.flipped .card-face.front{display:none;}
-  .card-scene.flipped .card-face.back{display:block;}
+  .card-inner{position:relative;width:100%;cursor:pointer;}
+  .card-face{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:opacity .2s ease;}
+  .card-face.front{display:block;opacity:1;}
+  .card-face.back{display:block;opacity:0;position:absolute;top:0;left:0;width:100%;pointer-events:none;visibility:hidden;transition:opacity .2s ease;}
+  .card-scene.flipped .card-face.front{opacity:0;pointer-events:none;}
+  .card-scene.flipped .card-face.back{opacity:1;pointer-events:all;visibility:visible;position:relative;}
   .card-scene.status-done .card-face.front,.card-scene.status-done .card-face.back{border-left:3px solid var(--done-border);}
   .card-scene.status-consider .card-face.front,.card-scene.status-consider .card-face.back{border-left:3px solid var(--consider-border);}
   .card-scene.status-na .card-face.front,.card-scene.status-na .card-face.back{border-left:3px solid var(--na-border);}
@@ -408,7 +408,28 @@ function buildCard(item){
 function flipCard(id){
   state[id].flipped=!state[id].flipped;
   const scene=document.getElementById('scene-'+id);
-  scene.classList.toggle('flipped',state[id].flipped);
+  const front=scene.querySelector('.front');
+  const back=scene.querySelector('.back');
+  if(state[id].flipped){
+    // measure back height before showing
+    back.style.visibility='visible';
+    back.style.position='absolute';
+    back.style.opacity='0';
+    scene.classList.add('flipped');
+    // force reflow then fade
+    requestAnimationFrame(()=>{
+      back.style.opacity='1';
+      front.style.opacity='0';
+    });
+  } else {
+    scene.classList.remove('flipped');
+    front.style.opacity='1';
+    back.style.opacity='0';
+    setTimeout(()=>{
+      back.style.visibility='hidden';
+      back.style.position='absolute';
+    },200);
+  }
 }
 
 function setStatus(id,status){
