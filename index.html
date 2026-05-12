@@ -87,7 +87,7 @@
   .card-scene{}
   
   .card-inner{width:100%;cursor:pointer;}
-  .card-face{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:opacity .2s ease;}
+  .card-face{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
   .card-face.front{display:block;opacity:1;}
   .card-face.back{display:none;opacity:0;transition:opacity .2s ease;}
   .card-scene.flipped .card-face.front{display:none;}
@@ -408,23 +408,15 @@ function buildCard(item){
 function flipCard(id){
   state[id].flipped=!state[id].flipped;
   const scene=document.getElementById('scene-'+id);
-  const front=scene.querySelector('.front');
-  const back=scene.querySelector('.back');
-  if(state[id].flipped){
-    front.style.opacity='0';
-    setTimeout(()=>{
-      scene.classList.add('flipped');
-      back.style.opacity='0';
-      requestAnimationFrame(()=>{ back.style.opacity='1'; });
-    },150);
-  } else {
-    back.style.opacity='0';
-    setTimeout(()=>{
-      scene.classList.remove('flipped');
-      front.style.opacity='0';
-      requestAnimationFrame(()=>{ front.style.opacity='1'; });
-    },150);
-  }
+  const inner=scene.querySelector('.card-inner');
+  inner.style.transition='opacity .18s ease';
+  inner.style.opacity='0';
+  setTimeout(()=>{
+    scene.classList.toggle('flipped',state[id].flipped);
+    requestAnimationFrame(()=>{
+      inner.style.opacity='1';
+    });
+  },180);
 }
 
 function setStatus(id,status){
