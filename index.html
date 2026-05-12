@@ -86,12 +86,12 @@
   .cards-grid{display:flex;flex-direction:column;gap:8px;}
   .card-scene{}
   
-  .card-inner{width:100%;cursor:pointer;}
-  .card-face{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
-  .card-face.front{display:block;opacity:1;}
-  .card-face.back{display:none;opacity:0;transition:opacity .2s ease;}
-  .card-scene.flipped .card-face.front{display:none;}
-  .card-scene.flipped .card-face.back{display:block;opacity:1;}
+  .card-inner{position:relative;width:100%;cursor:pointer;overflow:hidden;transition:height .3s ease;}
+  .card-face{position:absolute;top:0;left:0;width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:opacity .25s ease;}
+  .card-face.front{opacity:1;pointer-events:all;}
+  .card-face.back{opacity:0;pointer-events:none;}
+  .card-scene.flipped .card-face.front{opacity:0;pointer-events:none;}
+  .card-scene.flipped .card-face.back{opacity:1;pointer-events:all;}
   .card-scene.status-done .card-face.front,.card-scene.status-done .card-face.back{border-left:3px solid var(--done-border);}
   .card-scene.status-consider .card-face.front,.card-scene.status-consider .card-face.back{border-left:3px solid var(--consider-border);}
   .card-scene.status-na .card-face.front,.card-scene.status-na .card-face.back{border-left:3px solid var(--na-border);}
@@ -409,14 +409,55 @@ function flipCard(id){
   state[id].flipped=!state[id].flipped;
   const scene=document.getElementById('scene-'+id);
   const inner=scene.querySelector('.card-inner');
-  inner.style.transition='opacity .18s ease';
-  inner.style.opacity='0';
-  setTimeout(()=>{
-    scene.classList.toggle('flipped',state[id].flipped);
-    requestAnimationFrame(()=>{
-      inner.style.opacity='1';
-    });
-  },180);
+  const front=scene.querySelector('.front');
+  const back=scene.querySelector('.back');
+
+  // Temporarily make both visible to measure heights
+  front.style.position='absolute';
+  back.style.position='absolute';
+  back.style.opacity='0';
+  back.style.pointerEvents='none';
+  front.style.opacity='1';
+
+  // Measure heights
+  const frontH=front.scrollHeight;
+  // Show back off-screen to measure
+  back.style.visibility='hidden';
+  back.style.opacity='0';
+  scene.classList.add('measuring');
+  back.style.display='block';
+  const backH=back.scrollHeight;
+  back.style.display='';
+  back.style.visibility='';
+  scene.classList.remove('measuring');
+
+  const fromH=state[id].flipped ? frontH : backH;
+  const toH=state[id].flipped ? backH : frontH;
+
+  // Set explicit starting height
+  inner.style.height=fromH+'px';
+
+  // Force reflow
+  inner.offsetHeight;
+
+  // Animate to target height
+  inner.style.height=toH+'px';
+
+  // Crossfade faces
+  if(state[id].flipped){
+    front.style.opacity='0';
+    front.style.pointerEvents='none';
+    back.style.opacity='1';
+    back.style.pointerEvents='all';
+  } else {
+    back.style.opacity='0';
+    back.style.pointerEvents='none';
+    front.style.opacity='1';
+    front.style.pointerEvents='all';
+  }
+
+  // After transition, remove explicit height so card is responsive again
+  setTimeout(()=>{ inner.style.height=''; },320);
 }
 
 function setStatus(id,status){
