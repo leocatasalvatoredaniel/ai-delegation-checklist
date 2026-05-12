@@ -58,10 +58,10 @@
   .progress-fill{height:100%;background:#2563eb;transition:width .4s ease;}
 
   /* LAYOUT */
-  .main{display:block;min-height:calc(100vh - 280px);margin-left:260px;}
+  .main{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 280px);align-items:start;}
 
   /* SIDEBAR */
-  .sidebar{background:var(--surface);border-right:1px solid var(--border);padding:24px 0;position:fixed;top:0;left:0;width:260px;height:100vh;overflow-y:auto;z-index:50;transition:top .1s;}
+  .sidebar{background:var(--surface);border-right:1px solid var(--border);padding:24px 0;position:sticky;top:0;height:100vh;overflow-y:auto;}
   .sidebar-section{padding:0 16px 0 18px;margin-bottom:24px;}
   .sidebar-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.18em;color:var(--text-dim);text-transform:uppercase;margin-bottom:8px;padding-left:2px;}
   .pillar-nav-item{display:flex;align-items:center;gap:8px;padding:7px 8px;cursor:pointer;border-radius:4px;margin-bottom:1px;transition:background .1s;overflow:hidden;}
@@ -172,8 +172,8 @@
   ::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:2px;}
 
   @media(max-width:760px){
-    .main{margin-left:0;}
-    .sidebar{position:static;height:auto;width:100%;border-right:none;border-bottom:1px solid var(--border);}
+    .main{grid-template-columns:1fr;}
+    .sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border);}
     .content{padding:20px 14px 120px;}
     .header{padding:20px 14px 0;}
     .summary-bar{padding:10px 14px;gap:10px;}
@@ -568,19 +568,6 @@ function showToast(type,msg,sub){
 
 buildSidebar();buildContent();updateStats();
 
-function positionSidebar(){
-  const header = document.querySelector('.header');
-  const progress = document.querySelector('.progress-wrap');
-  if(!header) return;
-  const offset = header.getBoundingClientRect().height + (progress ? progress.getBoundingClientRect().height : 3);
-  const sidebar = document.querySelector('.sidebar');
-  const main = document.querySelector('.main');
-  sidebar.style.top = offset + 'px';
-  sidebar.style.height = 'calc(100vh - ' + offset + 'px)';
-  main.style.marginLeft = '260px';
-}
-positionSidebar();
-window.addEventListener('resize', positionSidebar);
 </script>
 </body>
 </html>
