@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alessandro & Lucia — 25° Anniversario</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>emailjs.init('D2o-gKXMSKYU2JqdQ');</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --ivory:#F9F8F6; --ivory2:#F2EDE5; --ivory3:#EDE7DC;
+  --gold:#C4954A; --gold2:#E8D5A3; --gold3:#9A7028;
+  --silver:#A8A8B8;
+  --text:#2C2A26; --text-m:#6B6258; --text-l:#9A9288;
+  --border:#E2DDD5;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--ivory);color:var(--text);font-family:'Cormorant Garamond',serif;overflow:hidden;}
+body.open{overflow-y:auto;}
+
+/* ── BOKEH ── */
+#bokeh{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.bk{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(196,149,74,.45),transparent 70%);animation:floatBk linear infinite;}
+@keyframes floatBk{0%,100%{transform:translateY(0);}50%{transform:translateY(-16px);}}
+
+/* ── ENVELOPE SCREEN ── */
+#env-screen{
+  position:fixed;inset:0;z-index:100;
+  background:radial-gradient(ellipse at 50% 55%,#F7F2E9,#EAE4D8);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
+  overflow:hidden;
+  transition:opacity 700ms ease-out,transform 700ms ease-out;
+}
+#env-screen::before{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(196,149,74,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(196,149,74,.05) 1px,transparent 1px);
+  background-size:36px 36px;
+}
+#env-screen.opening{opacity:0;transform:scale(1.05);pointer-events:none;}
+
+/* Floral corners on envelope screen */
+.floral-tl,.floral-br{position:absolute;opacity:.18;pointer-events:none;}
+.floral-tl{top:0;left:0;transform:none;}
+.floral-br{bottom:0;right:0;transform:rotate(180deg);}
+
+/* ── ENVELOPE ── */
+.env-wrap{
+  position:relative;
+  width:min(290px,80vw);
+  height:calc(min(290px,80vw) * .64);
+  cursor:pointer;
+  filter:drop-shadow(0 18px 48px rgba(0,0,0,.16)) drop-shadow(0 4px 10px rgba(0,0,0,.09));
+  transition:transform 200ms ease-out;
+  margin-bottom:0;
+}
+.env-wrap:hover{transform:translateY(-5px);}
+.env-wrap:active{transform:scale(0.97);}
+
+.env-body{position:absolute;inset:0;background:#F3EDE0;border-radius:2px;overflow:hidden;}
+
+.env-fl,.env-fr,.env-fb,.env-ft{position:absolute;inset:0;}
+.env-ft{background:linear-gradient(175deg,#F8F3E8,#ECE6D6);clip-path:polygon(0 0,100% 0,50% 63%);z-index:2;}
+.env-fb{background:linear-gradient(0deg,#E5DFD0,#EDE8D8);clip-path:polygon(0 100%,50% 37%,100% 100%);z-index:1;}
+.env-fl{background:linear-gradient(90deg,rgba(0,0,0,.055) 0%,transparent 60%);clip-path:polygon(0 0,47% 50%,0 100%);z-index:1;}
+.env-fr{background:linear-gradient(270deg,rgba(0,0,0,.055) 0%,transparent 60%);clip-path:polygon(100% 0,53% 50%,100% 100%);z-index:1;}
+
+/* Wax seal */
+.wax{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:66px;height:66px;z-index:3;
+}
+.wax-c{
+  width:100%;height:100%;border-radius:50%;
+  background:conic-gradient(from 45deg,#A8A6B6,#D4D0CA,#989AA8,#E0DCD4,#B0AEC0,#A8A6B6);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(0,0,0,.22),inset 0 1px 3px rgba(255,255,255,.22);
+  position:relative;
+}
+.wax-c::before{content:'';position:absolute;inset:5px;border-radius:50%;border:1px solid rgba(255,255,255,.28);}
+.wax-i{
+  font-family:'Cinzel',serif;font-size:14px;font-weight:600;
+  color:#F8F6F2;letter-spacing:.1em;
+  text-shadow:0 1px 3px rgba(0,0,0,.4);position:relative;
+}
+
+/* Open hint */
+.open-hint{
+  font-family:'Montserrat',sans-serif;font-size:9px;
+  letter-spacing:.28em;color:var(--text-m);text-transform:uppercase;
+  text-align:center;margin-top:32px;
+  animation:hintPulse 2.6s ease-in-out infinite;position:relative;z-index:1;
+}
+@keyframes hintPulse{0%,100%{opacity:.5;}50%{opacity:1;}}
+
+.env-pretitle{
+  font-family:'Cinzel',serif;font-size:10px;letter-spacing:.22em;
+  color:var(--text-l);text-transform:uppercase;text-align:center;
+  margin-bottom:36px;position:relative;z-index:1;
+}
+
+/* ── INVITATION ── */
+#invitation{position:relative;z-index:1;}
+
+/* ── SHARED ── */
+.section-kicker{
+  display:block;font-family:'Montserrat',sans-serif;font-size:8.5px;
+  letter-spacing:.26em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;
+  text-align:center;
+}
+.sec-title{
+  font-family:'Cinzel',serif;font-size:clamp(18px,5vw,22px);font-weight:500;
+  letter-spacing:.05em;color:var(--text);text-align:center;
+}
+.divider{
+  width:44px;height:1px;margin:18px auto;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+
+/* Scroll animations */
+.fade-up{opacity:0;transform:translateY(26px);transition:opacity .75s ease-out,transform .75s ease-out;}
+.fade-up.vis{opacity:1;transform:translateY(0);}
+.fade-up.d1{transition-delay:.1s;}
+.fade-up.d2{transition-delay:.2s;}
+.fade-up.d3{transition-delay:.3s;}
+.fade-up.d4{transition-delay:.4s;}
+
+/* ── HERO ── */
+.hero{
+  min-height:100svh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  padding:80px 28px 64px;
+  background:linear-gradient(180deg,var(--ivory2) 0%,var(--ivory) 100%);
+}
+.hero-photo{
+  width:min(172px,56vw);height:min(172px,56vw);
+  border-radius:50%;border:2px solid var(--gold2);
+  box-shadow:0 0 0 8px rgba(196,149,74,.08),0 8px 32px rgba(0,0,0,.08);
+  background:var(--ivory3);display:flex;align-items:center;justify-content:center;
+  margin-bottom:32px;overflow:hidden;
+}
+.hero-photo img{width:100%;height:100%;object-fit:cover;}
+.hero-photo-ph{font-size:52px;opacity:.25;}
+.hero-pretitle{
+  font-family:'Montserrat',sans-serif;font-size:8.5px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--text-m);line-height:1.8;
+  margin-bottom:18px;max-width:260px;
+}
+.hero-names{
+  font-family:'Cinzel',serif;
+  font-size:clamp(34px,11vw,52px);
+  font-weight:400;letter-spacing:.03em;color:var(--gold3);line-height:1.15;
+  margin-bottom:22px;
+}
+.hero-amp{color:var(--gold);font-weight:300;}
+.hero-date{
+  font-family:'Montserrat',sans-serif;font-size:10px;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--text-m);
+}
+
+/* ── COUNTDOWN ── */
+.countdown{background:var(--ivory);text-align:center;padding:64px 20px;}
+.cd-title{font-family:'Cormorant Garamond',serif;font-size:clamp(20px,5vw,26px);font-style:italic;font-weight:300;color:var(--text-m);}
+.cd-sub{font-family:'Montserrat',sans-serif;font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-top:4px;margin-bottom:32px;display:block;}
+.cd-grid{display:flex;align-items:flex-start;justify-content:center;gap:4px;}
+.cd-unit{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:60px;}
+.cd-num{font-family:'Cinzel',serif;font-size:clamp(30px,9vw,46px);font-weight:400;color:var(--gold3);line-height:1;}
+.cd-label{font-family:'Montserrat',sans-serif;font-size:7.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-l);}
+.cd-sep{font-family:'Cinzel',serif;font-size:clamp(24px,7vw,36px);color:var(--gold2);line-height:1;padding-top:2px;align-self:flex-start;}
+.scroll-cue{margin-top:36px;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.scroll-cue-text{font-family:'Montserrat',sans-serif;font-size:7.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-l);}
+.scroll-mouse{width:20px;height:30px;border:1.5px solid var(--gold2);border-radius:10px;display:flex;justify-content:center;padding-top:5px;}
+.scroll-wheel{width:3px;height:5px;background:var(--gold);border-radius:2px;animation:wheel 1.9s ease-in-out infinite;}
+@keyframes wheel{0%{opacity:1;transform:translateY(0);}75%{opacity:0;transform:translateY(8px);}100%{opacity:0;}}
+
+/* ── MESSAGE ── */
+.message{background:var(--ivory2);padding:72px 32px;text-align:center;}
+.msg-heart{width:48px;height:48px;margin:0 auto 22px;color:var(--gold);}
+.msg-text{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(17px,4.5vw,21px);font-style:italic;font-weight:300;
+  line-height:1.9;color:var(--text-m);max-width:360px;margin:0 auto 20px;
+}
+.msg-sign{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.08em;color:var(--gold3);margin-bottom:28px;}
+.btn-cal{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:11px 22px;border:1px solid var(--gold);background:transparent;
+  color:var(--gold3);font-family:'Montserrat',sans-serif;font-size:8.5px;
+  letter-spacing:.18em;text-transform:uppercase;border-radius:100px;
+  cursor:pointer;
+  transition:background 180ms ease-out,color 180ms ease-out,transform 120ms ease-out;
+}
+.btn-cal:hover{background:var(--gold);color:#fff;}
+.btn-cal:active{transform:scale(0.97);}
+
+/* ── PROGRAM ── */
+.program{background:var(--ivory);padding:64px 28px;}
+.timeline{display:flex;flex-direction:column;margin-top:36px;position:relative;}
+.timeline::before{
+  content:'';position:absolute;left:27px;top:20px;bottom:20px;
+  width:1px;background:linear-gradient(to bottom,transparent,var(--gold2) 20%,var(--gold2) 80%,transparent);
+}
+.tl-item{display:flex;align-items:flex-start;gap:18px;padding:14px 0;}
+.tl-icon{
+  width:54px;height:54px;border-radius:50%;
+  border:1.5px solid var(--gold2);background:var(--ivory);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;color:var(--gold);position:relative;z-index:1;
+}
+.tl-content{padding-top:5px;}
+.tl-time{font-family:'Montserrat',sans-serif;font-size:8.5px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin-bottom:2px;}
+.tl-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:var(--text);line-height:1.2;}
+.tl-desc{font-family:'Montserrat',sans-serif;font-size:10px;color:var(--text-l);margin-top:2px;}
+
+/* ── LOCATION ── */
+.location{background:var(--ivory2);padding:64px 24px;}
+.loc-card{background:var(--ivory);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:28px;}
+.loc-head{padding:18px 18px 14px;border-bottom:1px solid var(--border);}
+.loc-type{font-family:'Montserrat',sans-serif;font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:3px;}
+.loc-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;color:var(--text);line-height:1.3;}
+.loc-time{font-family:'Montserrat',sans-serif;font-size:9.5px;color:var(--text-l);margin-top:1px;}
+.loc-map{width:100%;height:176px;border:none;display:block;}
+.loc-foot{padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.loc-addr{font-family:'Montserrat',sans-serif;font-size:9.5px;color:var(--text-m);line-height:1.55;flex:1;}
+.btn-maps{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:9px 15px;background:var(--gold);color:#fff;
+  font-family:'Montserrat',sans-serif;font-size:8.5px;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;border-radius:8px;
+  text-decoration:none;white-space:nowrap;border:none;cursor:pointer;
+  transition:background 150ms ease-out,transform 120ms ease-out;
+}
+.btn-maps:hover{background:var(--gold3);}
+.btn-maps:active{transform:scale(0.97);}
+
+/* ── RSVP ── */
+.rsvp{background:var(--ivory);padding:64px 24px;}
+.rsvp-deadline{
+  font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;
+  color:var(--text-m);text-align:center;margin:-4px 0 32px;
+}
+.rsvp-form{display:flex;flex-direction:column;gap:16px;max-width:460px;margin:0 auto;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.f-label{font-family:'Montserrat',sans-serif;font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-m);}
+.f-input,.f-select,.f-textarea{
+  background:var(--ivory2);border:1px solid var(--border);color:var(--text);
+  font-family:'Cormorant Garamond',serif;font-size:16px;
+  padding:11px 14px;border-radius:10px;outline:none;width:100%;
+  -webkit-appearance:none;appearance:none;
+  transition:border-color 150ms ease-out;
+}
+.f-input:focus,.f-select:focus,.f-textarea:focus{border-color:var(--gold);}
+.f-input::placeholder,.f-textarea::placeholder{color:var(--text-l);font-style:italic;}
+.f-textarea{resize:vertical;min-height:80px;}
+.f-select{
+  background-image:url("data:image/svg+xml,%3Csvg width='11' height='7' viewBox='0 0 11 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%239A9288' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;
+  padding-right:34px;cursor:pointer;
+}
+/* Radios */
+.radio-group{display:flex;flex-direction:column;gap:10px;}
+.r-label{display:flex;align-items:center;gap:10px;cursor:pointer;font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--text-m);}
+.r-label input[type=radio]{display:none;}
+.r-dot{
+  width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  transition:border-color 150ms ease-out;
+}
+.r-label input:checked~.r-dot{border-color:var(--gold);}
+.r-label input:checked~.r-dot::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--gold);}
+/* Checkboxes */
+.check-group{display:flex;flex-direction:column;gap:9px;}
+.c-label{display:flex;align-items:center;gap:10px;cursor:pointer;font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--text-m);}
+.c-label input[type=checkbox]{display:none;}
+.c-box{
+  width:18px;height:18px;border-radius:4px;border:1.5px solid var(--border);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  transition:border-color 150ms ease-out,background 150ms ease-out;
+}
+.c-label input:checked~.c-box{border-color:var(--gold);background:var(--gold);}
+.c-label input:checked~.c-box::after{content:'✓';font-size:10px;font-weight:700;color:#fff;font-family:'Montserrat',sans-serif;}
+
+.btn-submit{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:14px;background:var(--gold3);color:#fff;border:none;
+  font-family:'Montserrat',sans-serif;font-size:8.5px;font-weight:600;
+  letter-spacing:.2em;text-transform:uppercase;border-radius:12px;cursor:pointer;
+  margin-top:6px;
+  transition:background 150ms ease-out,transform 120ms ease-out;
+}
+.btn-submit:hover:not(:disabled){background:var(--gold);}
+.btn-submit:active:not(:disabled){transform:scale(0.97);}
+.btn-submit:disabled{opacity:.55;cursor:not-allowed;}
+
+/* ── FOOTER ── */
+footer{background:var(--ivory2);border-top:1px solid var(--border);padding:48px 24px 32px;text-align:center;}
+.ft-names{font-family:'Cinzel',serif;font-size:20px;font-weight:400;letter-spacing:.05em;color:var(--gold3);margin-bottom:6px;}
+.ft-date{font-family:'Montserrat',sans-serif;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-l);margin-bottom:30px;}
+.btn-sposi{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 16px;border:1px solid var(--border);background:transparent;
+  color:var(--text-l);font-family:'Montserrat',sans-serif;font-size:8px;
+  letter-spacing:.14em;text-transform:uppercase;border-radius:6px;cursor:pointer;
+  margin-bottom:22px;
+  transition:border-color 120ms ease-out,color 120ms ease-out,transform 120ms ease-out;
+}
+.btn-sposi:hover{border-color:var(--gold2);color:var(--text-m);}
+.btn-sposi:active{transform:scale(0.97);}
+.ft-credits{font-family:'Montserrat',sans-serif;font-size:8px;letter-spacing:.08em;color:var(--text-l);opacity:.5;}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:#2C2A26;color:#fff;padding:13px 22px;border-radius:12px;
+  font-family:'Montserrat',sans-serif;font-size:11px;letter-spacing:.04em;
+  z-index:999;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.18);
+  transition:transform 200ms ease-out;
+}
+#toast.show{transform:translateX(-50%) translateY(0);transition:transform 420ms cubic-bezier(.34,1.56,.64,1);}
+
+/* ── MODAL ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity 200ms ease;
+}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal-box{
+  background:var(--ivory);border-radius:16px;padding:28px;
+  width:min(320px,90vw);
+  transform:translateY(12px);transition:transform 250ms ease-out;
+}
+.modal-overlay.open .modal-box{transform:translateY(0);}
+.modal-title{font-family:'Cinzel',serif;font-size:17px;color:var(--text);margin-bottom:6px;}
+.modal-sub{font-family:'Montserrat',sans-serif;font-size:11px;color:var(--text-m);margin-bottom:18px;}
+.modal-actions{display:flex;gap:10px;margin-top:16px;justify-content:flex-end;}
+.btn-cancel{
+  padding:9px 18px;border:1px solid var(--border);background:transparent;
+  color:var(--text-m);font-family:'Montserrat',sans-serif;font-size:8.5px;
+  letter-spacing:.12em;text-transform:uppercase;border-radius:8px;cursor:pointer;
+  transition:border-color 120ms ease-out,color 120ms ease-out,transform 120ms ease-out;
+}
+.btn-cancel:hover{border-color:var(--text);color:var(--text);}
+.btn-cancel:active{transform:scale(0.97);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:380px){
+  .form-row{grid-template-columns:1fr;}
+  .cd-grid{gap:2px;}
+  .cd-unit{min-width:50px;}
+}
+</style>
+</head>
+<body>
+
+<!-- BOKEH -->
+<div id="bokeh"></div>
+
+<!-- ENVELOPE SCREEN -->
+<div id="env-screen">
+  <!-- Floral SVG corners -->
+  <svg class="floral-tl" width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M10 150 Q30 80 80 40 Q120 15 150 10" stroke="#C4954A" stroke-width="1" fill="none"/>
+    <path d="M10 150 Q20 100 60 60" stroke="#C4954A" stroke-width=".7" fill="none"/>
+    <circle cx="80" cy="40" r="3" fill="#C4954A"/><circle cx="120" cy="18" r="2" fill="#C4954A"/>
+    <circle cx="48" cy="72" r="2.5" fill="#C4954A"/><circle cx="30" cy="110" r="2" fill="#C4954A"/>
+    <path d="M80 40 Q90 30 100 32" stroke="#C4954A" stroke-width=".7" fill="none"/>
+    <path d="M48 72 Q55 60 65 62" stroke="#C4954A" stroke-width=".6" fill="none"/>
+  </svg>
+  <svg class="floral-br" width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M10 150 Q30 80 80 40 Q120 15 150 10" stroke="#C4954A" stroke-width="1" fill="none"/>
+    <circle cx="80" cy="40" r="3" fill="#C4954A"/><circle cx="120" cy="18" r="2" fill="#C4954A"/>
+    <circle cx="48" cy="72" r="2.5" fill="#C4954A"/>
+  </svg>
+
+  <p class="env-pretitle">25° Anniversario di Matrimonio</p>
+
+  <div class="env-wrap" onclick="openEnvelope()">
+    <div class="env-body">
+      <div class="env-ft"></div>
+      <div class="env-fb"></div>
+      <div class="env-fl"></div>
+      <div class="env-fr"></div>
+      <div class="wax">
+        <div class="wax-c"><span class="wax-i">A&amp;L</span></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="open-hint">Tocca per aprire &nbsp;♥</p>
+</div>
+
+<!-- INVITATION -->
+<div id="invitation">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="fade-up" style="display:flex;flex-direction:column;align-items:center;width:100%">
+      <div class="hero-photo">
+        <!-- Sostituisci con: <img src="foto.jpg" alt="Alessandro e Lucia"> -->
+        <span class="hero-photo-ph">♡</span>
+      </div>
+      <p class="hero-pretitle">Siete invitati al<br>25° anniversario di matrimonio di</p>
+      <h1 class="hero-names">Alessandro<br><span class="hero-amp">&amp;</span><br>Lucia</h1>
+      <div class="divider"></div>
+      <p class="hero-date">21 luglio 2026 &nbsp;·&nbsp; Biancavilla, Sicilia</p>
+    </div>
+  </section>
+
+  <!-- COUNTDOWN -->
+  <section class="countdown">
+    <p class="cd-title fade-up">Il Grande Giorno</p>
+    <span class="cd-sub fade-up">Mancano solo...</span>
+    <div class="cd-grid fade-up">
+      <div class="cd-unit"><span class="cd-num" id="cdG">00</span><span class="cd-label">Giorni</span></div>
+      <span class="cd-sep">:</span>
+      <div class="cd-unit"><span class="cd-num" id="cdH">00</span><span class="cd-label">Ore</span></div>
+      <span class="cd-sep">:</span>
+      <div class="cd-unit"><span class="cd-num" id="cdM">00</span><span class="cd-label">Min</span></div>
+      <span class="cd-sep">:</span>
+      <div class="cd-unit"><span class="cd-num" id="cdS">00</span><span class="cd-label">Sec</span></div>
+    </div>
+    <div class="scroll-cue fade-up">
+      <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
+      <span class="scroll-cue-text">Scorri per scoprire</span>
+    </div>
+  </section>
+
+  <!-- MESSAGE -->
+  <section class="message">
+    <div class="fade-up" style="display:flex;flex-direction:column;align-items:center">
+      <svg class="msg-heart" viewBox="0 0 24 24" fill="rgba(196,149,74,.12)" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+      <p class="msg-text">"Siamo felici e onorati che possiate essere partecipi del nostro grande giorno. La vostra presenza renderà questo momento ancora più speciale e indimenticabile."</p>
+      <p class="msg-sign">Con amore, Alessandro &amp; Lucia</p>
+      <div class="divider"></div>
+      <button class="btn-cal" onclick="downloadICS()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Aggiungi al calendario
+      </button>
+    </div>
+  </section>
+
+  <!-- PROGRAM -->
+  <section class="program">
+    <span class="section-kicker">La Giornata</span>
+    <h2 class="sec-title fade-up">Programma</h2>
+    <div class="divider fade-up"></div>
+    <div class="timeline">
+      <div class="tl-item fade-up">
+        <div class="tl-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 2L3 7v9a9 9 0 0018 0V7L12 2z"/><path d="M12 12v4M10 16h4"/></svg>
+        </div>
+        <div class="tl-content">
+          <p class="tl-time">18:00</p>
+          <p class="tl-name">Cerimonia</p>
+          <p class="tl-desc">Chiesa del Sacratissimo Cuore di Gesù</p>
+        </div>
+      </div>
+      <div class="tl-item fade-up d1">
+        <div class="tl-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 2v7a4 4 0 008 0V2M7 2v20M17 2a5 5 0 015 5v1h-5V2z"/><path d="M17 8v14"/></svg>
+        </div>
+        <div class="tl-content">
+          <p class="tl-time">20:30</p>
+          <p class="tl-name">Cena</p>
+          <p class="tl-desc">Banchetti nel Giardino della Bellezza</p>
+        </div>
+      </div>
+      <div class="tl-item fade-up d2">
+        <div class="tl-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        </div>
+        <div class="tl-content">
+          <p class="tl-time">A seguire</p>
+          <p class="tl-name">Musica &amp; Balli</p>
+          <p class="tl-desc">Una serata da ricordare</p>
+        </div>
+      </div>
+      <div class="tl-item fade-up d3">
+        <div class="tl-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"/></svg>
+        </div>
+        <div class="tl-content">
+          <p class="tl-time">Tutta la notte</p>
+          <p class="tl-name">Allegria &amp; Divertimento</p>
+          <p class="tl-desc">Con chi amiamo</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOCATION -->
+  <section class="location">
+    <span class="section-kicker">Dove Trovarci</span>
+    <h2 class="sec-title fade-up">Location</h2>
+    <div class="divider fade-up"></div>
+
+    <div class="loc-card fade-up">
+      <div class="loc-head">
+        <p class="loc-type">Cerimonia · Ore 18:00</p>
+        <p class="loc-name">Chiesa del Sacratissimo<br>Cuore di Gesù</p>
+      </div>
+      <iframe class="loc-map" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"
+        src="https://maps.google.com/maps?q=Via+Sacro+Cuore,+95033+Biancavilla,+CT,+Italy&output=embed&z=16">
+      </iframe>
+      <div class="loc-foot">
+        <p class="loc-addr">Via Sacro Cuore<br>95033 Biancavilla (CT)</p>
+        <a class="btn-maps" href="https://maps.google.com/?q=Via+Sacro+Cuore,+95033+Biancavilla,+CT" target="_blank" rel="noopener">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Apri Maps
+        </a>
+      </div>
+    </div>
+
+    <div class="loc-card fade-up d1">
+      <div class="loc-head">
+        <p class="loc-type">Ricevimento · Ore 20:30</p>
+        <p class="loc-name">Banchetti nel Giardino<br>della Bellezza</p>
+      </div>
+      <iframe class="loc-map" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"
+        src="https://maps.google.com/maps?q=Contrada+Don+Assenzio,+95033+Biancavilla,+CT,+Italy&output=embed&z=15">
+      </iframe>
+      <div class="loc-foot">
+        <p class="loc-addr">Contrada Don Assenzio<br>95033 Biancavilla (CT)</p>
+        <a class="btn-maps" href="https://maps.google.com/?q=Contrada+Don+Assenzio,+95033+Biancavilla,+CT" target="_blank" rel="noopener">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Apri Maps
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- RSVP -->
+  <section class="rsvp">
+    <span class="section-kicker">Conferma di Presenza</span>
+    <h2 class="sec-title fade-up">RSVP</h2>
+    <p class="rsvp-deadline fade-up">Vi preghiamo di confermare entro il <strong>2 luglio</strong></p>
+
+    <form class="rsvp-form fade-up" id="rsvpForm" onsubmit="submitRSVP(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="f-label">Nome *</label>
+          <input class="f-input" type="text" name="nome" placeholder="Alessandro" required>
+        </div>
+        <div class="form-group">
+          <label class="f-label">Cognome *</label>
+          <input class="f-input" type="text" name="cognome" placeholder="Rossi" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="f-label">Parteciperai? *</label>
+        <div class="radio-group">
+          <label class="r-label">
+            <input type="radio" name="partecipa" value="si" required>
+            <span class="r-dot"></span>
+            Sì, con gioia!
+          </label>
+          <label class="r-label">
+            <input type="radio" name="partecipa" value="no">
+            <span class="r-dot"></span>
+            No, purtroppo non posso
+          </label>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="f-label">Adulti *</label>
+          <select class="f-select" name="adulti">
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5+">5+</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="f-label">Bambini</label>
+          <select class="f-select" name="bambini">
+            <option value="0" selected>0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4+">4+</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="f-label">Esigenze alimentari</label>
+        <div class="check-group">
+          <label class="c-label"><input type="checkbox" name="dieta" value="Senza Glutine"><span class="c-box"></span>Senza Glutine</label>
+          <label class="c-label"><input type="checkbox" name="dieta" value="Senza Lattosio"><span class="c-box"></span>Senza Lattosio</label>
+          <label class="c-label"><input type="checkbox" name="dieta" value="Vegetariano"><span class="c-box"></span>Vegetariano</label>
+          <label class="c-label"><input type="checkbox" name="dieta" value="Vegano"><span class="c-box"></span>Vegano</label>
+          <label class="c-label"><input type="checkbox" name="dieta" value="Senza Frutta Secca"><span class="c-box"></span>Senza Frutta Secca</label>
+          <label class="c-label"><input type="checkbox" name="dieta" value="In dolce attesa"><span class="c-box"></span>In dolce attesa</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="f-label">La tua email (per ricevere conferma)</label>
+        <input class="f-input" type="email" name="email" placeholder="mario.rossi@email.com">
+      </div>
+
+      <div class="form-group">
+        <label class="f-label">Un messaggio per gli sposi</label>
+        <textarea class="f-textarea" name="messaggio" placeholder="Scrivi un pensiero speciale…"></textarea>
+      </div>
+
+      <button class="btn-submit" type="submit" id="submitBtn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
+        <span id="submitLabel">Invia la conferma</span>
+      </button>
+    </form>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p class="ft-names">Alessandro &amp; Lucia</p>
+    <p class="ft-date">21 luglio 2026 · Biancavilla, Sicilia</p>
+    <br>
+    <button class="btn-sposi" onclick="document.getElementById('sposiModal').classList.add('open')">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      Area Sposi
+    </button>
+    <br>
+    <span class="ft-credits">Con amore · Biancavilla 2026</span>
+  </footer>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- AREA SPOSI MODAL -->
+<div class="modal-overlay" id="sposiModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-box">
+    <h3 class="modal-title">Area Sposi</h3>
+    <p class="modal-sub">Accesso riservato agli organizzatori</p>
+    <div class="form-group">
+      <label class="f-label">Password</label>
+      <input class="f-input" type="password" id="sposiPwd" placeholder="••••••">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="document.getElementById('sposiModal').classList.remove('open')">Annulla</button>
+      <button class="btn-submit" style="width:auto;padding:9px 20px" onclick="checkSposi()">Accedi</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── BOKEH ──
+(function(){
+  const c = document.getElementById('bokeh');
+  for(let i=0;i<22;i++){
+    const d = document.createElement('div');
+    d.className = 'bk';
+    const s = Math.random()*14+5;
+    d.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;top:${Math.random()*100}%;opacity:${(Math.random()*.2+.04).toFixed(2)};animation-delay:${(Math.random()*6).toFixed(1)}s;animation-duration:${(Math.random()*4+5).toFixed(1)}s`;
+    c.appendChild(d);
+  }
+})();
+
+// ── ENVELOPE OPEN ──
+function openEnvelope(){
+  const s = document.getElementById('env-screen');
+  s.classList.add('opening');
+  setTimeout(()=>{
+    s.style.display = 'none';
+    document.body.classList.add('open');
+    initScrollAnimations();
+  }, 680);
+}
+
+// ── COUNTDOWN ──
+(function tick(){
+  const target = new Date('2026-07-21T16:00:00Z'); // 18:00 CEST
+  function update(){
+    const diff = target - Date.now();
+    if(diff <= 0){
+      ['cdG','cdH','cdM','cdS'].forEach(id=>document.getElementById(id).textContent='00');
+      return;
+    }
+    const s = Math.floor(diff/1000);
+    document.getElementById('cdG').textContent = String(Math.floor(s/86400)).padStart(2,'0');
+    document.getElementById('cdH').textContent = String(Math.floor((s%86400)/3600)).padStart(2,'0');
+    document.getElementById('cdM').textContent = String(Math.floor((s%3600)/60)).padStart(2,'0');
+    document.getElementById('cdS').textContent = String(s%60).padStart(2,'0');
+  }
+  update();
+  setInterval(update, 1000);
+})();
+
+// ── SCROLL ANIMATIONS ──
+function initScrollAnimations(){
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('vis'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
+}
+
+// ── ICS DOWNLOAD ──
+function downloadICS(){
+  const ics = [
+    'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//A&L//25Anniversario//IT',
+    'BEGIN:VEVENT',
+    'UID:al-25anniv-20260721@al25.it',
+    'DTSTAMP:20260622T000000Z',
+    'DTSTART:20260721T160000Z',
+    'DTEND:20260722T000000Z',
+    'SUMMARY:25° Anniversario di Matrimonio - Alessandro & Lucia',
+    'DESCRIPTION:Cerimonia ore 18:00 - Chiesa del Sacratissimo Cuore di Gesù\\nRicevimento ore 20:30 - Banchetti nel Giardino della Bellezza',
+    'LOCATION:Biancavilla\\, Sicilia',
+    'END:VEVENT','END:VCALENDAR'
+  ].join('\r\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics);
+  a.download = 'anniversario-al-lucia.ics';
+  a.click();
+  showToast('Evento aggiunto al calendario');
+}
+
+// ── RSVP SUBMIT ──
+// Template EmailJS richiesto — crea un template su emailjs.com con questi campi:
+//   {{nome}}, {{cognome}}, {{partecipa}}, {{adulti}}, {{bambini}},
+//   {{dieta}}, {{messaggio}}, {{email_ospite}}, {{data_invio}}
+// Imposta "To email" a: leocatasalvatoredaniel@gmail.com
+// Sostituisci TEMPLATE_RSVP_ID con l'ID del template creato.
+const EMAILJS_SERVICE  = 'service_yguijtb';
+const EMAILJS_TEMPLATE = 'template_ud4dvgj';
+
+async function submitRSVP(e){
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  const lbl = document.getElementById('submitLabel');
+  const fd  = new FormData(e.target);
+  const dieta = [...document.querySelectorAll('[name=dieta]:checked')].map(x=>x.value).join(', ');
+
+  btn.disabled = true;
+  lbl.textContent = 'Invio in corso…';
+
+  const partecipa = fd.get('partecipa');
+  const data = {
+    nome:        fd.get('nome'),
+    cognome:     fd.get('cognome'),
+    partecipa:   partecipa === 'si' ? 'Sì, con gioia!' : 'No, purtroppo non posso',
+    adulti:      partecipa === 'si' ? fd.get('adulti') : '—',
+    bambini:     partecipa === 'si' ? fd.get('bambini') : '—',
+    dieta:       dieta || 'Nessuna',
+    messaggio:   fd.get('messaggio') || '',
+    email_ospite: fd.get('email') || '(non fornita)',
+    data_invio:  new Date().toLocaleString('it-IT', {dateStyle:'long', timeStyle:'short'}),
+  };
+
+  try {
+    await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, data);
+    e.target.reset();
+    lbl.textContent = 'Conferma inviata!';
+    setTimeout(()=>{ lbl.textContent = 'Invia la conferma'; btn.disabled = false; }, 5000);
+    showToast(partecipa === 'si' ? 'Presenza confermata — a presto!' : 'Risposta ricevuta, grazie!');
+  } catch(err) {
+    console.error('EmailJS error:', err);
+    showToast('Errore nell\'invio. Riprova.');
+    btn.disabled = false;
+    lbl.textContent = 'Invia la conferma';
+  }
+}
+
+// ── AREA SPOSI ──
+function checkSposi(){
+  const pwd = document.getElementById('sposiPwd').value;
+  if(pwd === 'AL2026'){
+    document.getElementById('sposiModal').classList.remove('open');
+    showToast('Benvenuti, sposi!');
+    // qui puoi mostrare il pannello con le RSVP ricevute
+  } else {
+    document.getElementById('sposiPwd').style.borderColor = '#ef4444';
+    setTimeout(()=>{ document.getElementById('sposiPwd').style.borderColor=''; }, 1500);
+  }
+}
+
+// ── TOAST ──
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 4200);
+}
+</script>
+</body>
+</html>
