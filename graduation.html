@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laurea · Salvatore Daniel Leocata</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+
+:root{
+  --navy:#0A1628;
+  --navy-mid:#112240;
+  --navy-light:#1E3A5F;
+  --blue:#2563EB;
+  --blue-l:#60A5FA;
+  --blue-xl:#BFDBFE;
+  --gold:#C4A747;
+  --bg:#F5F8FF;
+  --white:#FFFFFF;
+  --text:#0F1C2E;
+  --text-muted:#4A6080;
+  --border:#CBD8F0;
+}
+
+html{scroll-behavior:smooth;}
+
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+/* ─── SPLASH ─────────────────────────────────────────── */
+#splash{
+  position:fixed;inset:0;
+  background:#060B14;
+  z-index:1000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;
+  transition:opacity 600ms ease-out,visibility 600ms ease-out;
+}
+#splash.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+
+.terminal{
+  width:min(680px,92vw);
+  background:#0D1117;
+  border:1px solid #1E3A5F;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 0 80px rgba(37,99,235,0.15),0 0 0 1px rgba(96,165,250,0.08);
+}
+.terminal-bar{
+  background:#161B22;
+  padding:12px 16px;
+  display:flex;align-items:center;gap:8px;
+  border-bottom:1px solid #21262D;
+}
+.t-dot{width:12px;height:12px;border-radius:50%;}
+.t-dot:nth-child(1){background:#FF5F56;}
+.t-dot:nth-child(2){background:#FFBD2E;}
+.t-dot:nth-child(3){background:#27C93F;}
+.t-title{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;color:#6E7681;
+  margin-left:auto;margin-right:auto;
+}
+.terminal-body{
+  padding:24px 28px 28px;
+  min-height:320px;
+  display:flex;flex-direction:column;gap:0;
+}
+.t-line{
+  font-family:'JetBrains Mono',monospace;
+  font-size:14px;
+  line-height:1.8;
+  white-space:pre;
+  overflow:hidden;
+  max-width:0;
+  opacity:0;
+  transition:max-width 0ms, opacity 0ms;
+}
+.t-line.visible{
+  max-width:600px;
+  opacity:1;
+}
+.t-prompt{color:#60A5FA;}
+.t-cmd{color:#E6EDF3;}
+.t-ok{color:#3FB950;}
+.t-dim{color:#6E7681;}
+.t-title-line{color:#C4A747;font-weight:700;}
+.t-data{color:#A5D6FF;}
+.t-cursor{
+  display:inline-block;width:2px;height:14px;background:#60A5FA;
+  vertical-align:middle;margin-left:2px;
+  animation:blink 1s step-end infinite;
+}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+.progress-wrap{margin-top:20px;}
+.progress-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;color:#6E7681;
+  margin-bottom:6px;
+}
+.progress-bar-bg{
+  background:#21262D;border-radius:4px;height:4px;overflow:hidden;
+}
+.progress-bar-fill{
+  height:100%;background:linear-gradient(90deg,#2563EB,#60A5FA);
+  border-radius:4px;width:0;
+  transition:width 2800ms cubic-bezier(.4,0,.2,1);
+}
+
+.splash-hint{
+  margin-top:20px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;color:#2F3740;
+  letter-spacing:.08em;
+  animation:fadeHint 1s ease-out 4s forwards;
+  opacity:0;
+}
+@keyframes fadeHint{to{opacity:1;color:#4A5568;}}
+
+/* ─── MAIN CONTENT ────────────────────────────────────── */
+main{opacity:0;transition:opacity 700ms ease-out;}
+main.visible{opacity:1;}
+
+/* ─── NAV ─────────────────────────────────────────────── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(10,22,40,0.85);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(37,99,235,0.15);
+  padding:0 24px;
+  height:60px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.nav-logo{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:15px;font-weight:600;
+  color:var(--white);letter-spacing:-.01em;
+}
+.nav-logo span{color:var(--blue-l);}
+.nav-links{display:flex;gap:28px;}
+.nav-links a{
+  font-family:'Inter',sans-serif;
+  font-size:13px;font-weight:500;
+  color:rgba(255,255,255,.55);
+  text-decoration:none;
+  transition:color 130ms ease-out;
+}
+.nav-links a:hover{color:var(--blue-l);}
+@media(max-width:600px){.nav-links{display:none;}}
+
+/* ─── HERO ─────────────────────────────────────────────── */
+#hero{
+  min-height:100svh;
+  background:linear-gradient(160deg,#060B14 0%,#0A1628 50%,#0E2040 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;
+  padding:80px 24px 60px;
+  position:relative;
+  overflow:hidden;
+}
+
+/* Starfield */
+.stars{position:absolute;inset:0;pointer-events:none;}
+.star{
+  position:absolute;border-radius:50%;
+  background:rgba(255,255,255,.7);
+  animation:twinkle var(--dur,3s) ease-in-out infinite var(--delay,0s);
+}
+@keyframes twinkle{0%,100%{opacity:.2;}50%{opacity:1;}}
+
+/* 3D chip */
+.chip-wrap{
+  perspective:600px;
+  width:120px;height:120px;
+  margin:0 auto 40px;
+  position:relative;
+  z-index:2;
+}
+.chip{
+  width:100%;height:100%;
+  transform-style:preserve-3d;
+  animation:chipFloat 8s ease-in-out infinite;
+  position:relative;
+}
+@keyframes chipFloat{
+  0%,100%{transform:rotateX(18deg) rotateY(-15deg) translateY(0);}
+  25%{transform:rotateX(10deg) rotateY(20deg) translateY(-8px);}
+  50%{transform:rotateX(22deg) rotateY(0deg) translateY(-14px);}
+  75%{transform:rotateX(8deg) rotateY(-25deg) translateY(-6px);}
+}
+.chip-face{
+  position:absolute;inset:0;
+  border-radius:10px;
+  background:linear-gradient(135deg,#1A3A6B 0%,#0F2347 60%,#0A1628 100%);
+  border:1.5px solid rgba(96,165,250,0.4);
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  grid-template-rows:repeat(5,1fr);
+  gap:6px;padding:14px;
+  box-shadow:
+    0 0 30px rgba(37,99,235,.35),
+    0 0 60px rgba(37,99,235,.15),
+    inset 0 1px 0 rgba(96,165,250,.2);
+}
+.chip-cell{
+  background:rgba(37,99,235,.12);
+  border-radius:2px;
+  border:1px solid rgba(96,165,250,.08);
+}
+.chip-cell.active{
+  background:rgba(37,99,235,.5);
+  border-color:rgba(96,165,250,.5);
+  box-shadow:0 0 8px rgba(37,99,235,.6);
+  animation:cellPulse 2s ease-in-out infinite var(--cd,0s);
+}
+@keyframes cellPulse{
+  0%,100%{opacity:.5;}
+  50%{opacity:1;}
+}
+.chip-pins{
+  position:absolute;
+  display:flex;flex-direction:column;justify-content:space-around;
+  padding:16px 0;
+}
+.chip-pins.left{right:calc(100% - 1px);}
+.chip-pins.right{left:calc(100% - 1px);}
+.chip-pins.top{
+  flex-direction:row;
+  bottom:calc(100% - 1px);
+  left:0;right:0;
+  padding:0 16px;
+  flex-direction:row;
+  justify-content:space-around;
+}
+.chip-pins.bottom{
+  flex-direction:row;
+  top:calc(100% - 1px);
+  left:0;right:0;
+  padding:0 16px;
+  flex-direction:row;
+  justify-content:space-around;
+}
+.pin{
+  width:12px;height:3px;
+  background:linear-gradient(90deg,rgba(96,165,250,.6),rgba(96,165,250,.2));
+  border-radius:1px;
+}
+.chip-pins.top .pin,.chip-pins.bottom .pin{
+  width:3px;height:10px;
+}
+.chip-glow{
+  position:absolute;inset:-30px;
+  background:radial-gradient(ellipse at center,rgba(37,99,235,.2) 0%,transparent 70%);
+  pointer-events:none;
+}
+
+.hero-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;font-weight:500;
+  color:var(--blue-l);
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  margin-bottom:16px;
+  opacity:.8;
+}
+h1{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:clamp(36px,7vw,72px);
+  font-weight:700;
+  color:var(--white);
+  letter-spacing:-.03em;
+  line-height:1.05;
+  margin-bottom:16px;
+}
+h1 .first{color:var(--blue-xl);}
+.hero-sub{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:clamp(16px,2.5vw,22px);
+  font-weight:400;
+  color:rgba(255,255,255,.6);
+  letter-spacing:-.01em;
+  margin-bottom:8px;
+}
+.hero-uni{
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;
+  color:var(--blue-l);
+  opacity:.7;
+  letter-spacing:.05em;
+  margin-bottom:48px;
+}
+.hero-cta{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--blue);
+  color:var(--white);
+  font-family:'Inter',sans-serif;
+  font-size:15px;font-weight:600;
+  padding:14px 32px;
+  border-radius:10px;
+  text-decoration:none;
+  border:none;cursor:pointer;
+  transition:background 150ms ease-out,transform 120ms ease-out,box-shadow 150ms ease-out;
+  box-shadow:0 4px 20px rgba(37,99,235,.4);
+}
+.hero-cta:hover{background:#1D4ED8;box-shadow:0 6px 28px rgba(37,99,235,.5);}
+.hero-cta:active{transform:scale(0.97);}
+.hero-cta svg{width:18px;height:18px;}
+
+.scroll-hint{
+  position:absolute;bottom:32px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  opacity:.4;
+}
+.scroll-hint span{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;color:var(--blue-l);letter-spacing:.1em;
+}
+.scroll-mouse{
+  width:22px;height:34px;border:1.5px solid rgba(96,165,250,.5);border-radius:11px;
+  display:flex;align-items:flex-start;justify-content:center;padding-top:6px;
+}
+.scroll-wheel{
+  width:3px;height:6px;background:rgba(96,165,250,.7);border-radius:2px;
+  animation:scrollWheel 1.8s ease-in-out infinite;
+}
+@keyframes scrollWheel{0%{transform:translateY(0);opacity:1;}80%{transform:translateY(8px);opacity:0;}100%{transform:translateY(0);opacity:0;}}
+
+/* ─── SECTIONS ────────────────────────────────────────── */
+section{padding:100px 24px;}
+
+.section-inner{max-width:900px;margin:0 auto;}
+
+.section-tag{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;font-weight:500;
+  color:var(--blue);
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-tag::before{content:'';display:block;width:24px;height:1.5px;background:var(--blue);}
+
+h2{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:clamp(28px,4vw,44px);
+  font-weight:700;
+  color:var(--navy);
+  letter-spacing:-.03em;
+  line-height:1.1;
+  margin-bottom:16px;
+}
+.section-desc{
+  font-size:16px;
+  color:var(--text-muted);
+  line-height:1.7;
+  max-width:560px;
+  margin-bottom:56px;
+}
+
+/* ─── COUNTDOWN ───────────────────────────────────────── */
+#countdown{
+  background:var(--navy);
+  padding:80px 24px;
+}
+#countdown h2{color:var(--white);}
+#countdown .section-tag{color:var(--blue-l);}
+#countdown .section-tag::before{background:var(--blue-l);}
+#countdown .section-desc{color:rgba(255,255,255,.5);}
+
+.cd-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+  max-width:600px;
+}
+@media(max-width:500px){.cd-grid{grid-template-columns:repeat(2,1fr);}}
+
+.cd-box{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(96,165,250,.12);
+  border-radius:16px;
+  padding:24px 16px;
+  text-align:center;
+  position:relative;overflow:hidden;
+  transition:border-color 200ms ease-out;
+}
+.cd-box::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 0%,rgba(37,99,235,.1) 0%,transparent 70%);
+  pointer-events:none;
+}
+.cd-num{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:clamp(32px,6vw,52px);
+  font-weight:700;
+  color:var(--white);
+  line-height:1;
+  margin-bottom:8px;
+  font-variant-numeric:tabular-nums;
+}
+.cd-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  color:rgba(96,165,250,.6);
+  letter-spacing:.1em;
+  text-transform:uppercase;
+}
+
+/* ─── PROGRAM ─────────────────────────────────────────── */
+#program{background:var(--bg);}
+
+.program-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:24px;
+}
+@media(max-width:640px){.program-grid{grid-template-columns:1fr;}}
+
+.event-card{
+  background:var(--white);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:32px;
+  position:relative;overflow:hidden;
+  transition:border-color 200ms ease-out,transform 200ms ease-out,box-shadow 200ms ease-out;
+}
+.event-card:hover{
+  border-color:var(--blue);
+  transform:translateY(-4px);
+  box-shadow:0 16px 48px rgba(37,99,235,.1);
+}
+.event-card:active{transform:scale(0.98);}
+
+.event-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--blue),var(--blue-l));
+}
+.event-date{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;font-weight:500;
+  color:var(--blue);
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  margin-bottom:12px;
+}
+.event-title{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:22px;font-weight:700;
+  color:var(--navy);
+  letter-spacing:-.02em;
+  margin-bottom:8px;
+  line-height:1.2;
+}
+.event-time{
+  font-family:'JetBrains Mono',monospace;
+  font-size:28px;font-weight:700;
+  color:var(--blue);
+  letter-spacing:-.02em;
+  margin-bottom:16px;
+}
+.event-desc{
+  font-size:14px;
+  color:var(--text-muted);
+  line-height:1.6;
+}
+.event-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(37,99,235,.08);
+  color:var(--blue);
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;font-weight:500;
+  padding:5px 12px;border-radius:100px;
+  margin-top:16px;
+  border:1px solid rgba(37,99,235,.15);
+}
+.event-badge svg{width:12px;height:12px;}
+
+/* ─── LOCATIONS ───────────────────────────────────────── */
+#locations{background:var(--white);}
+
+.loc-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:32px;
+}
+@media(max-width:700px){.loc-grid{grid-template-columns:1fr;}}
+
+.loc-card{
+  border-radius:20px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  transition:transform 200ms ease-out,box-shadow 200ms ease-out;
+}
+.loc-card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 16px 48px rgba(10,22,40,.08);
+}
+.loc-map{
+  width:100%;height:220px;
+  border:none;display:block;
+}
+.loc-info{padding:24px;}
+.loc-name{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:17px;font-weight:700;
+  color:var(--navy);letter-spacing:-.02em;
+  margin-bottom:4px;
+}
+.loc-addr{
+  font-size:13px;color:var(--text-muted);
+  line-height:1.5;margin-bottom:12px;
+}
+.loc-tag{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;font-weight:500;
+  color:var(--blue);
+  letter-spacing:.1em;text-transform:uppercase;
+  background:rgba(37,99,235,.07);
+  display:inline-block;padding:3px 10px;border-radius:100px;
+  border:1px solid rgba(37,99,235,.12);
+}
+
+/* ─── RSVP ────────────────────────────────────────────── */
+#rsvp{
+  background:linear-gradient(160deg,#06101E 0%,#0A1628 100%);
+}
+#rsvp h2{color:var(--white);}
+#rsvp .section-tag{color:var(--blue-l);}
+#rsvp .section-tag::before{background:var(--blue-l);}
+#rsvp .section-desc{color:rgba(255,255,255,.5);}
+
+.rsvp-form{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(96,165,250,.1);
+  border-radius:24px;
+  padding:40px;
+  max-width:640px;
+}
+@media(max-width:600px){.rsvp-form{padding:28px 20px;}}
+
+.form-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+@media(max-width:500px){.form-row{grid-template-columns:1fr;}}
+
+.field{margin-bottom:20px;}
+.field label{
+  display:block;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;font-weight:500;
+  color:rgba(96,165,250,.7);
+  letter-spacing:.1em;text-transform:uppercase;
+  margin-bottom:8px;
+}
+.field input,.field select,.field textarea{
+  width:100%;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(96,165,250,.15);
+  border-radius:10px;
+  padding:12px 16px;
+  font-family:'Inter',sans-serif;
+  font-size:15px;
+  color:var(--white);
+  outline:none;
+  transition:border-color 130ms ease-out,box-shadow 130ms ease-out;
+  appearance:none;-webkit-appearance:none;
+}
+.field input::placeholder,.field textarea::placeholder{color:rgba(255,255,255,.2);}
+.field select option{background:#0D1117;color:var(--white);}
+.field input:focus,.field select:focus,.field textarea:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(37,99,235,.2);
+}
+.field textarea{resize:vertical;min-height:100px;}
+
+.radio-group{
+  display:flex;gap:12px;flex-wrap:wrap;
+}
+.radio-opt{
+  flex:1;min-width:120px;
+  background:rgba(255,255,255,.04);
+  border:1.5px solid rgba(96,165,250,.15);
+  border-radius:10px;
+  padding:12px 16px;
+  cursor:pointer;
+  transition:border-color 130ms ease-out,background 130ms ease-out;
+  display:flex;align-items:center;gap:10px;
+}
+.radio-opt:active{transform:scale(0.97);}
+.radio-opt input{
+  width:16px!important;height:16px;
+  accent-color:var(--blue);
+  flex-shrink:0;
+  background:transparent;
+  border:none;padding:0;
+}
+.radio-opt span{
+  font-size:14px;color:rgba(255,255,255,.7);
+  font-weight:500;
+}
+.radio-opt:has(input:checked){
+  border-color:var(--blue);
+  background:rgba(37,99,235,.12);
+}
+.radio-opt:has(input:checked) span{color:var(--white);}
+
+.select-wrap{position:relative;}
+.select-wrap::after{
+  content:'▾';
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  color:rgba(96,165,250,.5);
+  pointer-events:none;font-size:14px;
+}
+
+.submit-btn{
+  width:100%;
+  background:var(--blue);
+  color:var(--white);
+  border:none;
+  border-radius:10px;
+  padding:15px 24px;
+  font-family:'Inter',sans-serif;
+  font-size:16px;font-weight:600;
+  cursor:pointer;
+  margin-top:8px;
+  transition:background 150ms ease-out,transform 120ms ease-out,box-shadow 150ms ease-out;
+  box-shadow:0 4px 16px rgba(37,99,235,.3);
+}
+.submit-btn:hover:not(:disabled){background:#1D4ED8;box-shadow:0 6px 24px rgba(37,99,235,.4);}
+.submit-btn:active:not(:disabled){transform:scale(0.97);}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed;}
+
+/* ─── TOAST ───────────────────────────────────────────── */
+#toast{
+  position:fixed;bottom:32px;left:50%;
+  transform:translateX(-50%) translateY(100px);
+  background:#1A2E4A;
+  border:1px solid rgba(96,165,250,.2);
+  color:var(--white);
+  font-family:'Inter',sans-serif;
+  font-size:14px;font-weight:500;
+  padding:14px 24px;
+  border-radius:100px;
+  white-space:nowrap;
+  z-index:500;
+  pointer-events:none;
+  transition:transform 200ms ease-out;
+  box-shadow:0 8px 32px rgba(0,0,0,.3);
+}
+#toast.show{
+  transform:translateX(-50%) translateY(0);
+  transition:transform 400ms cubic-bezier(.34,1.56,.64,1);
+}
+
+/* ─── FOOTER ──────────────────────────────────────────── */
+footer{
+  background:#030608;
+  padding:40px 24px;
+  text-align:center;
+}
+footer .footer-name{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:18px;font-weight:700;
+  color:rgba(255,255,255,.8);
+  letter-spacing:-.02em;
+  margin-bottom:6px;
+}
+footer .footer-sub{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;color:rgba(96,165,250,.4);
+  letter-spacing:.1em;
+}
+
+/* ─── AREA RISERVATA ──────────────────────────────────── */
+.reserved-btn{
+  position:fixed;bottom:24px;right:24px;
+  background:rgba(10,22,40,.8);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(96,165,250,.2);
+  color:rgba(255,255,255,.5);
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;font-weight:500;
+  letter-spacing:.05em;
+  padding:10px 16px;border-radius:100px;
+  cursor:pointer;
+  transition:border-color 130ms ease-out,color 130ms ease-out,transform 120ms ease-out;
+}
+.reserved-btn:hover{border-color:rgba(96,165,250,.5);color:var(--blue-l);}
+.reserved-btn:active{transform:scale(0.97);}
+
+.modal-overlay{
+  display:none;
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.7);
+  backdrop-filter:blur(8px);
+  z-index:200;
+  align-items:center;justify-content:center;
+  padding:24px;
+}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:#0D1117;
+  border:1px solid rgba(96,165,250,.15);
+  border-radius:20px;
+  padding:36px;
+  width:min(440px,100%);
+  animation:modalIn 300ms cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes modalIn{from{transform:scale(0.94);opacity:0;}to{transform:scale(1);opacity:1;}}
+.modal h3{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:20px;font-weight:700;
+  color:var(--white);letter-spacing:-.02em;
+  margin-bottom:8px;
+}
+.modal p{font-size:13px;color:rgba(255,255,255,.4);margin-bottom:24px;line-height:1.6;}
+.modal-input{
+  width:100%;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(96,165,250,.2);
+  border-radius:10px;
+  padding:12px 16px;
+  color:var(--white);
+  font-family:'JetBrains Mono',monospace;
+  font-size:15px;
+  outline:none;
+  letter-spacing:.15em;
+  transition:border-color 130ms ease-out,box-shadow 130ms ease-out;
+  margin-bottom:16px;
+}
+.modal-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.2);}
+.modal-actions{display:flex;gap:12px;}
+.modal-cancel{
+  flex:1;
+  background:transparent;
+  border:1.5px solid rgba(96,165,250,.2);
+  color:rgba(255,255,255,.5);
+  border-radius:10px;padding:12px;
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:500;
+  cursor:pointer;
+  transition:border-color 120ms ease-out,color 120ms ease-out,transform 120ms ease-out;
+}
+.modal-cancel:hover{border-color:rgba(96,165,250,.5);color:var(--white);}
+.modal-cancel:active{transform:scale(0.97);}
+.modal-send{
+  flex:2;
+  background:var(--blue);
+  border:none;
+  color:var(--white);
+  border-radius:10px;padding:12px;
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;
+  transition:background 150ms ease-out,transform 120ms ease-out;
+}
+.modal-send:hover{background:#1D4ED8;}
+.modal-send:active{transform:scale(0.97);}
+
+.modal-content{display:none;}
+.modal-content.visible{display:block;}
+.reserved-msg{
+  font-size:14px;color:rgba(255,255,255,.6);
+  line-height:1.7;
+}
+.reserved-msg strong{
+  color:var(--blue-l);
+  font-family:'JetBrains Mono',monospace;
+  font-weight:500;
+}
+
+/* ─── ANIMATIONS ──────────────────────────────────────── */
+.fade-up{
+  opacity:0;transform:translateY(32px);
+  transition:opacity 600ms ease-out,transform 600ms ease-out;
+}
+.fade-up.in{opacity:1;transform:translateY(0);}
+.fade-up.delay-1{transition-delay:100ms;}
+.fade-up.delay-2{transition-delay:200ms;}
+.fade-up.delay-3{transition-delay:300ms;}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash" onclick="dismissSplash()">
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="t-dot"></div>
+      <div class="t-dot"></div>
+      <div class="t-dot"></div>
+      <span class="t-title">graduation.exe — zsh</span>
+    </div>
+    <div class="terminal-body" id="termBody"></div>
+    <div style="padding:0 28px 24px">
+      <div class="progress-wrap">
+        <div class="progress-label" id="progLabel">Initializing...</div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="progBar"></div></div>
+      </div>
+      <div class="splash-hint">[ click anywhere to continue ]</div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">SDL <span>// laurea</span></div>
+  <div class="nav-links">
+    <a href="#program">Programma</a>
+    <a href="#locations">Luoghi</a>
+    <a href="#rsvp">RSVP</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main id="main">
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="stars" id="stars"></div>
+
+    <div class="chip-wrap">
+      <div class="chip" id="chip">
+        <div class="chip-glow"></div>
+        <div class="chip-face" id="chipFace"></div>
+        <div class="chip-pins left" id="pinsLeft"></div>
+        <div class="chip-pins right" id="pinsRight"></div>
+        <div class="chip-pins top" id="pinsTop"></div>
+        <div class="chip-pins bottom" id="pinsBottom"></div>
+      </div>
+    </div>
+
+    <div class="hero-label">// proclama · 2026</div>
+    <h1><span class="first">Salvatore Daniel</span><br>Leocata</h1>
+    <p class="hero-sub">Ingegneria Informatica</p>
+    <p class="hero-uni">Politecnico di Torino — A.A. 2025/2026</p>
+
+    <a href="#rsvp" class="hero-cta">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      Conferma la tua presenza
+    </a>
+
+    <div class="scroll-hint">
+      <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
+      <span>scroll</span>
+    </div>
+  </section>
+
+  <!-- COUNTDOWN -->
+  <section id="countdown">
+    <div class="section-inner">
+      <div class="section-tag fade-up">// count down</div>
+      <h2 class="fade-up delay-1">Mancano ancora</h2>
+      <p class="section-desc fade-up delay-2">Al gran festeggiamento del 3 ottobre 2026</p>
+      <div class="cd-grid fade-up delay-2">
+        <div class="cd-box"><div class="cd-num" id="cd-d">--</div><div class="cd-label">Giorni</div></div>
+        <div class="cd-box"><div class="cd-num" id="cd-h">--</div><div class="cd-label">Ore</div></div>
+        <div class="cd-box"><div class="cd-num" id="cd-m">--</div><div class="cd-label">Minuti</div></div>
+        <div class="cd-box"><div class="cd-num" id="cd-s">--</div><div class="cd-label">Secondi</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROGRAM -->
+  <section id="program">
+    <div class="section-inner">
+      <div class="section-tag fade-up">// programma</div>
+      <h2 class="fade-up delay-1">Due momenti,<br>un solo traguardo</h2>
+      <p class="section-desc fade-up delay-2">Due appuntamenti speciali per celebrare questo percorso.</p>
+      <div class="program-grid">
+        <div class="event-card fade-up delay-1">
+          <div class="event-date">16 Settembre 2026 · Torino</div>
+          <div class="event-title">Proclamazione</div>
+          <div class="event-time">10:00</div>
+          <div class="event-desc">La cerimonia ufficiale di laurea presso il Politecnico di Torino. Il momento in cui anni di studio diventano un titolo.</div>
+          <div class="event-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            Cerimonia Accademica
+          </div>
+        </div>
+        <div class="event-card fade-up delay-2">
+          <div class="event-date">3 Ottobre 2026 · Biancavilla</div>
+          <div class="event-title">Festeggiamenti</div>
+          <div class="event-time">21:00</div>
+          <div class="event-desc">La festa per celebrare insieme questo traguardo. Una serata speciale al Beauty Garden Banqueting, tra cibo, musica e affetti.</div>
+          <div class="event-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Cena di Gala
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOCATIONS -->
+  <section id="locations">
+    <div class="section-inner">
+      <div class="section-tag fade-up">// luoghi</div>
+      <h2 class="fade-up delay-1">Dove ci troviamo</h2>
+      <p class="section-desc fade-up delay-2">Due luoghi, due momenti da non perdere.</p>
+      <div class="loc-grid fade-up delay-2">
+        <div class="loc-card">
+          <iframe class="loc-map"
+            src="https://maps.google.com/maps?q=Politecnico+di+Torino,+Corso+Duca+degli+Abruzzi+24,+Torino&output=embed&z=15"
+            allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <div class="loc-info">
+            <div class="loc-tag">16 Settembre · 10:00</div>
+            <div class="loc-name" style="margin-top:10px">Politecnico di Torino</div>
+            <div class="loc-addr">Corso Duca degli Abruzzi, 24<br>10129 Torino TO</div>
+          </div>
+        </div>
+        <div class="loc-card">
+          <iframe class="loc-map"
+            src="https://maps.google.com/maps?q=Beauty+Garden+Banqueting+Biancavilla&output=embed&z=15"
+            allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <div class="loc-info">
+            <div class="loc-tag">3 Ottobre · 21:00</div>
+            <div class="loc-name" style="margin-top:10px">Beauty Garden Banqueting</div>
+            <div class="loc-addr">Biancavilla, Catania<br>Sicilia</div>
+          </div>
+        </div>
+      </div>
+      <!-- Calendar buttons -->
+      <div style="margin-top:32px;display:flex;gap:12px;flex-wrap:wrap;" class="fade-up delay-3">
+        <button onclick="downloadICS('proclama')" style="
+          display:inline-flex;align-items:center;gap:8px;
+          background:var(--white);border:1.5px solid var(--border);
+          color:var(--navy);border-radius:10px;
+          padding:12px 20px;font-family:'Inter',sans-serif;
+          font-size:14px;font-weight:500;cursor:pointer;
+          transition:border-color 130ms ease-out,transform 120ms ease-out;
+        " onmouseenter="this.style.borderColor='var(--blue)'" onmouseleave="this.style.borderColor='var(--border)'" onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform=''">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Aggiungi Proclamazione
+        </button>
+        <button onclick="downloadICS('festa')" style="
+          display:inline-flex;align-items:center;gap:8px;
+          background:var(--white);border:1.5px solid var(--border);
+          color:var(--navy);border-radius:10px;
+          padding:12px 20px;font-family:'Inter',sans-serif;
+          font-size:14px;font-weight:500;cursor:pointer;
+          transition:border-color 130ms ease-out,transform 120ms ease-out;
+        " onmouseenter="this.style.borderColor='var(--blue)'" onmouseleave="this.style.borderColor='var(--border)'" onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform=''">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Aggiungi Festeggiamenti
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- RSVP -->
+  <section id="rsvp">
+    <div class="section-inner">
+      <div class="section-tag fade-up">// rsvp</div>
+      <h2 class="fade-up delay-1">Conferma la tua<br>presenza</h2>
+      <p class="section-desc fade-up delay-2">Facci sapere entro il <strong style="color:rgba(255,255,255,.8)">25 settembre 2026</strong> se potrai essere con noi.</p>
+      <form class="rsvp-form fade-up delay-2" id="rsvpForm" novalidate>
+        <div class="form-row">
+          <div class="field">
+            <label>Nome</label>
+            <input type="text" name="nome" placeholder="Mario" required>
+          </div>
+          <div class="field">
+            <label>Cognome</label>
+            <input type="text" name="cognome" placeholder="Rossi" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Email</label>
+          <input type="email" name="email_ospite" placeholder="mario@esempio.it" required>
+        </div>
+
+        <div class="field">
+          <label>Parteciperai alla festa del 3 ottobre?</label>
+          <div class="radio-group">
+            <label class="radio-opt">
+              <input type="radio" name="partecipa" value="Sì, ci sarò!" required>
+              <span>Sì, ci sarò!</span>
+            </label>
+            <label class="radio-opt">
+              <input type="radio" name="partecipa" value="Purtroppo no">
+              <span>Purtroppo no</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Verrai anche alla proclamazione (16 sett.)?</label>
+          <div class="radio-group">
+            <label class="radio-opt">
+              <input type="radio" name="proclamazione" value="Sì">
+              <span>Sì</span>
+            </label>
+            <label class="radio-opt">
+              <input type="radio" name="proclamazione" value="No">
+              <span>No</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>Adulti</label>
+            <div class="select-wrap">
+              <select name="adulti">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5+">5+</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Bambini</label>
+            <div class="select-wrap">
+              <select name="bambini">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4+">4+</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Note alimentari / allergie</label>
+          <input type="text" name="dieta" placeholder="Vegetariano, celiaco, ecc. (opzionale)">
+        </div>
+
+        <div class="field">
+          <label>Un messaggio per Salvatore Daniel (opzionale)</label>
+          <textarea name="messaggio" placeholder="Scrivi qualcosa di speciale…"></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">Invia conferma</button>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-name">Salvatore Daniel Leocata</div>
+  <div class="footer-sub">Ingegneria Informatica · Politecnico di Torino · 2026</div>
+</footer>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- AREA RISERVATA -->
+<button class="reserved-btn" onclick="openModal()">// area riservata</button>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal" id="modal">
+    <div id="loginSection">
+      <h3>Area Riservata</h3>
+      <p>Inserisci la password per accedere alle conferme ricevute.</p>
+      <input type="password" class="modal-input" id="modalPwd" placeholder="Password" onkeydown="if(event.key==='Enter')checkPwd()">
+      <div class="modal-actions">
+        <button class="modal-cancel" onclick="closeModal()">Annulla</button>
+        <button class="modal-send" onclick="checkPwd()">Accedi</button>
+      </div>
+    </div>
+    <div class="modal-content" id="reservedContent">
+      <h3 style="margin-bottom:16px">Conferme ricevute</h3>
+      <p class="reserved-msg">
+        Le conferme vengono inviate via EmailJS al tuo indirizzo.<br><br>
+        <strong>Service:</strong> service_yguijtb<br>
+        <strong>Template:</strong> template_ud4dvgj<br><br>
+        Accedi alla dashboard EmailJS per visualizzare tutte le risposte.
+      </p>
+      <button class="modal-cancel" onclick="closeModal()" style="margin-top:20px;width:100%">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── EMAILJS ────────────────────────────────────────────
+(function(){emailjs.init({publicKey:'YOUR_PUBLIC_KEY'});})();
+const EMAILJS_SERVICE  = 'service_yguijtb';
+const EMAILJS_TEMPLATE = 'template_ud4dvgj';
+
+// ─── TERMINAL SPLASH ────────────────────────────────────
+const lines = [
+  {text:'$ sudo run graduation.exe --name="SDL"', cls:'t-prompt t-cmd', delay:0},
+  {text:'[sudo] password for root: ··········',   cls:'t-dim',          delay:600},
+  {text:'',                                        cls:'',               delay:1000},
+  {text:'  Booting graduation sequence...',        cls:'t-ok',           delay:1100},
+  {text:'  Loading thesis_defense.pdf    [OK]',    cls:'t-dim',          delay:1500},
+  {text:'  Mounting campus_memories/     [OK]',    cls:'t-dim',          delay:1800},
+  {text:'  Compiling 5 years of effort   [OK]',    cls:'t-dim',          delay:2100},
+  {text:'',                                        cls:'',               delay:2400},
+  {text:'  ╔═══════════════════════════════╗',     cls:'t-title-line',   delay:2500},
+  {text:'  ║   LAUREA IN INFORMATICA      ║',      cls:'t-title-line',   delay:2600},
+  {text:'  ╚═══════════════════════════════╝',     cls:'t-title-line',   delay:2700},
+  {text:'',                                        cls:'',               delay:2800},
+  {text:'  Student:    Salvatore Daniel Leocata',  cls:'t-data',         delay:2900},
+  {text:'  Degree:     Ingegneria Informatica',    cls:'t-data',         delay:3050},
+  {text:'  University: Politecnico di Torino',     cls:'t-data',         delay:3200},
+  {text:'  Date:       16 September 2026',         cls:'t-data',         delay:3350},
+  {text:'',                                        cls:'',               delay:3500},
+  {text:'$ echo "Congratulazioni, Dott. Ing. Leocata!" ', cls:'t-prompt t-cmd', delay:3600},
+];
+
+const labels = ['Loading assets','Mounting memories','Compiling 5 years','Almost there...','Ready!'];
+let splashDone = false;
+
+function buildTerminal(){
+  const body = document.getElementById('termBody');
+  const bar  = document.getElementById('progBar');
+  const lbl  = document.getElementById('progLabel');
+
+  lines.forEach((l, i)=>{
+    const el = document.createElement('div');
+    el.className = 't-line ' + (l.cls||'');
+    el.textContent = l.text;
+    body.appendChild(el);
+
+    setTimeout(()=>{
+      el.classList.add('visible');
+    }, l.delay);
+  });
+
+  // progress
+  setTimeout(()=>{ bar.style.width='20%'; lbl.textContent=labels[0]; }, 500);
+  setTimeout(()=>{ bar.style.width='45%'; lbl.textContent=labels[1]; }, 1100);
+  setTimeout(()=>{ bar.style.width='70%'; lbl.textContent=labels[2]; }, 2000);
+  setTimeout(()=>{ bar.style.width='90%'; lbl.textContent=labels[3]; }, 3000);
+  setTimeout(()=>{ bar.style.width='100%'; lbl.textContent=labels[4]; splashDone=true; }, 3800);
+}
+
+function dismissSplash(){
+  if(!splashDone) return;
+  document.getElementById('splash').classList.add('hidden');
+  document.getElementById('main').classList.add('visible');
+}
+
+buildTerminal();
+
+// ─── STARS ──────────────────────────────────────────────
+function buildStars(){
+  const c = document.getElementById('stars');
+  for(let i=0;i<120;i++){
+    const s = document.createElement('div');
+    s.className='star';
+    const size = Math.random()*2+0.5;
+    s.style.cssText=`
+      width:${size}px;height:${size}px;
+      left:${Math.random()*100}%;top:${Math.random()*100}%;
+      --dur:${2+Math.random()*4}s;--delay:-${Math.random()*4}s;
+    `;
+    c.appendChild(s);
+  }
+}
+buildStars();
+
+// ─── CHIP ────────────────────────────────────────────────
+function buildChip(){
+  const face = document.getElementById('chipFace');
+  const activeCells = [1,3,6,8,11,13,18,20,23];
+  for(let i=0;i<25;i++){
+    const cell = document.createElement('div');
+    cell.className = 'chip-cell' + (activeCells.includes(i) ? ' active' : '');
+    if(activeCells.includes(i)) cell.style.setProperty('--cd', (Math.random()*2)+'s');
+    face.appendChild(cell);
+  }
+  // pins
+  ['pinsLeft','pinsRight'].forEach(id=>{
+    const el = document.getElementById(id);
+    for(let i=0;i<6;i++){const p=document.createElement('div');p.className='pin';el.appendChild(p);}
+  });
+  ['pinsTop','pinsBottom'].forEach(id=>{
+    const el = document.getElementById(id);
+    for(let i=0;i<6;i++){const p=document.createElement('div');p.className='pin';el.appendChild(p);}
+  });
+}
+buildChip();
+
+// ─── COUNTDOWN ──────────────────────────────────────────
+const target = new Date('2026-10-03T19:00:00Z'); // 21:00 CEST
+function updateCD(){
+  const diff = target - Date.now();
+  if(diff <= 0){
+    ['cd-d','cd-h','cd-m','cd-s'].forEach(id=>document.getElementById(id).textContent='0');
+    return;
+  }
+  const d = Math.floor(diff/864e5);
+  const h = Math.floor((diff%864e5)/36e5);
+  const m = Math.floor((diff%36e5)/6e4);
+  const s = Math.floor((diff%6e4)/1e3);
+  document.getElementById('cd-d').textContent = String(d).padStart(2,'0');
+  document.getElementById('cd-h').textContent = String(h).padStart(2,'0');
+  document.getElementById('cd-m').textContent = String(m).padStart(2,'0');
+  document.getElementById('cd-s').textContent = String(s).padStart(2,'0');
+}
+updateCD();
+setInterval(updateCD,1000);
+
+// ─── TOAST ───────────────────────────────────────────────
+function showToast(msg, dur=4000){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), dur);
+}
+
+// ─── FORM ────────────────────────────────────────────────
+document.getElementById('rsvpForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const form = e.target;
+  const btn  = document.getElementById('submitBtn');
+  const data = Object.fromEntries(new FormData(form));
+
+  if(!data.nome || !data.cognome || !data.email_ospite || !data.partecipa){
+    showToast('Compila tutti i campi obbligatori.');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Invio in corso…';
+
+  const params = {
+    nome:       data.nome,
+    cognome:    data.cognome,
+    partecipa:  data.partecipa,
+    proclamazione: data.proclamazione || 'Non specificato',
+    adulti:     data.adulti,
+    bambini:    data.bambini,
+    dieta:      data.dieta || 'Nessuna',
+    messaggio:  data.messaggio || '',
+    email_ospite: data.email_ospite,
+    data_invio: new Date().toLocaleString('it-IT'),
+  };
+
+  try {
+    await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, params);
+    showToast('Risposta inviata! A presto 🎓', 5000);
+    form.reset();
+  } catch(err){
+    showToast('Errore nell\'invio. Riprova più tardi.');
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Invia conferma';
+  }
+});
+
+// ─── ICS ─────────────────────────────────────────────────
+function downloadICS(type){
+  let ics;
+  if(type === 'proclama'){
+    ics = `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//SDL Laurea//IT\r\nBEGIN:VEVENT\r\nUID:proclama-2026@sdl\r\nDTSTART:20260916T080000Z\r\nDTEND:20260916T120000Z\r\nSUMMARY:Proclamazione di Laurea - Salvatore Daniel Leocata\r\nDESCRIPTION:Cerimonia di proclamazione di laurea in Ingegneria Informatica\r\nLOCATION:Politecnico di Torino\\, Corso Duca degli Abruzzi 24\\, Torino\r\nEND:VEVENT\r\nEND:VCALENDAR`;
+  } else {
+    ics = `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//SDL Laurea//IT\r\nBEGIN:VEVENT\r\nUID:festa-2026@sdl\r\nDTSTART:20261003T190000Z\r\nDTEND:20261004T010000Z\r\nSUMMARY:Festeggiamenti Laurea - Salvatore Daniel Leocata\r\nDESCRIPTION:Cena e festeggiamenti per la laurea\r\nLOCATION:Beauty Garden Banqueting\\, Biancavilla\\, Catania\r\nEND:VEVENT\r\nEND:VCALENDAR`;
+  }
+  const a = document.createElement('a');
+  a.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics);
+  a.download = type === 'proclama' ? 'proclamazione-sdl.ics' : 'festa-laurea-sdl.ics';
+  a.click();
+}
+
+// ─── MODAL ───────────────────────────────────────────────
+function openModal(){ document.getElementById('modalOverlay').classList.add('open'); }
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.getElementById('loginSection').style.display='block';
+  document.getElementById('reservedContent').classList.remove('visible');
+  document.getElementById('modalPwd').value='';
+}
+function closeModalOutside(e){
+  if(e.target===document.getElementById('modalOverlay')) closeModal();
+}
+function checkPwd(){
+  const pwd = document.getElementById('modalPwd').value.trim();
+  if(pwd === 'SDL2026'){
+    document.getElementById('loginSection').style.display='none';
+    document.getElementById('reservedContent').classList.add('visible');
+  } else {
+    document.getElementById('modalPwd').style.borderColor='#EF4444';
+    setTimeout(()=>document.getElementById('modalPwd').style.borderColor='', 800);
+    showToast('Password errata.');
+  }
+}
+
+// ─── SCROLL ANIMATIONS ───────────────────────────────────
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
+},{threshold:0.12});
+document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
