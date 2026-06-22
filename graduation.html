@@ -429,6 +429,9 @@ h2{
 
 /* ─── PROGRAM ─────────────────────────────────────────── */
 #program{background:var(--bg);}
+@media(max-width:600px){
+  .reserved-btn{bottom:16px;right:16px;font-size:10px;padding:8px 12px;}
+}
 
 .program-grid{
   display:grid;
@@ -441,15 +444,16 @@ h2{
   background:var(--white);
   border:1px solid var(--border);
   border-radius:20px;
-  padding:32px;
+  padding:28px 28px 24px;
   position:relative;overflow:hidden;
+  box-shadow:0 2px 16px rgba(10,22,40,.06);
   transition:border-color 200ms var(--ease-out),transform 200ms var(--ease-out),box-shadow 200ms var(--ease-out);
 }
 @media(hover:hover) and (pointer:fine){
   .event-card:hover{
-    border-color:var(--blue);
-    transform:translateY(-4px);
-    box-shadow:0 16px 48px rgba(37,99,235,.1);
+    border-color:rgba(37,99,235,.3);
+    transform:translateY(-5px);
+    box-shadow:0 24px 64px rgba(37,99,235,.12),0 4px 16px rgba(10,22,40,.06);
   }
 }
 .event-card:active{transform:scale(0.98);}
@@ -457,46 +461,65 @@ h2{
 .program-grid .event-card:nth-child(2){animation-delay:60ms;}
 
 .event-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,var(--blue),var(--blue-l));
+  content:'';position:absolute;top:0;left:0;right:0;height:5px;
+  background:linear-gradient(90deg,var(--blue) 0%,var(--blue-l) 65%,rgba(96,165,250,.25) 100%);
+}
+.event-idx{
+  position:absolute;bottom:20px;right:20px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:56px;font-weight:700;
+  color:rgba(37,99,235,.06);
+  line-height:1;
+  letter-spacing:-.04em;
+  user-select:none;pointer-events:none;
+}
+.event-header{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:12px;margin-bottom:14px;
 }
 .event-date{
   font-family:'JetBrains Mono',monospace;
-  font-size:11px;font-weight:500;
+  font-size:10px;font-weight:500;
   color:var(--blue);
-  letter-spacing:.1em;
+  letter-spacing:.12em;
   text-transform:uppercase;
-  margin-bottom:12px;
-}
-.event-title{
-  font-family:'Space Grotesk',sans-serif;
-  font-size:22px;font-weight:700;
-  color:var(--navy);
-  letter-spacing:-.02em;
-  margin-bottom:8px;
-  line-height:1.2;
+  line-height:1.5;
+  flex:1;
 }
 .event-time{
   font-family:'JetBrains Mono',monospace;
-  font-size:28px;font-weight:700;
-  color:var(--blue);
-  letter-spacing:-.02em;
-  margin-bottom:16px;
+  font-size:12px;font-weight:700;
+  color:var(--white);
+  background:var(--blue);
+  letter-spacing:.05em;
+  padding:4px 10px;
+  border-radius:6px;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+.event-title{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:clamp(24px,4vw,30px);font-weight:700;
+  color:var(--navy);
+  letter-spacing:-.03em;
+  margin-bottom:10px;
+  line-height:1.1;
 }
 .event-desc{
   font-size:14px;
   color:var(--text-muted);
-  line-height:1.6;
+  line-height:1.65;
 }
 .event-badge{
   display:inline-flex;align-items:center;gap:6px;
-  background:rgba(37,99,235,.08);
+  background:rgba(37,99,235,.06);
   color:var(--blue);
   font-family:'JetBrains Mono',monospace;
-  font-size:11px;font-weight:500;
-  padding:5px 12px;border-radius:100px;
-  margin-top:16px;
-  border:1px solid rgba(37,99,235,.15);
+  font-size:10px;font-weight:500;
+  padding:6px 12px;border-radius:6px;
+  margin-top:20px;
+  border:1px solid rgba(37,99,235,.12);
+  letter-spacing:.04em;
 }
 .event-badge svg{width:12px;height:12px;}
 
@@ -927,9 +950,12 @@ footer .footer-sub{
       <p class="section-desc fade-up delay-2">Due appuntamenti speciali per celebrare questo percorso.</p>
       <div class="program-grid">
         <div class="event-card fade-up delay-1">
-          <div class="event-date">16 Settembre 2026 · Torino</div>
+          <div class="event-idx">01</div>
+          <div class="event-header">
+            <div class="event-date">16 Settembre 2026<br>Torino</div>
+            <div class="event-time">ore 10:00</div>
+          </div>
           <div class="event-title">Proclamazione</div>
-          <div class="event-time">10:00</div>
           <div class="event-desc">La cerimonia ufficiale di laurea presso il Politecnico di Torino. Il momento in cui anni di studio diventano un titolo.</div>
           <div class="event-badge">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
@@ -937,9 +963,12 @@ footer .footer-sub{
           </div>
         </div>
         <div class="event-card fade-up delay-2">
-          <div class="event-date">3 Ottobre 2026 · Biancavilla</div>
+          <div class="event-idx">02</div>
+          <div class="event-header">
+            <div class="event-date">3 Ottobre 2026<br>Biancavilla</div>
+            <div class="event-time">ore 21:00</div>
+          </div>
           <div class="event-title">Festeggiamenti</div>
-          <div class="event-time">21:00</div>
           <div class="event-desc">La festa per celebrare insieme questo traguardo. Una serata speciale al Beauty Garden Banqueting, tra cibo, musica e affetti.</div>
           <div class="event-badge">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
