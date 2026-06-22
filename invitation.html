@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>emailjs.init('D2o-gKXMSKYU2JqdQ');</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
@@ -607,6 +609,11 @@ footer{background:var(--ivory2);border-top:1px solid var(--border);padding:48px 
       </div>
 
       <div class="form-group">
+        <label class="f-label">La tua email (per ricevere conferma)</label>
+        <input class="f-input" type="email" name="email" placeholder="mario.rossi@email.com">
+      </div>
+
+      <div class="form-group">
         <label class="f-label">Un messaggio per gli sposi</label>
         <textarea class="f-textarea" name="messaggio" placeholder="Scrivi un pensiero speciale…"></textarea>
       </div>
@@ -724,39 +731,49 @@ function downloadICS(){
 }
 
 // ── RSVP SUBMIT ──
-// Integra con EmailJS, Formspree o altro backend di tua scelta.
-// Esempio con EmailJS: emailjs.send('SERVICE_ID', 'TEMPLATE_ID', data)
+// Template EmailJS richiesto — crea un template su emailjs.com con questi campi:
+//   {{nome}}, {{cognome}}, {{partecipa}}, {{adulti}}, {{bambini}},
+//   {{dieta}}, {{messaggio}}, {{email_ospite}}, {{data_invio}}
+// Imposta "To email" a: leocatasalvatoredaniel@gmail.com
+// Sostituisci TEMPLATE_RSVP_ID con l'ID del template creato.
+const EMAILJS_SERVICE  = 'service_yguijtb';
+const EMAILJS_TEMPLATE = 'TEMPLATE_RSVP_ID'; // <-- aggiorna qui
+
 async function submitRSVP(e){
   e.preventDefault();
   const btn = document.getElementById('submitBtn');
   const lbl = document.getElementById('submitLabel');
-  const fd = new FormData(e.target);
+  const fd  = new FormData(e.target);
   const dieta = [...document.querySelectorAll('[name=dieta]:checked')].map(x=>x.value).join(', ');
 
   btn.disabled = true;
   lbl.textContent = 'Invio in corso…';
 
+  const partecipa = fd.get('partecipa');
   const data = {
-    nome: fd.get('nome'),
-    cognome: fd.get('cognome'),
-    partecipa: fd.get('partecipa'),
-    adulti: fd.get('adulti'),
-    bambini: fd.get('bambini'),
-    dieta: dieta || 'Nessuna',
-    messaggio: fd.get('messaggio') || ''
+    nome:        fd.get('nome'),
+    cognome:     fd.get('cognome'),
+    partecipa:   partecipa === 'si' ? 'Sì, con gioia!' : 'No, purtroppo non posso',
+    adulti:      partecipa === 'si' ? fd.get('adulti') : '—',
+    bambini:     partecipa === 'si' ? fd.get('bambini') : '—',
+    dieta:       dieta || 'Nessuna',
+    messaggio:   fd.get('messaggio') || '',
+    email_ospite: fd.get('email') || '(non fornita)',
+    data_invio:  new Date().toLocaleString('it-IT', {dateStyle:'long', timeStyle:'short'}),
   };
 
-  // TODO: sostituire con la tua integrazione
-  // await emailjs.send('SERVICE_ID', 'TEMPLATE_ID', data);
-
-  // Simulazione invio (rimuovi quando integri il backend)
-  await new Promise(r => setTimeout(r, 900));
-
-  e.target.reset();
-  btn.disabled = false;
-  lbl.textContent = 'Conferma inviata!';
-  setTimeout(()=>{ lbl.textContent = 'Invia la conferma'; }, 4000);
-  showToast(data.partecipa === 'si' ? 'Presenza confermata — a presto!' : 'Risposta ricevuta, grazie!');
+  try {
+    await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, data);
+    e.target.reset();
+    lbl.textContent = 'Conferma inviata!';
+    setTimeout(()=>{ lbl.textContent = 'Invia la conferma'; btn.disabled = false; }, 5000);
+    showToast(partecipa === 'si' ? 'Presenza confermata — a presto!' : 'Risposta ricevuta, grazie!');
+  } catch(err) {
+    console.error('EmailJS error:', err);
+    showToast('Errore nell\'invio. Riprova.');
+    btn.disabled = false;
+    lbl.textContent = 'Invia la conferma';
+  }
 }
 
 // ── AREA SPOSI ──
