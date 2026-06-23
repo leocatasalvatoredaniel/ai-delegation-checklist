@@ -953,12 +953,24 @@ footer .footer-sub{
 }
 .rsvp-table tr:last-child td{border-bottom:none;}
 .rsvp-pill{
-  display:inline-block;
-  font-size:10px;font-weight:600;letter-spacing:.05em;
-  padding:2px 8px;border-radius:100px;
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:11px;font-weight:600;letter-spacing:.02em;
+  padding:4px 10px;border-radius:100px;white-space:nowrap;
 }
-.rsvp-pill.si{background:rgba(63,185,80,.15);color:#3FB950;}
-.rsvp-pill.no{background:rgba(239,68,68,.12);color:#F87171;}
+.rsvp-pill.si{background:rgba(63,185,80,.12);color:#3FB950;border:1px solid rgba(63,185,80,.2);}
+.rsvp-pill.no{background:rgba(239,68,68,.1);color:#F87171;border:1px solid rgba(239,68,68,.2);}
+.rsvp-stats{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
+  margin-bottom:20px;
+}
+.rsvp-stat{
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+  border-radius:12px;padding:12px 14px;text-align:center;
+}
+.rsvp-stat-n{display:block;font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--white);line-height:1;}
+.rsvp-stat-l{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:4px;}
+.rsvp-nome{font-weight:500;color:rgba(255,255,255,.85);}
+.rsvp-email{font-size:11px;color:rgba(255,255,255,.3);margin-top:2px;font-family:'JetBrains Mono',monospace;}
 .rsvp-count{
   font-family:'JetBrains Mono',monospace;
   font-size:11px;color:rgba(255,255,255,.35);
@@ -1544,21 +1556,34 @@ async function loadRsvpResponses(){
     if(!res.ok) throw new Error('HTTP '+res.status);
     const rows = parseCSV(await res.text());
     if(!rows.length){ wrap.innerHTML='<p class="reserved-msg">Nessuna conferma ancora ricevuta.</p>'; return; }
-    const si = rows.filter(r=>{const p=(r.Presenza||'').toLowerCase(); return p.includes('sì')||p.includes('si');}).length;
+    const isSiCheck = p => { const l=(p||'').toLowerCase(); return l.includes('sì')||l.includes('si'); };
+    const si = rows.filter(r=>isSiCheck(r.Presenza)).length;
+    const no = rows.length - si;
+    const proc = rows.filter(r=>isSiCheck(r.Proclamazione)).length;
+    const fmtDate = s => {
+      if(!s) return '—';
+      const parts = s.split(', '); if(parts.length<2) return s;
+      const [d,m,y] = parts[0].split('/');
+      const mesi=['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+      return `${parseInt(d)} ${mesi[parseInt(m)-1]} · ${parts[1].slice(0,5)}`;
+    };
     wrap.innerHTML = `
-      <p class="rsvp-count">${rows.length} risposta${rows.length!==1?'e':''} &nbsp;·&nbsp; <span style="color:#3FB950">${si} confermata${si!==1?'e':''}</span></p>
-      <div style="overflow-x:auto">
+      <div class="rsvp-stats">
+        <div class="rsvp-stat"><span class="rsvp-stat-n">${rows.length}</span><span class="rsvp-stat-l">Risposte</span></div>
+        <div class="rsvp-stat"><span class="rsvp-stat-n" style="color:#3FB950">${si}</span><span class="rsvp-stat-l">Confermati</span></div>
+        <div class="rsvp-stat"><span class="rsvp-stat-n" style="color:#F87171">${no}</span><span class="rsvp-stat-l">Non vengono</span></div>
+        <div class="rsvp-stat"><span class="rsvp-stat-n" style="color:#93C5FD">${proc}</span><span class="rsvp-stat-l">Proclamazione</span></div>
+      </div>
       <table class="rsvp-table">
-        <thead><tr><th>Nome</th><th>Email</th><th>Presenza</th><th>Proclamazione</th><th>Note</th><th>Data</th></tr></thead>
-        <tbody>${rows.map(r=>{const isSi=(r.Presenza||'').toLowerCase().includes('sì')||(r.Presenza||'').toLowerCase().includes('si');return`<tr>
-          <td>${r.Nome||'—'}</td>
-          <td style="font-size:12px;opacity:.7">${r.Email||'—'}</td>
-          <td><span class="rsvp-pill ${isSi?'si':'no'}">${r.Presenza||'—'}</span></td>
-          <td>${r.Proclamazione||'—'}</td>
-          <td style="max-width:140px;word-break:break-word">${r.Note||'—'}</td>
-          <td style="white-space:nowrap;font-size:11px;opacity:.4">${r.Timestamp||'—'}</td>
+        <thead><tr><th>Ospite</th><th>Presenza</th><th>Proclamaz.</th><th>Note</th><th>Data</th></tr></thead>
+        <tbody>${rows.map(r=>{const ok=isSiCheck(r.Presenza);return`<tr>
+          <td><div class="rsvp-nome">${r.Nome||'—'}</div><div class="rsvp-email">${r.Email||''}</div></td>
+          <td><span class="rsvp-pill ${ok?'si':'no'}">${ok?'✓ Sì':'✗ No'}</span></td>
+          <td style="color:rgba(255,255,255,.6)">${isSiCheck(r.Proclamazione)?'✓ Sì':'✗ No'}</td>
+          <td style="max-width:160px;word-break:break-word;color:rgba(255,255,255,.5);font-size:12px">${r.Note||'—'}</td>
+          <td style="white-space:nowrap;font-size:11px;font-family:\'JetBrains Mono\',monospace;color:rgba(255,255,255,.25)">${fmtDate(r.Timestamp)}</td>
         </tr>`;}).join('')}</tbody>
-      </table></div>`;
+      </table>`;
   } catch(e){
     wrap.innerHTML='<p class="reserved-msg">Errore nel caricamento.<br>Assicurati che il foglio sia condiviso come <strong>Visualizzatore per chiunque con il link</strong>.</p>';
   }
