@@ -1499,5 +1499,162 @@ const obs = new IntersectionObserver(entries=>{
 },{threshold:0.12});
 document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
 </script>
+
+<!-- PROTOTYPE VARIANT SWITCHER — throwaway, delete after picking -->
+<style>
+/* ── Switcher bar ── */
+#proto-switcher{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+  z-index:9999;
+  display:flex;align-items:center;gap:6px;
+  background:rgba(6,11,20,.96);
+  border:1px solid rgba(96,165,250,.3);
+  border-radius:100px;
+  padding:10px 14px;
+  box-shadow:0 8px 32px rgba(0,0,0,.55),0 0 0 1px rgba(96,165,250,.06);
+  backdrop-filter:blur(16px);
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;color:#fff;
+  white-space:nowrap;user-select:none;
+}
+#proto-switcher button{
+  background:none;border:none;color:#60A5FA;cursor:pointer;
+  font-size:16px;line-height:1;padding:2px 8px;border-radius:100px;
+  transition:background 120ms;
+}
+#proto-switcher button:hover{background:rgba(96,165,250,.12);}
+#proto-label{min-width:148px;text-align:center;letter-spacing:.03em;}
+#proto-close{font-size:12px!important;opacity:.5;}
+#proto-close:hover{opacity:1!important;}
+
+/* ── Variant A — Dark Glass ── */
+#program[data-v="A"]{background:var(--navy);}
+#program[data-v="A"] .section-tag{color:rgba(96,165,250,.7);background:rgba(37,99,235,.1);border-color:rgba(96,165,250,.2);}
+#program[data-v="A"] h2{color:#fff;}
+#program[data-v="A"] .section-desc{color:rgba(255,255,255,.4);}
+#program[data-v="A"] .event-card{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(96,165,250,.1);
+  border-radius:24px;
+  box-shadow:none;
+}
+#program[data-v="A"] .event-card::before{display:none;}
+@media(hover:hover) and (pointer:fine){
+  #program[data-v="A"] .event-card:hover{
+    border-color:rgba(96,165,250,.28);
+    box-shadow:0 20px 60px rgba(37,99,235,.14);
+    transform:translateY(-4px);
+  }
+}
+#program[data-v="A"] .event-idx{color:rgba(96,165,250,.05);font-size:80px;}
+#program[data-v="A"] .event-date{color:#60A5FA;}
+#program[data-v="A"] .event-time{background:rgba(37,99,235,.25);border:1px solid rgba(37,99,235,.5);color:#BFDBFE;}
+#program[data-v="A"] .event-title{color:#fff;}
+#program[data-v="A"] .event-desc{color:rgba(255,255,255,.5);}
+#program[data-v="A"] .event-badge{background:rgba(37,99,235,.1);color:#60A5FA;border-color:rgba(96,165,250,.2);}
+
+/* ── Variant B — Minimal Left Border ── */
+#program[data-v="B"]{background:#F0F4FF;}
+#program[data-v="B"] .event-card{
+  background:#fff;
+  border:none;
+  border-radius:4px;
+  border-left:3px solid var(--blue);
+  box-shadow:0 1px 6px rgba(10,22,40,.05);
+  padding-left:32px;
+}
+#program[data-v="B"] .event-card::before{display:none;}
+@media(hover:hover) and (pointer:fine){
+  #program[data-v="B"] .event-card:hover{
+    transform:translateX(5px);
+    box-shadow:0 4px 20px rgba(37,99,235,.1);
+  }
+}
+#program[data-v="B"] .event-card:active{transform:translateX(2px) scale(1);}
+#program[data-v="B"] .event-idx{display:none;}
+#program[data-v="B"] .event-time{background:transparent;color:var(--blue);border:1px solid rgba(37,99,235,.3);}
+#program[data-v="B"] .event-badge{background:transparent;border-color:rgba(37,99,235,.15);}
+
+/* ── Variant C — Typographic Dark ── */
+#program[data-v="C"]{background:#060B14;}
+#program[data-v="C"] .section-tag{color:rgba(96,165,250,.6);background:transparent;border-color:rgba(96,165,250,.15);}
+#program[data-v="C"] h2{color:#fff;}
+#program[data-v="C"] .section-desc{color:rgba(255,255,255,.35);}
+#program[data-v="C"] .program-grid{grid-template-columns:1fr;gap:0;}
+#program[data-v="C"] .event-card{
+  background:transparent;border:none;border-radius:0;
+  border-top:1px solid rgba(255,255,255,.1);
+  box-shadow:none;padding:40px 0;
+  overflow:visible;
+}
+#program[data-v="C"] .program-grid .event-card:last-child{border-bottom:1px solid rgba(255,255,255,.1);}
+#program[data-v="C"] .event-card::before{display:none;}
+@media(hover:hover) and (pointer:fine){
+  #program[data-v="C"] .event-card:hover{transform:none;box-shadow:none;}
+}
+#program[data-v="C"] .event-idx{
+  position:static;display:block;
+  font-size:11px;letter-spacing:.25em;
+  color:rgba(96,165,250,.45);
+  margin-bottom:20px;
+}
+#program[data-v="C"] .event-header{margin-bottom:16px;}
+#program[data-v="C"] .event-date{color:#60A5FA;font-size:11px;}
+#program[data-v="C"] .event-time{background:transparent;color:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.12);}
+#program[data-v="C"] .event-title{
+  color:#fff;
+  font-size:clamp(32px,6vw,52px);
+  margin-bottom:16px;
+  letter-spacing:-.04em;
+}
+#program[data-v="C"] .event-desc{color:rgba(255,255,255,.45);font-size:15px;}
+#program[data-v="C"] .event-badge{background:transparent;color:rgba(96,165,250,.5);border-color:rgba(96,165,250,.15);}
+</style>
+<script>
+(function(){
+  const params = new URLSearchParams(location.search);
+  const VARIANTS = ['A','B','C'];
+  const NAMES = {A:'Dark Glass',B:'Minimal Line',C:'Typographic'};
+  let cur = (params.get('variant')||'A').toUpperCase();
+  if(!VARIANTS.includes(cur)) cur='A';
+
+  const prog = document.getElementById('program');
+  function apply(v){
+    cur = v;
+    if(prog) prog.dataset.v = v;
+    const lbl = document.getElementById('proto-label');
+    if(lbl) lbl.textContent = v + ' — ' + NAMES[v];
+    const p = new URLSearchParams(location.search);
+    p.set('variant', v);
+    history.replaceState(null,'','?'+p.toString()+(location.hash||''));
+  }
+
+  const bar = document.createElement('div');
+  bar.id = 'proto-switcher';
+  bar.innerHTML =
+    '<button id="proto-prev">←</button>'+
+    '<span id="proto-label"></span>'+
+    '<button id="proto-next">→</button>'+
+    '<button id="proto-close" title="Chiudi">✕</button>';
+  document.body.appendChild(bar);
+
+  apply(cur);
+
+  document.getElementById('proto-prev').onclick = function(){
+    apply(VARIANTS[(VARIANTS.indexOf(cur)-1+VARIANTS.length)%VARIANTS.length]);
+  };
+  document.getElementById('proto-next').onclick = function(){
+    apply(VARIANTS[(VARIANTS.indexOf(cur)+1)%VARIANTS.length]);
+  };
+  document.getElementById('proto-close').onclick = function(){
+    bar.style.display='none';
+  };
+  document.addEventListener('keydown',function(e){
+    if(['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) return;
+    if(e.key==='ArrowLeft') document.getElementById('proto-prev').click();
+    if(e.key==='ArrowRight') document.getElementById('proto-next').click();
+  });
+})();
+</script>
 </body>
 </html>
