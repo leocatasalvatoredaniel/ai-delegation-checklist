@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍕</text></svg>">
 <title>Laurea · Salvatore Daniel Leocata</title>
 <meta name="description" content="Sei invitato a celebrare la laurea in Ingegneria Informatica di Salvatore Daniel Leocata al Politecnico di Torino.">
 <meta property="og:title" content="Laurea · Salvatore Daniel Leocata">
@@ -1305,11 +1306,13 @@ footer .footer-sub{
       </div>
     </div>
     <div class="modal-content" id="reservedContent">
-      <h3 style="margin-bottom:16px">Conferme ricevute</h3>
-      <div id="rsvpTableWrap">
-        <p class="reserved-msg" id="rsvpLoading">Caricamento...</p>
-      </div>
-      <button class="modal-cancel" onclick="closeModal()" style="margin-top:20px;width:100%">Chiudi</button>
+      <h3 style="margin-bottom:8px">Conferme ricevute</h3>
+      <p class="reserved-msg" style="margin-bottom:20px">Le risposte vengono salvate automaticamente nel foglio Google.</p>
+      <a href="https://docs.google.com/spreadsheets/d/1OK2ONnYEXpUsRxft2hus5tuOyhmKKICABlmgliQCwNE/edit" target="_blank" rel="noopener" class="modal-send" style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;margin-bottom:12px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Apri il foglio Google
+      </a>
+      <button class="modal-cancel" onclick="closeModal()" style="width:100%">Chiudi</button>
     </div>
   </div>
 </div>
@@ -1483,7 +1486,7 @@ document.getElementById('rsvpForm').addEventListener('submit', async e=>{
     };
     await Promise.all([
       emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, params),
-      fetch(SHEETS_URL, {method:'POST', body:JSON.stringify(sheetsPayload)}),
+      fetch(SHEETS_URL, {method:'POST', mode:'no-cors', body:JSON.stringify(sheetsPayload)}),
     ]);
     showToast('Risposta inviata! A presto 🎓', 5000);
     form.reset();
@@ -1521,44 +1524,11 @@ function closeModal(){
 function closeModalOutside(e){
   if(e.target===document.getElementById('modalOverlay')) closeModal();
 }
-async function loadRsvpResponses(){
-  const wrap = document.getElementById('rsvpTableWrap');
-  wrap.innerHTML = '<p class="reserved-msg">Caricamento...</p>';
-  try {
-    const res = await fetch(SHEETS_URL);
-    const rows = await res.json();
-    if(!rows.length){
-      wrap.innerHTML = '<p class="reserved-msg">Nessuna conferma ancora ricevuta.</p>';
-      return;
-    }
-    const si = rows.filter(r=>r.presenza && r.presenza.toLowerCase().includes('sì')||r.presenza&&r.presenza.toLowerCase().includes('si')).length;
-    wrap.innerHTML = `
-      <p class="rsvp-count">${rows.length} risposta${rows.length!==1?'e':''} · ${si} confermata${si!==1?'e':''}</p>
-      <div style="overflow-x:auto">
-      <table class="rsvp-table">
-        <thead><tr>
-          <th>Nome</th><th>Presenza</th><th>Proclamazione</th><th>Note</th><th>Data</th>
-        </tr></thead>
-        <tbody>${rows.map(r=>`<tr>
-          <td>${r.nome||'—'}</td>
-          <td><span class="rsvp-pill ${(r.presenza||'').toLowerCase().includes('sì')||(r.presenza||'').toLowerCase().includes('si')?'si':'no'}">${r.presenza||'—'}</span></td>
-          <td>${r.proclamazione||'—'}</td>
-          <td style="max-width:160px;word-break:break-word">${r.note||'—'}</td>
-          <td style="white-space:nowrap;opacity:.5">${r.timestamp||'—'}</td>
-        </tr>`).join('')}</tbody>
-      </table>
-      </div>`;
-  } catch(e){
-    wrap.innerHTML = '<p class="reserved-msg">Errore nel caricamento. Riprova.</p>';
-  }
-}
-
-async function checkPwd(){
+function checkPwd(){
   const pwd = document.getElementById('modalPwd').value.trim();
   if(pwd === 'SDL2026'){
     document.getElementById('loginSection').style.display='none';
     document.getElementById('reservedContent').classList.add('visible');
-    await loadRsvpResponses();
   } else {
     document.getElementById('modalPwd').style.borderColor='#EF4444';
     setTimeout(()=>document.getElementById('modalPwd').style.borderColor='', 800);
