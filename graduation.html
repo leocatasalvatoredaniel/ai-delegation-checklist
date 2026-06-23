@@ -928,6 +928,38 @@ footer .footer-sub{
   font-family:'JetBrains Mono',monospace;
   font-weight:500;
 }
+.rsvp-table{
+  width:100%;border-collapse:collapse;
+  font-size:13px;margin-top:4px;
+}
+.rsvp-table th{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(96,165,250,.7);
+  padding:8px 10px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  text-align:left;
+  white-space:nowrap;
+}
+.rsvp-table td{
+  padding:10px 10px;
+  border-bottom:1px solid rgba(255,255,255,.05);
+  color:rgba(255,255,255,.75);
+  vertical-align:top;
+}
+.rsvp-table tr:last-child td{border-bottom:none;}
+.rsvp-pill{
+  display:inline-block;
+  font-size:10px;font-weight:600;letter-spacing:.05em;
+  padding:2px 8px;border-radius:100px;
+}
+.rsvp-pill.si{background:rgba(63,185,80,.15);color:#3FB950;}
+.rsvp-pill.no{background:rgba(239,68,68,.12);color:#F87171;}
+.rsvp-count{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;color:rgba(255,255,255,.35);
+  margin-bottom:14px;
+}
 
 /* ─── ANIMATIONS ──────────────────────────────────────── */
 .fade-up{
@@ -1274,12 +1306,9 @@ footer .footer-sub{
     </div>
     <div class="modal-content" id="reservedContent">
       <h3 style="margin-bottom:16px">Conferme ricevute</h3>
-      <p class="reserved-msg">
-        Le conferme vengono inviate via EmailJS al tuo indirizzo.<br><br>
-        <strong>Service:</strong> service_yguijtb<br>
-        <strong>Template:</strong> template_ud4dvgj<br><br>
-        Accedi alla dashboard EmailJS per visualizzare tutte le risposte.
-      </p>
+      <div id="rsvpTableWrap">
+        <p class="reserved-msg" id="rsvpLoading">Caricamento...</p>
+      </div>
       <button class="modal-cancel" onclick="closeModal()" style="margin-top:20px;width:100%">Chiudi</button>
     </div>
   </div>
@@ -1290,6 +1319,7 @@ footer .footer-sub{
 (function(){emailjs.init({publicKey:'D2o-gKXMSKYU2JqdQ'});})();
 const EMAILJS_SERVICE  = 'service_yguijtb';
 const EMAILJS_TEMPLATE = 'template_ud4dvgj';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyVZvehOsmfvCKE_OjkgcElrGCUoBk-nP55cEMFN6vA93zGlrE0krSZhmH2uL2nArF5Tg/exec';
 
 // ─── TERMINAL SPLASH ────────────────────────────────────
 const lines = [
@@ -1444,7 +1474,17 @@ document.getElementById('rsvpForm').addEventListener('submit', async e=>{
   };
 
   try {
-    await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, params);
+    const sheetsPayload = {
+      nome:          `${data.nome} ${data.cognome}`,
+      email:         data.email_ospite,
+      presenza:      data.partecipa,
+      proclamazione: data.proclamazione || 'Non specificato',
+      note:          [data.dieta ? `Dieta: ${data.dieta}` : '', data.messaggio || ''].filter(Boolean).join(' | '),
+    };
+    await Promise.all([
+      emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, params),
+      fetch(SHEETS_URL, {method:'POST', body:JSON.stringify(sheetsPayload)}),
+    ]);
     showToast('Risposta inviata! A presto 🎓', 5000);
     form.reset();
   } catch(err){
@@ -1481,11 +1521,44 @@ function closeModal(){
 function closeModalOutside(e){
   if(e.target===document.getElementById('modalOverlay')) closeModal();
 }
-function checkPwd(){
+async function loadRsvpResponses(){
+  const wrap = document.getElementById('rsvpTableWrap');
+  wrap.innerHTML = '<p class="reserved-msg">Caricamento...</p>';
+  try {
+    const res = await fetch(SHEETS_URL);
+    const rows = await res.json();
+    if(!rows.length){
+      wrap.innerHTML = '<p class="reserved-msg">Nessuna conferma ancora ricevuta.</p>';
+      return;
+    }
+    const si = rows.filter(r=>r.presenza && r.presenza.toLowerCase().includes('sì')||r.presenza&&r.presenza.toLowerCase().includes('si')).length;
+    wrap.innerHTML = `
+      <p class="rsvp-count">${rows.length} risposta${rows.length!==1?'e':''} · ${si} confermata${si!==1?'e':''}</p>
+      <div style="overflow-x:auto">
+      <table class="rsvp-table">
+        <thead><tr>
+          <th>Nome</th><th>Presenza</th><th>Proclamazione</th><th>Note</th><th>Data</th>
+        </tr></thead>
+        <tbody>${rows.map(r=>`<tr>
+          <td>${r.nome||'—'}</td>
+          <td><span class="rsvp-pill ${(r.presenza||'').toLowerCase().includes('sì')||(r.presenza||'').toLowerCase().includes('si')?'si':'no'}">${r.presenza||'—'}</span></td>
+          <td>${r.proclamazione||'—'}</td>
+          <td style="max-width:160px;word-break:break-word">${r.note||'—'}</td>
+          <td style="white-space:nowrap;opacity:.5">${r.timestamp||'—'}</td>
+        </tr>`).join('')}</tbody>
+      </table>
+      </div>`;
+  } catch(e){
+    wrap.innerHTML = '<p class="reserved-msg">Errore nel caricamento. Riprova.</p>';
+  }
+}
+
+async function checkPwd(){
   const pwd = document.getElementById('modalPwd').value.trim();
   if(pwd === 'SDL2026'){
     document.getElementById('loginSection').style.display='none';
     document.getElementById('reservedContent').classList.add('visible');
+    await loadRsvpResponses();
   } else {
     document.getElementById('modalPwd').style.borderColor='#EF4444';
     setTimeout(()=>document.getElementById('modalPwd').style.borderColor='', 800);
