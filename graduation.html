@@ -862,9 +862,12 @@ footer .footer-sub{
   border:1px solid rgba(96,165,250,.15);
   border-radius:20px;
   padding:36px;
-  width:min(440px,100%);
+  width:min(720px,95vw);
+  max-height:90vh;
+  overflow-y:auto;
   animation:modalIn 300ms cubic-bezier(.34,1.56,.64,1);
 }
+#loginSection .modal{width:min(440px,95vw);}
 @keyframes modalIn{from{transform:scale(0.95);opacity:0;}to{transform:scale(1);opacity:1;}}
 .modal h3{
   font-family:'Space Grotesk',sans-serif;
@@ -1306,13 +1309,12 @@ footer .footer-sub{
       </div>
     </div>
     <div class="modal-content" id="reservedContent">
-      <h3 style="margin-bottom:8px">Conferme ricevute</h3>
-      <p class="reserved-msg" style="margin-bottom:20px">Le risposte vengono salvate automaticamente nel foglio Google.</p>
-      <a href="https://docs.google.com/spreadsheets/d/1OK2ONnYEXpUsRxft2hus5tuOyhmKKICABlmgliQCwNE/edit" target="_blank" rel="noopener" class="modal-send" style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;margin-bottom:12px;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        Apri il foglio Google
-      </a>
-      <button class="modal-cancel" onclick="closeModal()" style="width:100%">Chiudi</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;">
+        <h3 style="margin:0">Conferme ricevute</h3>
+        <button onclick="loadRsvpResponses()" style="background:none;border:1px solid rgba(96,165,250,.3);color:var(--blue-l);font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 12px;border-radius:6px;cursor:pointer;">↻ Aggiorna</button>
+      </div>
+      <div id="rsvpTableWrap"><p class="reserved-msg">Caricamento...</p></div>
+      <button class="modal-cancel" onclick="closeModal()" style="margin-top:20px;width:100%">Chiudi</button>
     </div>
   </div>
 </div>
@@ -1476,27 +1478,22 @@ document.getElementById('rsvpForm').addEventListener('submit', async e=>{
     data_invio: new Date().toLocaleString('it-IT'),
   };
 
+  const sheetsPayload = {
+    nome:          `${data.nome} ${data.cognome}`,
+    email:         data.email_ospite,
+    presenza:      data.partecipa,
+    proclamazione: data.proclamazione || 'Non specificato',
+    note:          [data.dieta ? `Dieta: ${data.dieta}` : '', data.messaggio || ''].filter(Boolean).join(' | '),
+  };
+  // Fire-and-forget to Sheets (don't block on this)
+  fetch(SHEETS_URL, {method:'POST', mode:'no-cors', body:JSON.stringify(sheetsPayload)}).catch(()=>{});
   try {
-    const sheetsPayload = {
-      nome:          `${data.nome} ${data.cognome}`,
-      email:         data.email_ospite,
-      presenza:      data.partecipa,
-      proclamazione: data.proclamazione || 'Non specificato',
-      note:          [data.dieta ? `Dieta: ${data.dieta}` : '', data.messaggio || ''].filter(Boolean).join(' | '),
-    };
-    await Promise.all([
-      emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, params),
-      fetch(SHEETS_URL, {method:'POST', mode:'no-cors', body:JSON.stringify(sheetsPayload)}),
-    ]);
-    showToast('Risposta inviata! A presto 🎓', 5000);
-    form.reset();
-  } catch(err){
-    showToast('Errore nell\'invio. Riprova più tardi.');
-    console.error(err);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Invia conferma';
-  }
+    await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, params);
+  } catch(err){ console.warn('EmailJS:', err); }
+  showToast('Risposta inviata! A presto 🎓', 5000);
+  form.reset();
+  btn.disabled = false;
+  btn.textContent = 'Invia conferma';
 });
 
 // ─── ICS ─────────────────────────────────────────────────
@@ -1524,11 +1521,54 @@ function closeModal(){
 function closeModalOutside(e){
   if(e.target===document.getElementById('modalOverlay')) closeModal();
 }
-function checkPwd(){
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/1OK2ONnYEXpUsRxft2hus5tuOyhmKKICABlmgliQCwNE/export?format=csv&sheet=RSVP';
+
+function parseCSV(text){
+  const lines = text.trim().split('\n');
+  if(lines.length < 2) return [];
+  const hdrs = lines[0].split(',').map(h=>h.replace(/^"|"$/g,'').trim());
+  return lines.slice(1).map(line=>{
+    const vals=[]; let cur='', inQ=false;
+    for(const c of line){ if(c==='"') inQ=!inQ; else if(c===',' && !inQ){vals.push(cur);cur='';}else cur+=c; }
+    vals.push(cur);
+    const obj={}; hdrs.forEach((h,i)=>obj[h]=(vals[i]||'').replace(/^"|"$/g,'').trim()); return obj;
+  });
+}
+
+async function loadRsvpResponses(){
+  const wrap = document.getElementById('rsvpTableWrap');
+  wrap.innerHTML = '<p class="reserved-msg">Caricamento...</p>';
+  try {
+    const res = await fetch(CSV_URL);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const rows = parseCSV(await res.text());
+    if(!rows.length){ wrap.innerHTML='<p class="reserved-msg">Nessuna conferma ancora ricevuta.</p>'; return; }
+    const si = rows.filter(r=>{const p=(r.Presenza||'').toLowerCase(); return p.includes('sì')||p.includes('si');}).length;
+    wrap.innerHTML = `
+      <p class="rsvp-count">${rows.length} risposta${rows.length!==1?'e':''} &nbsp;·&nbsp; <span style="color:#3FB950">${si} confermata${si!==1?'e':''}</span></p>
+      <div style="overflow-x:auto">
+      <table class="rsvp-table">
+        <thead><tr><th>Nome</th><th>Email</th><th>Presenza</th><th>Proclamazione</th><th>Note</th><th>Data</th></tr></thead>
+        <tbody>${rows.map(r=>{const isSi=(r.Presenza||'').toLowerCase().includes('sì')||(r.Presenza||'').toLowerCase().includes('si');return`<tr>
+          <td>${r.Nome||'—'}</td>
+          <td style="font-size:12px;opacity:.7">${r.Email||'—'}</td>
+          <td><span class="rsvp-pill ${isSi?'si':'no'}">${r.Presenza||'—'}</span></td>
+          <td>${r.Proclamazione||'—'}</td>
+          <td style="max-width:140px;word-break:break-word">${r.Note||'—'}</td>
+          <td style="white-space:nowrap;font-size:11px;opacity:.4">${r.Timestamp||'—'}</td>
+        </tr>`;}).join('')}</tbody>
+      </table></div>`;
+  } catch(e){
+    wrap.innerHTML='<p class="reserved-msg">Errore nel caricamento.<br>Assicurati che il foglio sia condiviso come <strong>Visualizzatore per chiunque con il link</strong>.</p>';
+  }
+}
+
+async function checkPwd(){
   const pwd = document.getElementById('modalPwd').value.trim();
   if(pwd === 'SDL2026'){
     document.getElementById('loginSection').style.display='none';
     document.getElementById('reservedContent').classList.add('visible');
+    loadRsvpResponses();
   } else {
     document.getElementById('modalPwd').style.borderColor='#EF4444';
     setTimeout(()=>document.getElementById('modalPwd').style.borderColor='', 800);
