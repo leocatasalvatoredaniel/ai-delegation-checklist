@@ -1478,7 +1478,7 @@ document.getElementById('rsvpForm').addEventListener('submit', async e=>{
     data_invio: new Date().toLocaleString('it-IT'),
   };
 
-  // Fire-and-forget via GET (avoids POST body loss on Apps Script redirect)
+  // Fire-and-forget via Image (bypasses CORS entirely — most reliable approach)
   const writeParams = new URLSearchParams({
     action:        'write',
     nome:          `${data.nome} ${data.cognome}`,
@@ -1487,7 +1487,7 @@ document.getElementById('rsvpForm').addEventListener('submit', async e=>{
     proclamazione: data.proclamazione || 'Non specificato',
     note:          [data.dieta ? `Dieta: ${data.dieta}` : '', data.messaggio || ''].filter(Boolean).join(' | '),
   });
-  fetch(`${SHEETS_URL}?${writeParams}`, {mode:'no-cors'}).catch(()=>{});
+  new Image().src = `${SHEETS_URL}?${writeParams}`;
   try {
     await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, params);
   } catch(err){ console.warn('EmailJS:', err); }
