@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy: #0a192f;
+  --color-navy-2: #0d2138;
+  --color-navy-3: #08111f;
+  --color-gold: #f5c842;
+  --color-gold-2: #ffd877;
+  --color-ink: #f8fafc;
+  --color-dim: rgba(248, 250, 252, 0.5);
+  --color-dim-2: rgba(248, 250, 252, 0.26);
+
+  --font-sans: var(--font-space-grotesk), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-spotlight: spotlight 2.4s ease 0.55s 1 forwards;
+  --animate-shimmer-text: shimmerText 8s linear infinite;
+  --animate-nudge: nudge 2.2s ease-in-out infinite;
+  --animate-beam: beam 7s linear infinite;
+}
+
+@keyframes spotlight {
+  0% {
+    opacity: 0;
+    transform: translate(-72%, -62%) scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -40%) scale(1);
+  }
+}
+@keyframes shimmerText {
+  to {
+    background-position: 200% center;
+  }
+}
+@keyframes nudge {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(7px);
+  }
+}
+@keyframes beam {
+  0% {
+    offset-distance: 0%;
+  }
+  100% {
+    offset-distance: 100%;
+  }
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-navy);
+  color: var(--color-ink);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-gold);
+  color: var(--color-navy);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Shimmering gold display text (Aceternity-style) */
+.text-shimmer {
+  background: linear-gradient(
+    110deg,
+    var(--color-ink) 18%,
+    var(--color-gold) 38%,
+    var(--color-gold-2) 52%,
+    var(--color-ink) 72%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: var(--animate-shimmer-text);
+}
+
+.text-stroke-gold {
+  color: transparent;
+  -webkit-text-stroke: clamp(1px, 0.3vw, 3px) var(--color-gold);
+}
+.text-stroke-ink {
+  color: transparent;
+  -webkit-text-stroke: clamp(1px, 0.3vw, 3px) var(--color-ink);
+}
+
+/* difference blend for oversized display type over canvas FX */
+.blend {
+  mix-blend-mode: difference;
+}
