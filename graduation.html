@@ -995,17 +995,17 @@ footer .footer-sub{
 
 /* ─── ANIMATIONS ──────────────────────────────────────── */
 .fade-up{
-  opacity:0;transform:translateY(28px);
-  transition:opacity 500ms var(--ease-out),transform 500ms var(--ease-out);
+  opacity:0;transform:translateY(34px) scale(.985);filter:blur(6px);
+  transition:opacity 700ms var(--ease-out),transform 700ms var(--ease-out),filter 700ms var(--ease-out);
 }
-.fade-up.in{opacity:1;transform:translateY(0);}
+.fade-up.in{opacity:1;transform:none;filter:blur(0);}
 .fade-up.delay-1{transition-delay:80ms;}
 .fade-up.delay-2{transition-delay:160ms;}
 .fade-up.delay-3{transition-delay:240ms;}
 
 /* prefers-reduced-motion */
 @media(prefers-reduced-motion:reduce){
-  .fade-up{transform:none;transition:opacity 200ms ease;}
+  .fade-up{transform:none;filter:none;transition:opacity 200ms ease;}
   .chip{animation:none;transform:rotateX(18deg) rotateY(-15deg);}
   .star{animation:none;opacity:.4;}
   #toast,#toast.show{transition:opacity 200ms ease;}
@@ -1057,16 +1057,157 @@ footer .footer-sub{
   .reserved-btn{bottom:auto;}
 }
 
+/* ═══════════════════════════════════════════════════════
+   CINEMATIC LAYER — scene cuts, grain, chapter numerals,
+   shimmer title, glass sheen, scroll-to-top   (additive)
+   ═══════════════════════════════════════════════════════ */
+
+/* film grain — fixed, static (perf-safe), never blocks input */
+#grain{
+  position:fixed;inset:0;z-index:95;pointer-events:none;
+  opacity:.05;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* SCENE CUTS — each chapter wipes over the previous (ascending depth) */
+main>section{position:relative;}
+#hero{z-index:1;}
+#stats{z-index:2;}
+#countdown{z-index:3;}
+#program{z-index:4;}
+#locations{z-index:5;}
+#rsvp{z-index:6;}
+main>section:not(#hero){
+  border-top-left-radius:clamp(24px,5vw,44px);
+  border-top-right-radius:clamp(24px,5vw,44px);
+  margin-top:-48px;
+  padding-top:148px;
+}
+#stats{margin-top:0;padding-top:120px;}
+#program,#locations{position:relative;overflow:hidden;}
+/* luminous seam at every cut */
+main>section:not(#hero)::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;z-index:3;
+  border-top-left-radius:inherit;border-top-right-radius:inherit;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(96,165,250,.5),rgba(196,167,71,.4),transparent);
+}
+#program::before,#locations::before{background:linear-gradient(90deg,transparent,rgba(37,99,235,.4),transparent);}
+
+/* CHAPTER WATERMARKS — big faint editorial numerals */
+main{counter-reset:chap -1;}
+main>section{counter-increment:chap;}
+main>section:not(#hero) .section-inner::before{
+  content:counter(chap,decimal-leading-zero);
+  position:absolute;top:-78px;right:0;z-index:-1;
+  font-family:'Space Grotesk',sans-serif;font-weight:700;
+  font-size:clamp(110px,20vw,240px);line-height:.8;letter-spacing:-.05em;
+  pointer-events:none;user-select:none;
+}
+#stats .section-inner::before,#countdown .section-inner::before,#rsvp .section-inner::before{color:#fff;opacity:.04;}
+#program .section-inner::before,#locations .section-inner::before{color:var(--navy);opacity:.05;}
+
+/* LINEAR-STYLE GRID texture on the light program section */
+#program::after{
+  content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(37,99,235,.05) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(37,99,235,.05) 1px,transparent 1px);
+  background-size:46px 46px;
+  -webkit-mask-image:radial-gradient(130% 80% at 50% 0%,#000 35%,transparent 78%);
+          mask-image:radial-gradient(130% 80% at 50% 0%,#000 35%,transparent 78%);
+}
+
+/* HERO — shimmering display title, vignette, light sweep */
+.cine-title{
+  color:#fff;
+  background:linear-gradient(100deg,#fff 0%,var(--blue-xl) 28%,#fff 50%,var(--blue-l) 72%,#fff 100%);
+  background-size:200% 100%;
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:titleShimmer 9s linear infinite;
+}
+@keyframes titleShimmer{to{background-position:-200% 0;}}
+.hero-vignette{
+  position:absolute;inset:0;z-index:3;pointer-events:none;
+  background:radial-gradient(125% 90% at 50% 38%,transparent 52%,rgba(3,6,12,.6) 100%);
+}
+.hero-sweep{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden;}
+.hero-sweep::after{
+  content:'';position:absolute;top:-50%;height:200%;width:45%;left:-60%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent);
+  transform:rotate(8deg);
+  animation:heroSweep 8s ease-in-out 1.4s infinite;
+}
+@keyframes heroSweep{0%{left:-60%;}55%,100%{left:150%;}}
+.scroll-hint{z-index:4;}
+
+/* GLASS REFINEMENT — diagonal sheen + lift on cards */
+.stat-card,.cd-box{
+  background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}
+.stat-card::after,.cd-box::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(120deg,transparent 42%,rgba(255,255,255,.06) 50%,transparent 58%);
+  opacity:0;transition:opacity 400ms var(--ease-out);
+}
+.cd-box{transition:border-color 200ms var(--ease-out),transform 300ms var(--ease-out),box-shadow 300ms var(--ease-out);}
+@media(hover:hover) and (pointer:fine){
+  .stat-card:hover::after,.cd-box:hover::after{opacity:1;}
+  .cd-box:hover{transform:translateY(-3px);box-shadow:0 14px 40px rgba(37,99,235,.18);}
+}
+#countdown .cd-num{text-shadow:0 0 26px rgba(96,165,250,.35);}
+.cd-num.tick{animation:cdTick 420ms var(--ease-spring);}
+@keyframes cdTick{0%{transform:scale(1);}30%{transform:scale(1.13);}100%{transform:scale(1);}}
+
+/* event cards: 3D tilt needs perspective context + snappy reset */
+.event-card{transition:transform 220ms var(--ease-out),border-color 200ms var(--ease-out),box-shadow 200ms var(--ease-out);transform-style:preserve-3d;}
+
+/* NAV — active chapter indicator (gold) */
+.nav-links a{position:relative;}
+.nav-links a.active{color:var(--gold);}
+.nav-links a.active::after{
+  content:'';position:absolute;left:0;right:0;bottom:-7px;height:2px;border-radius:2px;
+  background:var(--gold);box-shadow:0 0 10px rgba(196,167,71,.6);
+}
+
+/* SCROLL-TO-TOP — cinematic gold orb */
+#scrollTop{
+  position:fixed;left:24px;z-index:99;
+  bottom:max(24px,calc(env(safe-area-inset-bottom) + 12px));
+  width:46px;height:46px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  background:rgba(10,22,40,.7);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  border:1px solid rgba(196,167,71,.35);color:var(--gold);
+  box-shadow:0 8px 28px rgba(0,0,0,.35);
+  opacity:0;transform:translateY(16px) scale(.9);pointer-events:none;
+  transition:opacity 300ms var(--ease-out),transform 300ms var(--ease-out),border-color 200ms var(--ease-out),box-shadow 200ms var(--ease-out);
+  touch-action:manipulation;
+}
+#scrollTop.show{opacity:1;transform:none;pointer-events:auto;}
+#scrollTop:active{transform:scale(.92);}
+@media(hover:hover) and (pointer:fine){
+  #scrollTop:hover{border-color:var(--gold);box-shadow:0 0 26px rgba(196,167,71,.32);}
+}
+@media(max-width:600px){
+  #scrollTop{width:42px;height:42px;left:14px;bottom:max(16px,calc(env(safe-area-inset-bottom) + 8px));}
+}
+
 /* respect reduced-motion for every added effect (must stay last) */
 @media(prefers-reduced-motion:reduce){
   .stars,.chip-wrap,[data-parallax],.aurora{transform:none!important;will-change:auto;}
   #scrollProgress{box-shadow:none;}
+  .cine-title{animation:none;}
+  .hero-sweep::after{animation:none;display:none;}
+  .cd-num.tick{animation:none;}
+  #scrollTop{transition:opacity 200ms ease;}
 }
 </style>
 </head>
 <body>
 
 <div id="scrollProgress" aria-hidden="true"></div>
+<div id="grain" aria-hidden="true"></div>
 
 <!-- SPLASH -->
 <div id="splash" onclick="dismissSplash()">
@@ -1105,6 +1246,8 @@ footer .footer-sub{
   <!-- HERO -->
   <section id="hero">
     <div class="stars" id="stars"></div>
+    <div class="hero-vignette" aria-hidden="true"></div>
+    <div class="hero-sweep" aria-hidden="true"></div>
 
     <div class="chip-wrap">
       <div class="chip" id="chip">
@@ -1118,7 +1261,7 @@ footer .footer-sub{
     </div>
 
     <div class="hero-label">// proclama · 2026</div>
-    <h1><span class="first">Salvatore Daniel</span><br>Leocata</h1>
+    <h1 class="cine-title"><span class="first">Salvatore Daniel</span><br>Leocata</h1>
     <p class="hero-sub">Ingegneria Informatica</p>
     <p class="hero-uni">Politecnico di Torino — A.A. 2025/2026</p>
 
@@ -1138,17 +1281,17 @@ footer .footer-sub{
       <div class="stats-grid fade-up delay-2">
         <div class="stat-card">
           <span class="stat-emoji">😴</span>
-          <div class="stat-num">1.847</div>
+          <div class="stat-num" data-count="1847" data-sep="1">1.847</div>
           <div class="stat-desc">ore di sonno<br>perse</div>
         </div>
         <div class="stat-card">
           <span class="stat-emoji">🍸</span>
-          <div class="stat-num">312</div>
+          <div class="stat-num" data-count="312">312</div>
           <div class="stat-desc">gin tonic consumati<br><span class="stat-note">(stima cautelativa)</span></div>
         </div>
         <div class="stat-card">
           <span class="stat-emoji">👁️</span>
-          <div class="stat-num">12k+</div>
+          <div class="stat-num" data-count="12" data-suffix="k+">12k+</div>
           <div class="stat-desc">ore fissando<br>uno schermo</div>
         </div>
         <div class="stat-card">
@@ -1375,6 +1518,11 @@ footer .footer-sub{
 <!-- TOAST -->
 <div id="toast"></div>
 
+<!-- SCROLL TO TOP -->
+<button id="scrollTop" aria-label="Torna su">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
 <!-- AREA RISERVATA -->
 <button class="reserved-btn" onclick="openModal()" aria-label="Area riservata — conferme RSVP">// area riservata</button>
 
@@ -1518,7 +1666,11 @@ function updateCD(){
   document.getElementById('cd-d').textContent = String(d).padStart(2,'0');
   document.getElementById('cd-h').textContent = String(h).padStart(2,'0');
   document.getElementById('cd-m').textContent = String(m).padStart(2,'0');
-  document.getElementById('cd-s').textContent = String(s).padStart(2,'0');
+  const sEl = document.getElementById('cd-s');
+  sEl.textContent = String(s).padStart(2,'0');
+  if(!matchMedia('(prefers-reduced-motion:reduce)').matches){
+    sEl.classList.remove('tick'); void sEl.offsetWidth; sEl.classList.add('tick');
+  }
 }
 updateCD();
 setInterval(updateCD,1000);
@@ -1716,6 +1868,7 @@ const parallaxEls = [...document.querySelectorAll('[data-parallax]')];
 const stars   = document.getElementById('stars');
 const chipW   = document.querySelector('.chip-wrap');
 const heroSec = document.getElementById('hero');
+const scrollTopBtn = document.getElementById('scrollTop');
 
 let ticking = false;
 function onScroll(){
@@ -1723,6 +1876,9 @@ function onScroll(){
   // scroll progress rail
   const max = document.documentElement.scrollHeight - window.innerHeight;
   progressEl.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
+
+  // scroll-to-top visibility (works in reduced-motion too)
+  if(scrollTopBtn) scrollTopBtn.classList.toggle('show', y > window.innerHeight * 0.9);
 
   if(reduceMotion){ ticking = false; return; }
 
@@ -1750,6 +1906,64 @@ function requestTick(){ if(!ticking){ ticking = true; requestAnimationFrame(onSc
 window.addEventListener('scroll', requestTick, { passive:true });
 window.addEventListener('resize', requestTick, { passive:true });
 onScroll();
+
+// ═══ CINEMATIC ENHANCEMENTS ══════════════════════════════
+// 1 · count-up on the stat numbers (respects reduced-motion)
+function animateCount(el){
+  const target = parseFloat(el.dataset.count);
+  if(isNaN(target)) return;
+  const suffix = el.dataset.suffix || '';
+  const sep = el.dataset.sep === '1';
+  const fmt = v => (sep ? v.toLocaleString('it-IT') : v) + suffix;
+  const dur = 1500, start = performance.now();
+  (function frame(now){
+    const p = Math.min(1,(now - start)/dur);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = fmt(Math.round(target * eased));
+    if(p < 1) requestAnimationFrame(frame);
+  })(start);
+}
+(function initCounters(){
+  const els = document.querySelectorAll('[data-count]');
+  if(reduceMotion){
+    els.forEach(el=>{ const t = parseFloat(el.dataset.count);
+      el.textContent = (el.dataset.sep === '1' ? t.toLocaleString('it-IT') : t) + (el.dataset.suffix || ''); });
+    return;
+  }
+  els.forEach(el=> el.textContent = '0' + (el.dataset.suffix || ''));
+  const co = new IntersectionObserver(es=>es.forEach(e=>{
+    if(e.isIntersecting){ animateCount(e.target); co.unobserve(e.target); }
+  }), { threshold:.5 });
+  els.forEach(el=> co.observe(el));
+})();
+
+// 2 · scroll-to-top
+if(scrollTopBtn) scrollTopBtn.addEventListener('click',()=>window.scrollTo({ top:0, behavior: reduceMotion ? 'auto' : 'smooth' }));
+
+// 3 · nav active-chapter highlight (+ aria-current for screen readers)
+(function navHighlight(){
+  const map = {};
+  document.querySelectorAll('.nav-links a').forEach(a=>{ map[a.getAttribute('href').slice(1)] = a; });
+  const no = new IntersectionObserver(es=>es.forEach(e=>{
+    const a = map[e.target.id]; if(!a || !e.isIntersecting) return;
+    Object.values(map).forEach(x=>{ x.classList.remove('active'); x.removeAttribute('aria-current'); });
+    a.classList.add('active'); a.setAttribute('aria-current','true');
+  }), { rootMargin:'-45% 0px -50% 0px' });
+  ['stats','program','locations','rsvp'].forEach(id=>{ const s = document.getElementById(id); if(s) no.observe(s); });
+})();
+
+// 4 · subtle 3D tilt on event cards (pointer-fine + motion only)
+if(!reduceMotion && matchMedia('(hover:hover) and (pointer:fine)').matches){
+  document.querySelectorAll('.event-card').forEach(card=>{
+    card.addEventListener('pointermove', e=>{
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left)/r.width - .5;
+      const py = (e.clientY - r.top)/r.height - .5;
+      card.style.transform = `perspective(900px) rotateX(${(-py*6).toFixed(2)}deg) rotateY(${(px*6).toFixed(2)}deg) translateY(-5px)`;
+    });
+    card.addEventListener('pointerleave', ()=>{ card.style.transform = ''; });
+  });
+}
 </script>
 
 </body>
