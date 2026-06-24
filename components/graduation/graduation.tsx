@@ -3,6 +3,44 @@
 import { useEffect, useRef } from "react";
 import emailjs from "@emailjs/browser";
 import { RSVP_BACKEND } from "@/lib/config";
+import { StickyScroll, type StickyItem } from "@/components/ui/sticky-scroll-reveal";
+
+/** Stats narrative for the sticky-scroll reveal. Add `img:"/img/…"` per item
+ *  to swap the emoji placeholder for a generated photo. */
+const STATS_CONTENT: StickyItem[] = [
+  {
+    num: "1.847",
+    title: "Ore di sonno sacrificate",
+    description:
+      "Notti in bianco tra progetti consegnati all'ultimo secondo e sveglie all'alba. Il caffè ringrazia, le occhiaie un po' meno.",
+    emoji: "😴",
+    gradient: "linear-gradient(160deg,#1A3A6B 0%,#0F2347 60%,#0A1628 100%)",
+  },
+  {
+    num: "312",
+    title: "Gin tonic di sopravvivenza",
+    description:
+      "Stima cautelativa. Ogni esame superato meritava un brindisi — e anche qualcuno di quelli andati male, per consolazione.",
+    emoji: "🍸",
+    gradient: "linear-gradient(160deg,#10243f 0%,#13314f 55%,#091522 100%)",
+  },
+  {
+    num: "12k+",
+    title: "Ore fissando uno schermo",
+    description:
+      "Tra IDE aperti, slide infinite e bug che esistevano solo sul mio portatile. La vista non è più quella di prima.",
+    emoji: "👁️",
+    gradient: "linear-gradient(160deg,#1d3a5f 0%,#0e2747 60%,#0a1628 100%)",
+  },
+  {
+    num: "∞",
+    title: "Volte che l'AI mi ha salvato",
+    description:
+      "Compagni fedeli delle sessioni impossibili. Sì, li ringrazio. No, non me ne vergogno. (Ho comunque studiato, giuro.)",
+    emoji: "🤖",
+    gradient: "linear-gradient(160deg,#16335a 0%,#0c244a 55%,#081320 100%)",
+  },
+];
 
 const SHEETS_URL = RSVP_BACKEND.sheetsUrl;
 const CSV_URL = RSVP_BACKEND.csvUrl;
@@ -589,53 +627,12 @@ export function Graduation() {
               <br />
               non mette nella laurea
             </h2>
-            <p className="section-desc fade-up delay-2">Dati verificati. La tesi meno.</p>
+            <p className="section-desc fade-up delay-2">
+              Dati verificati. La tesi meno. (Scorri.)
+            </p>
 
-            <div className="stats-grid fade-up delay-2">
-              <div className="stat-card">
-                <span className="stat-emoji">😴</span>
-                <div className="stat-num" data-count="1847" data-sep="1">
-                  1.847
-                </div>
-                <div className="stat-desc">
-                  ore di sonno
-                  <br />
-                  perse
-                </div>
-              </div>
-              <div className="stat-card">
-                <span className="stat-emoji">🍸</span>
-                <div className="stat-num" data-count="312">
-                  312
-                </div>
-                <div className="stat-desc">
-                  gin tonic consumati
-                  <br />
-                  <span className="stat-note">(stima cautelativa)</span>
-                </div>
-              </div>
-              <div className="stat-card">
-                <span className="stat-emoji">👁️</span>
-                <div className="stat-num" data-count="12" data-suffix="k+">
-                  12k+
-                </div>
-                <div className="stat-desc">
-                  ore fissando
-                  <br />
-                  uno schermo
-                </div>
-              </div>
-              <div className="stat-card">
-                <span className="stat-emoji">🤖</span>
-                <div className="stat-num" style={{ fontSize: "clamp(40px,8vw,64px)" }}>
-                  ∞
-                </div>
-                <div className="stat-desc">
-                  AI che mi hanno
-                  <br />
-                  salvato gli esami
-                </div>
-              </div>
+            <div className="fade-up delay-2">
+              <StickyScroll content={STATS_CONTENT} />
             </div>
 
             <div className="about-terminal fade-up delay-3">
