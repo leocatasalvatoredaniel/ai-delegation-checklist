@@ -48,13 +48,14 @@ const MONO = "var(--font-jetbrains),monospace";
 
 /** Terminal boot sequence shown on the splash screen. */
 const TERMINAL_LINES: { text: string; cls: string; delay: number }[] = [
-  { text: '$ sudo run graduation.exe --name="SDL"', cls: "t-prompt t-cmd", delay: 0 },
+  { text: '$ sudo run invito.exe --guest="ospite_speciale"', cls: "t-prompt t-cmd", delay: 0 },
   { text: "[sudo] password for root: ··········", cls: "t-dim", delay: 600 },
   { text: "", cls: "", delay: 1000 },
   { text: "  Booting graduation sequence...", cls: "t-ok", delay: 1100 },
   { text: "  Loading thesis_defense.pdf    [OK]", cls: "t-dim", delay: 1500 },
   { text: "  Mounting campus_memories/     [OK]", cls: "t-dim", delay: 1800 },
   { text: "  Compiling 3 years of effort   [OK]", cls: "t-dim", delay: 2100 },
+  { text: "  Preparing your invitation     [OK]", cls: "t-dim", delay: 2350 },
   { text: "", cls: "", delay: 2400 },
   { text: "  ╔═══════════════════════════════╗", cls: "t-title-line", delay: 2500 },
   { text: "  ║   LAUREA IN INFORMATICA      ║", cls: "t-title-line", delay: 2600 },
@@ -65,9 +66,9 @@ const TERMINAL_LINES: { text: string; cls: string; delay: number }[] = [
   { text: "  University: Politecnico di Torino", cls: "t-data", delay: 3200 },
   { text: "  Date:       16 September 2026", cls: "t-data", delay: 3350 },
   { text: "", cls: "", delay: 3500 },
-  { text: '$ echo "Congratulazioni, Dott. Leocata!" ', cls: "t-prompt t-cmd", delay: 3600 },
+  { text: '$ echo "Sei ufficialmente invitato!" ', cls: "t-prompt t-cmd", delay: 3600 },
 ];
-const PROG_LABELS = ["Loading assets", "Mounting memories", "Compiling 3 years", "Almost there...", "Ready!"];
+const PROG_LABELS = ["Loading assets", "Mounting memories", "Compiling 3 years", "Almost there...", "Invito pronto!"];
 
 export function Graduation() {
   const splashDone = useRef(false);
@@ -419,12 +420,20 @@ export function Graduation() {
     const chipW = document.querySelector(".chip-wrap") as HTMLElement | null;
     const heroSec = $("hero");
     const scrollTopBtn = $("scrollTop");
+    const rsvpFloat = $("rsvpFloat");
+    const rsvpSec = $("rsvp");
     let ticking = false;
     const onScroll = () => {
       const y = window.pageYOffset;
       const max = document.documentElement.scrollHeight - window.innerHeight;
       if (progressEl) progressEl.style.width = (max > 0 ? (y / max) * 100 : 0) + "%";
       if (scrollTopBtn) scrollTopBtn.classList.toggle("show", y > window.innerHeight * 0.9);
+      if (rsvpFloat) {
+        const rsvpInView = rsvpSec
+          ? rsvpSec.getBoundingClientRect().top < window.innerHeight * 0.85
+          : false;
+        rsvpFloat.classList.toggle("show", y > window.innerHeight * 0.9 && !rsvpInView);
+      }
       if (reduceMotion) {
         ticking = false;
         return;
@@ -553,7 +562,7 @@ export function Graduation() {
             <div className="t-dot" />
             <div className="t-dot" />
             <div className="t-dot" />
-            <span className="t-title">graduation.exe — zsh</span>
+            <span className="t-title">invito.exe — zsh</span>
           </div>
           <div className="terminal-body" id="termBody" />
           <div style={{ padding: "0 28px 24px" }}>
@@ -565,7 +574,7 @@ export function Graduation() {
                 <div className="progress-bar-fill" id="progBar" />
               </div>
             </div>
-            <div className="splash-hint">[ tocca per continuare ]</div>
+            <div className="splash-hint">[ tocca per aprire l&apos;invito ]</div>
           </div>
         </div>
       </div>
@@ -573,13 +582,15 @@ export function Graduation() {
       {/* NAV */}
       <nav>
         <div className="nav-logo">
-          SDL <span>// laurea</span>
+          SDL <span>// invito</span>
         </div>
         <div className="nav-links">
           <a href="#stats">// stats</a>
           <a href="#program">Programma</a>
           <a href="#locations">Luoghi</a>
-          <a href="#rsvp">RSVP</a>
+          <a href="#rsvp" className="nav-cta">
+            Conferma →
+          </a>
         </div>
       </nav>
 
@@ -601,7 +612,8 @@ export function Graduation() {
             </div>
           </div>
 
-          <div className="hero-label">// proclama · 2026</div>
+          <div className="hero-label">// invito ufficiale · 2026</div>
+          <p className="hero-invite">Siamo lieti di invitarti a celebrare la laurea di</p>
           <h1 className="cine-title">
             <span className="first">Salvatore Daniel</span>
             <br />
@@ -609,6 +621,20 @@ export function Graduation() {
           </h1>
           <p className="hero-sub">Ingegneria Informatica</p>
           <p className="hero-uni">Politecnico di Torino — A.A. 2025/2026</p>
+
+          <div className="hero-dates">
+            <span className="hero-date-chip">16 SET · Proclamazione · Torino</span>
+            <span className="hero-date-chip">3 OTT · Festa · Biancavilla</span>
+          </div>
+
+          <div className="hero-cta">
+            <a href="#rsvp" className="hero-btn primary">
+              Conferma la tua presenza
+            </a>
+            <a href="#program" className="hero-btn ghost">
+              Scopri il programma
+            </a>
+          </div>
 
           <div className="scroll-hint">
             <div className="scroll-mouse">
@@ -712,7 +738,8 @@ export function Graduation() {
               un solo traguardo
             </h2>
             <p className="section-desc fade-up delay-2">
-              Due appuntamenti speciali per celebrare questo percorso.
+              Due appuntamenti speciali per celebrare questo percorso. Saremo felici di averti con
+              noi.
             </p>
             <div className="program-grid">
               <div className="event-card fade-up delay-1">
@@ -864,7 +891,7 @@ export function Graduation() {
             <p className="section-desc fade-up delay-2">
               Facci sapere entro il{" "}
               <strong style={{ color: "rgba(255,255,255,.8)" }}>25 settembre 2026</strong> se potrai
-              essere con noi.
+              essere con noi. L&apos;invito è esteso anche ai tuoi accompagnatori.
             </p>
             <form className="rsvp-form fade-up delay-2" id="rsvpForm" noValidate onSubmit={handleSubmit}>
               <div className="form-row">
@@ -960,10 +987,16 @@ export function Graduation() {
       <footer>
         <div className="footer-name">Salvatore Daniel Leocata</div>
         <div className="footer-sub">Ingegneria Informatica · Politecnico di Torino · 2026</div>
+        <div className="footer-wait">Ti aspettiamo 🎓</div>
       </footer>
 
       {/* TOAST */}
       <div id="toast" />
+
+      {/* FLOATING RSVP (mobile) */}
+      <a id="rsvpFloat" href="#rsvp" aria-label="Vai alla conferma di presenza">
+        RSVP →
+      </a>
 
       {/* SCROLL TO TOP */}
       <button id="scrollTop" aria-label="Torna su">
