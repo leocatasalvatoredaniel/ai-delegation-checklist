@@ -24,13 +24,13 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Laurea · Salvatore Daniel Leocata",
+  title: "Sei invitato! · Laurea di Salvatore Daniel Leocata",
   description:
-    "Sei invitato a celebrare la laurea in Ingegneria Informatica di Salvatore Daniel Leocata al Politecnico di Torino.",
+    "Siamo lieti di invitarti a celebrare la laurea in Ingegneria Informatica di Salvatore Daniel Leocata al Politecnico di Torino.",
   openGraph: {
-    title: "Laurea · Salvatore Daniel Leocata",
+    title: "Sei invitato! · Laurea di Salvatore Daniel Leocata",
     description:
-      "Proclamazione 16 settembre · Festeggiamenti 3 ottobre 2026 a Biancavilla",
+      "Siamo lieti di invitarti — Proclamazione 16 settembre · Festeggiamenti 3 ottobre 2026 a Biancavilla",
     type: "website",
   },
   icons: {
