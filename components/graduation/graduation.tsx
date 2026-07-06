@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import emailjs from "@emailjs/browser";
 import { RSVP_BACKEND } from "@/lib/config";
 import { StickyScroll, type StickyItem } from "@/components/ui/sticky-scroll-reveal";
-import { DigitalGlobe } from "@/components/ui/digital-globe";
+import { GlobeMap } from "@/components/ui/globe-map";
 
 /** Stats narrative for the sticky-scroll reveal. Add `img:"/img/…"` per item
  *  to swap the emoji placeholder for a generated photo. */
@@ -298,42 +298,6 @@ export function Graduation() {
       cleanups.push(() => clearTimeout(t));
     });
 
-    // STARS
-    const starC = $("stars");
-    if (starC) {
-      starC.innerHTML = "";
-      for (let i = 0; i < 120; i++) {
-        const s = document.createElement("div");
-        s.className = "star";
-        const size = Math.random() * 2 + 0.5;
-        s.style.cssText = `width:${size}px;height:${size}px;left:${Math.random() * 100}%;top:${Math.random() * 100}%;--dur:${2 + Math.random() * 4}s;--delay:-${Math.random() * 4}s;`;
-        starC.appendChild(s);
-      }
-    }
-
-    // CHIP
-    const face = $("chipFace");
-    if (face) {
-      face.innerHTML = "";
-      const active = [1, 3, 6, 8, 11, 13, 18, 20, 23];
-      for (let i = 0; i < 25; i++) {
-        const cell = document.createElement("div");
-        cell.className = "chip-cell" + (active.includes(i) ? " active" : "");
-        if (active.includes(i)) cell.style.setProperty("--cd", Math.random() * 2 + "s");
-        face.appendChild(cell);
-      }
-    }
-    (["pinsLeft", "pinsRight", "pinsTop", "pinsBottom"] as const).forEach((id) => {
-      const el = $(id);
-      if (!el) return;
-      el.innerHTML = "";
-      for (let i = 0; i < 6; i++) {
-        const p = document.createElement("div");
-        p.className = "pin";
-        el.appendChild(p);
-      }
-    });
-
     // COUNTDOWN
     const target = new Date("2026-10-03T19:00:00Z");
     const updateCD = () => {
@@ -417,9 +381,6 @@ export function Graduation() {
 
     // PARALLAX + SCROLL PROGRESS + SCROLL-TO-TOP
     const progressEl = $("scrollProgress");
-    const stars = $("stars");
-    const chipW = document.querySelector(".chip-wrap") as HTMLElement | null;
-    const heroSec = $("hero");
     const scrollTopBtn = $("scrollTop");
     const rsvpFloat = $("rsvpFloat");
     const rsvpSec = $("rsvp");
@@ -438,13 +399,6 @@ export function Graduation() {
       if (reduceMotion) {
         ticking = false;
         return;
-      }
-      if (heroSec && y < window.innerHeight * 1.2) {
-        if (stars) stars.style.transform = `translate3d(0, ${y * 0.45}px, 0)`;
-        if (chipW) {
-          chipW.style.transform = `translate3d(0, ${y * 0.22}px, 0)`;
-          chipW.style.opacity = String(Math.max(0, 1 - y / (window.innerHeight * 0.7)));
-        }
       }
       const mid = window.innerHeight / 2;
       document.querySelectorAll<HTMLElement>("[data-parallax]").forEach((el) => {
@@ -598,42 +552,22 @@ export function Graduation() {
       <main id="main">
         {/* HERO */}
         <section id="hero">
-          <div className="stars" id="stars" />
+          <GlobeMap />
           <div className="hero-vignette" aria-hidden="true" />
           <div className="hero-sweep" aria-hidden="true" />
 
-          <div className="chip-wrap">
-            <div className="chip" id="chip">
-              <div className="chip-glow" />
-              <div className="chip-face" id="chipFace" />
-              <div className="chip-pins left" id="pinsLeft" />
-              <div className="chip-pins right" id="pinsRight" />
-              <div className="chip-pins top" id="pinsTop" />
-              <div className="chip-pins bottom" id="pinsBottom" />
-            </div>
-          </div>
-
           <div className="hero-label">// invito ufficiale · 2026</div>
-          <p className="hero-invite">Siamo lieti di invitarti a celebrare la laurea di</p>
+          <p className="hero-invite">Ho il piacere di invitarti a celebrare la mia laurea</p>
           <h1 className="cine-title">
             <span className="first">Salvatore Daniel</span>
             <br />
             Leocata
           </h1>
-          <p className="hero-sub">Ingegneria Informatica</p>
-          <p className="hero-uni">Politecnico di Torino — A.A. 2025/2026</p>
-
-          <div className="hero-dates">
-            <span className="hero-date-chip">16 SET · Proclamazione · Torino</span>
-            <span className="hero-date-chip">3 OTT · Festa · Biancavilla</span>
-          </div>
+          <p className="hero-sub">Ingegneria Informatica · Politecnico di Torino</p>
 
           <div className="hero-cta">
             <a href="#rsvp" className="hero-btn primary">
               Conferma la tua presenza
-            </a>
-            <a href="#program" className="hero-btn ghost">
-              Scopri il programma
             </a>
           </div>
 
@@ -692,22 +626,6 @@ export function Graduation() {
               </div>
             </div>
           </div>
-        </section>
-
-        {/* JOURNEY */}
-        <section id="journey">
-          <div className="section-inner">
-            <div className="section-tag fade-up">// il viaggio</div>
-            <h2 className="fade-up delay-1">
-              Da Biancavilla
-              <br />a Torino
-            </h2>
-            <p className="section-desc fade-up delay-2">
-              Quasi 1.500 km, tre anni fa. Andata e ritorno più volte di quante ne abbia
-              contate — ma sempre con un pezzo di Sicilia in valigia.
-            </p>
-          </div>
-          <DigitalGlobe />
         </section>
 
         {/* COUNTDOWN */}
@@ -907,8 +825,8 @@ export function Graduation() {
             </h2>
             <p className="section-desc fade-up delay-2">
               Facci sapere entro il{" "}
-              <strong style={{ color: "rgba(255,255,255,.8)" }}>25 settembre 2026</strong> se potrai
-              essere con noi. L&apos;invito è esteso anche ai tuoi accompagnatori.
+              <strong style={{ color: "rgba(255,255,255,.8)" }}>25 settembre 2026</strong>{" "}
+              se potrai essere con noi. L&apos;invito è esteso anche ai tuoi accompagnatori.
             </p>
             <form className="rsvp-form fade-up delay-2" id="rsvpForm" noValidate onSubmit={handleSubmit}>
               <div className="form-row">
