@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import emailjs from "@emailjs/browser";
 import { RSVP_BACKEND } from "@/lib/config";
 import { StickyScroll, type StickyItem } from "@/components/ui/sticky-scroll-reveal";
+import { ScrollJourney } from "@/components/ui/scroll-journey";
 
 /** Stats narrative for the sticky-scroll reveal. Add `img:"/img/…"` per item
  *  to swap the emoji placeholder for a generated photo. */
@@ -691,6 +692,11 @@ export function Graduation() {
               </div>
             </div>
           </div>
+        </section>
+
+        {/* JOURNEY */}
+        <section id="journey">
+          <ScrollJourney />
         </section>
 
         {/* COUNTDOWN */}

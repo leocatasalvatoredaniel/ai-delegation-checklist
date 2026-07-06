@@ -1141,10 +1141,15 @@ footer .footer-wait{
 main>section{position:relative;}
 #hero{z-index:1;}
 #stats{z-index:2;}
-#countdown{z-index:3;}
-#program{z-index:4;}
-#locations{z-index:5;}
-#rsvp{z-index:6;}
+#journey{z-index:3;}
+/* :not(#hero) smuggles an ID into the selector's specificity, so a plain
+   #journey{padding-top:0} loses to the generic rule above — match its
+   shape (plus #journey) to win outright. */
+main>section:not(#hero)#journey{padding-top:0;}
+#countdown{z-index:4;}
+#program{z-index:5;}
+#locations{z-index:6;}
+#rsvp{z-index:7;}
 main>section:not(#hero){
   border-top-left-radius:clamp(24px,5vw,44px);
   border-top-right-radius:clamp(24px,5vw,44px);
@@ -1351,6 +1356,72 @@ main>section:not(#hero) .section-inner::before{
   .ss-mobile-visual{ display:block; height:220px; border-radius:14px; overflow:hidden; margin-top:20px; border:1px solid rgba(96,165,250,.2); }
   /* on mobile every block is fully readable (no scroll-linked dimming) */
   .ss-num,.ss-title,.ss-desc{ opacity:1 !important; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   JOURNEY — scroll-scrubbed Sicilia → Torino transition
+   ═══════════════════════════════════════════════════════ */
+.journey-wrap{ height:260vh; position:relative; }
+.journey-sticky{
+  position:sticky; top:0; height:100svh; overflow:hidden;
+  border-top-left-radius:clamp(24px,5vw,44px);
+  border-top-right-radius:clamp(24px,5vw,44px);
+}
+@supports(height:100dvh){ .journey-sticky{ height:100dvh; } }
+
+.journey-layer{ position:absolute; inset:0; }
+.journey-layer img{ object-fit:cover; }
+
+.journey-vignette{
+  position:absolute; inset:0; pointer-events:none;
+  background:
+    linear-gradient(180deg,rgba(6,11,20,.55) 0%,transparent 24%,transparent 62%,rgba(6,11,20,.8) 100%),
+    linear-gradient(90deg,rgba(6,11,20,.3) 0%,transparent 28%,transparent 72%,rgba(6,11,20,.3) 100%);
+}
+
+.journey-arc{
+  position:absolute; inset:0; width:100%; height:100%; pointer-events:none;
+  filter:drop-shadow(0 0 6px rgba(196,167,71,.8)) drop-shadow(0 0 16px rgba(196,167,71,.4));
+}
+.journey-plane{
+  position:absolute;
+  transform:translate(-50%,-50%) rotate(-48deg);
+  filter:drop-shadow(0 0 8px rgba(196,167,71,.9));
+  pointer-events:none; will-change:left,top;
+}
+
+.journey-caption{ position:absolute; z-index:2; padding:0 28px; max-width:420px; }
+.journey-caption-start{ left:6%; bottom:14%; text-align:left; }
+.journey-caption-end{ right:6%; top:14%; text-align:right; }
+.journey-tag{
+  display:block;
+  font-family:var(--font-jetbrains),monospace;
+  font-size:11px; font-weight:500; color:var(--gold);
+  letter-spacing:.15em; text-transform:uppercase; opacity:.9;
+  margin-bottom:8px; text-shadow:0 2px 12px rgba(0,0,0,.6);
+}
+.journey-caption h3{
+  font-family:var(--font-space-grotesk),sans-serif;
+  font-size:clamp(22px,4vw,36px); font-weight:700; color:var(--white);
+  letter-spacing:-.02em; line-height:1.1; text-shadow:0 2px 20px rgba(0,0,0,.7);
+}
+@media(max-width:700px){
+  .journey-caption{ max-width:80%; padding:0 20px; }
+  .journey-caption-start{ left:5%; bottom:12%; }
+  .journey-caption-end{ right:5%; top:12%; }
+}
+
+/* reduced-motion fallback: static stacked frames, no scroll-jacking */
+.journey-static{ display:flex; flex-direction:column; gap:16px; padding:40px 24px; }
+.journey-static-frame{ position:relative; border-radius:20px; overflow:hidden; }
+.journey-static-frame img{ width:100%; height:auto; display:block; }
+.journey-caption-static{
+  position:absolute; left:0; right:0; bottom:0; padding:24px;
+  background:linear-gradient(0deg,rgba(6,11,20,.85),transparent);
+}
+.journey-caption-static h3{
+  font-family:var(--font-space-grotesk),sans-serif;
+  font-size:clamp(18px,3vw,26px); font-weight:700; color:var(--white); letter-spacing:-.02em;
 }
 
 /* respect reduced-motion for every added effect (must stay last) */
