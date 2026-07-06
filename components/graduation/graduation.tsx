@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import emailjs from "@emailjs/browser";
 import { RSVP_BACKEND } from "@/lib/config";
 import { StickyScroll, type StickyItem } from "@/components/ui/sticky-scroll-reveal";
-import { ScrollJourney } from "@/components/ui/scroll-journey";
+import { DigitalGlobe } from "@/components/ui/digital-globe";
 
 /** Stats narrative for the sticky-scroll reveal. Add `img:"/img/…"` per item
  *  to swap the emoji placeholder for a generated photo. */
@@ -696,7 +696,18 @@ export function Graduation() {
 
         {/* JOURNEY */}
         <section id="journey">
-          <ScrollJourney />
+          <div className="section-inner">
+            <div className="section-tag fade-up">// il viaggio</div>
+            <h2 className="fade-up delay-1">
+              Da Biancavilla
+              <br />a Torino
+            </h2>
+            <p className="section-desc fade-up delay-2">
+              Quasi 1.500 km, tre anni fa. Andata e ritorno più volte di quante ne abbia
+              contate — ma sempre con un pezzo di Sicilia in valigia.
+            </p>
+          </div>
+          <DigitalGlobe />
         </section>
 
         {/* COUNTDOWN */}
