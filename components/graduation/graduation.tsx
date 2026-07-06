@@ -565,17 +565,11 @@ export function Graduation() {
           </h1>
           <p className="hero-sub">Ingegneria Informatica · Politecnico di Torino</p>
 
-          <div className="hero-cta">
-            <a href="#rsvp" className="hero-btn primary">
-              Conferma la tua presenza
-            </a>
-          </div>
-
           <div className="scroll-hint">
             <div className="scroll-mouse">
               <div className="scroll-wheel" />
             </div>
-            <span>scroll</span>
+            <span>scorri per scoprire</span>
           </div>
         </section>
 
