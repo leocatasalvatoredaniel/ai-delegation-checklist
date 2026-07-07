@@ -207,11 +207,14 @@ nav{
   will-change:transform;
 }
 .ghero-frame{
-  position:relative;width:100%;
+  position:relative;width:100%;overflow:hidden;
   /* blend the photo's dark top into the hero backdrop */
   -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 16%);
   mask-image:linear-gradient(180deg,transparent 0,#000 16%);
 }
+/* zoom is a transform on this inner layer, never the frame's box, so it
+   can never push document.scrollWidth past the viewport on mobile */
+.ghero-zoom{position:relative;transform-origin:50% 0;}
 .ghero-frame img{width:100%;height:auto;display:block;}
 .ghero-frame svg{position:absolute;inset:0;width:100%;height:100%;}
 
@@ -241,7 +244,7 @@ nav{
 
 /* mobile: enlarge and re-centre so Italy stays readable */
 @media(max-width:700px){
-  .ghero-frame{width:180%;left:50%;transform:translateX(-58%);}
+  .ghero-zoom{transform:scale(1.8) translateX(-16%);}
 }
 
 .hero-label{
@@ -1236,7 +1239,7 @@ main>section:not(#hero) .section-inner::before{
   transition:opacity 520ms var(--ease-out),transform 650ms var(--ease-out);
 }
 .ss-visual-slide.active{opacity:1;transform:none;}
-.ss-visual-slide img{width:100%;height:100%;object-fit:cover;display:block;}
+.ss-visual-slide img,.ss-visual-slide video{width:100%;height:100%;object-fit:cover;display:block;}
 .ss-emoji{ font-size:clamp(72px,12vw,128px); line-height:1; filter:drop-shadow(0 12px 30px rgba(0,0,0,.45)); }
 
 /* slide progress dots */
@@ -1251,7 +1254,26 @@ main>section:not(#hero) .section-inner::before{
 }
 .ss-dots span.on{background:var(--gold);transform:scale(1.35);}
 
-/* inline fallback (small screens / reduced motion) */
+/* pinned stage on narrow screens: single column, visual on top,
+   dots move to a horizontal row along the bottom */
+@media(max-width:820px){
+  .ss-stage{
+    grid-template-columns:1fr;
+    gap:18px;
+    padding:0 24px;
+  }
+  .ss-visual-side{order:-1;height:36svh;max-height:320px;}
+  .ss-left{min-height:190px;}
+  .ss-num{font-size:clamp(34px,11vw,52px);}
+  .ss-title{font-size:clamp(18px,5vw,22px);margin-top:8px;}
+  .ss-desc{font-size:14px;margin-top:8px;}
+  .ss-dots{
+    right:auto;top:auto;bottom:14px;left:50%;
+    transform:translateX(-50%);flex-direction:row;
+  }
+}
+
+/* inline fallback (reduced motion only) */
 .ss-inline{max-width:900px;margin:0 auto;padding:0 24px;}
 .ss-inline .ss-block{margin:clamp(44px,9vh,80px) 0;}
 .ss-inline .ss-block:first-child{margin-top:8px;}
@@ -1260,7 +1282,7 @@ main>section:not(#hero) .section-inner::before{
   height:220px;border-radius:14px;overflow:hidden;margin-top:20px;
   border:1px solid rgba(96,165,250,.2);
 }
-.ss-inline-visual img{width:100%;height:100%;object-fit:cover;display:block;}
+.ss-inline-visual img,.ss-inline-visual video{width:100%;height:100%;object-fit:cover;display:block;}
 
 /* the second .section-inner in #stats must not repeat the chapter numeral */
 .ss-after::before{content:none!important;}

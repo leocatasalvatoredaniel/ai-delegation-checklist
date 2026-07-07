@@ -6,15 +6,16 @@ import { RSVP_BACKEND } from "@/lib/config";
 import { StickyScroll, type StickyItem } from "@/components/ui/sticky-scroll-reveal";
 import { GlobeHero } from "@/components/ui/globe-hero";
 
-/** Stats narrative for the sticky-scroll reveal. Add `img:"/img/…"` per item
- *  to swap the emoji placeholder for a generated photo. */
+const BASE_PATH = process.env.NODE_ENV === "production" ? "/ai-delegation-checklist" : "";
+
+/** Stats narrative for the sticky-scroll reveal. */
 const STATS_CONTENT: StickyItem[] = [
   {
     num: "1.847",
     title: "Ore di sonno sacrificate",
     description:
       "Notti in bianco tra progetti consegnati all'ultimo secondo e sveglie all'alba. Il caffè ringrazia, le occhiaie un po' meno.",
-    emoji: "😴",
+    img: `${BASE_PATH}/img/foto_sonno.jpg`,
     gradient: "linear-gradient(160deg,#1A3A6B 0%,#0F2347 60%,#0A1628 100%)",
   },
   {
@@ -22,7 +23,8 @@ const STATS_CONTENT: StickyItem[] = [
     title: "Gin tonic di sopravvivenza",
     description:
       "Stima cautelativa. Ogni esame superato meritava un brindisi — e anche qualcuno di quelli andati male, per consolazione.",
-    emoji: "🍸",
+    video: `${BASE_PATH}/video/video_gin.mp4`,
+    videoPoster: `${BASE_PATH}/img/video_gin_poster.jpg`,
     gradient: "linear-gradient(160deg,#10243f 0%,#13314f 55%,#091522 100%)",
   },
   {
@@ -30,7 +32,7 @@ const STATS_CONTENT: StickyItem[] = [
     title: "Ore fissando uno schermo",
     description:
       "Tra IDE aperti, slide infinite e bug che esistevano solo sul mio portatile. La vista non è più quella di prima.",
-    emoji: "👁️",
+    img: `${BASE_PATH}/img/foto_studio.jpg`,
     gradient: "linear-gradient(160deg,#1d3a5f 0%,#0e2747 60%,#0a1628 100%)",
   },
   {
@@ -38,7 +40,7 @@ const STATS_CONTENT: StickyItem[] = [
     title: "Volte che l'AI mi ha salvato",
     description:
       "Presenza fissa nelle nottate pre-esame. Orgogliosamente grato per il supporto tecnico e morale.",
-    emoji: "🤖",
+    img: `${BASE_PATH}/img/foto_ai.jpg`,
     gradient: "linear-gradient(160deg,#16335a 0%,#0c244a 55%,#081320 100%)",
   },
 ];

@@ -9,7 +9,12 @@ export interface StickyItem {
   description: string;
   /** Optional image path (under /public). When set, it replaces the emoji. */
   img?: string;
-  /** Fallback visual when no image is provided. */
+  /** Optional video path (under /public). Takes priority over img/emoji;
+   *  plays muted+looped only while this slide is the active one. */
+  video?: string;
+  /** Poster frame shown before the video starts playing. */
+  videoPoster?: string;
+  /** Fallback visual when neither img nor video is provided. */
   emoji?: string;
   /** CSS background for the sticky/visual card. */
   gradient?: string;
@@ -17,40 +22,47 @@ export interface StickyItem {
 
 const DEFAULT_GRADIENT = "linear-gradient(160deg,#1A3A6B 0%,#0F2347 60%,#0A1628 100%)";
 
-function Visual({ item }: { item: StickyItem }) {
-  return item.img ? (
+function Visual({ item, active }: { item: StickyItem; active: boolean }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (active) v.play().catch(() => {});
+    else v.pause();
+  }, [active]);
+
+  if (item.video) {
+    return (
+      <video
+        ref={videoRef}
+        src={item.video}
+        poster={item.videoPoster}
+        muted
+        loop
+        playsInline
+        preload="none"
+        aria-label={item.title}
+      />
+    );
+  }
+  if (item.img) {
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={item.img} alt={item.title} />
-  ) : (
+    return <img src={item.img} alt={item.title} />;
+  }
+  return (
     <span className="ss-emoji" aria-hidden="true">
       {item.emoji}
     </span>
   );
 }
 
-/** Simple stacked layout for small screens and reduced motion. */
-function InlineList({ content }: { content: StickyItem[] }) {
-  return (
-    <div className="ss-inline">
-      {content.map((item, i) => (
-        <div className="ss-block" key={item.title + i}>
-          {item.num && <div className="ss-num">{item.num}</div>}
-          <h3 className="ss-title">{item.title}</h3>
-          <p className="ss-desc">{item.description}</p>
-          <div className="ss-inline-visual" style={{ background: item.gradient || DEFAULT_GRADIENT }}>
-            <Visual item={item} />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 /**
- * Full-screen sticky scroll: the wrapper is content.length * 100vh tall,
+ * Full-screen sticky scroll: the wrapper is content.length * 100svh tall,
  * a 100svh pin stays fixed while the page scrolls past, and the active
- * slide is derived from the wrapper's position (plain rect math —
- * Motion's useScroll(target) proved unreliable in this layout).
+ * slide is derived from the wrapper's position (plain rect math — Motion's
+ * useScroll(target) proved unreliable in this layout). Runs on every
+ * screen size; only prefers-reduced-motion swaps it for a static stack.
  */
 export function StickyScroll({ content }: { content: StickyItem[] }) {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -58,16 +70,11 @@ export function StickyScroll({ content }: { content: StickyItem[] }) {
   const [pinned, setPinned] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const mq = matchMedia("(min-width: 900px)");
     const rm = matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => setPinned(mq.matches && !rm.matches);
+    const update = () => setPinned(!rm.matches);
     update();
-    mq.addEventListener("change", update);
     rm.addEventListener("change", update);
-    return () => {
-      mq.removeEventListener("change", update);
-      rm.removeEventListener("change", update);
-    };
+    return () => rm.removeEventListener("change", update);
   }, []);
 
   useEffect(() => {
@@ -91,10 +98,28 @@ export function StickyScroll({ content }: { content: StickyItem[] }) {
   }, [pinned, content.length]);
 
   if (pinned === null) return null;
-  if (!pinned) return <InlineList content={content} />;
+
+  if (!pinned) {
+    return (
+      <div className="ss-inline">
+        {content.map((item, i) => (
+          <div className="ss-block" key={item.title + i}>
+            {item.num && <div className="ss-num">{item.num}</div>}
+            <h3 className="ss-title">{item.title}</h3>
+            <p className="ss-desc">{item.description}</p>
+            <div className="ss-inline-visual" style={{ background: item.gradient || DEFAULT_GRADIENT }}>
+              {/* this branch only renders under prefers-reduced-motion: keep
+                  the video on its poster frame, never autoplay it */}
+              <Visual item={item} active={false} />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
-    <div className="ss-wrap" ref={wrapRef} style={{ height: `${content.length * 100}vh` }}>
+    <div className="ss-wrap" ref={wrapRef} style={{ height: `${content.length * 100}svh` }}>
       <div className="ss-pin">
         <div className="ss-stage">
           <div className="ss-left">
@@ -113,7 +138,7 @@ export function StickyScroll({ content }: { content: StickyItem[] }) {
                 key={"v" + i}
                 style={{ background: item.gradient || DEFAULT_GRADIENT }}
               >
-                <Visual item={item} />
+                <Visual item={item} active={i === active} />
               </div>
             ))}
           </div>
