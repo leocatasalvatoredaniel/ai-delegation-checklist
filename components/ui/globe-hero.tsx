@@ -34,30 +34,32 @@ export function GlobeHero() {
   return (
     <div className={`ghero${revealed ? " in" : ""}`} aria-hidden="true">
       <div className="ghero-frame" ref={ref}>
-        <Image
-          src={`${BASE_PATH}/img/globe-med.jpg`}
-          alt=""
-          width={1672}
-          height={941}
-          priority
-          sizes="(max-width: 700px) 180vw, 100vw"
-        />
-        <svg viewBox="0 0 1672 941" preserveAspectRatio="xMidYMid meet">
-          {/* quadratic fit of the faint track baked into the photo, so the
-              glowing redraw covers it exactly (it has a ~12px sag) */}
-          <path
-            className="ghero-route"
-            d={`M${SICILIA.x},${SICILIA.y} Q1000,498 ${TORINO.x},${TORINO.y}`}
-            fill="none"
-            pathLength={1}
+        <div className="ghero-zoom">
+          <Image
+            src={`${BASE_PATH}/img/globe-med.jpg`}
+            alt=""
+            width={1672}
+            height={941}
+            priority
+            sizes="100vw"
           />
-          <g className="ghero-marker ghero-marker-start">
-            <circle cx={SICILIA.x} cy={SICILIA.y} r="16" className="gh-pulse gold" />
-          </g>
-          <g className="ghero-marker ghero-marker-end">
-            <circle cx={TORINO.x} cy={TORINO.y} r="18" className="gh-pulse blue" />
-          </g>
-        </svg>
+          <svg viewBox="0 0 1672 941" preserveAspectRatio="xMidYMid meet">
+            {/* quadratic fit of the faint track baked into the photo, so the
+                glowing redraw covers it exactly (it has a ~12px sag) */}
+            <path
+              className="ghero-route"
+              d={`M${SICILIA.x},${SICILIA.y} Q1000,498 ${TORINO.x},${TORINO.y}`}
+              fill="none"
+              pathLength={1}
+            />
+            <g className="ghero-marker ghero-marker-start">
+              <circle cx={SICILIA.x} cy={SICILIA.y} r="16" className="gh-pulse gold" />
+            </g>
+            <g className="ghero-marker ghero-marker-end">
+              <circle cx={TORINO.x} cy={TORINO.y} r="18" className="gh-pulse blue" />
+            </g>
+          </svg>
+        </div>
       </div>
     </div>
   );
