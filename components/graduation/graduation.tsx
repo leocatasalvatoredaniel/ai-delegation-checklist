@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import emailjs from "@emailjs/browser";
 import { RSVP_BACKEND } from "@/lib/config";
 import { StickyScroll, type StickyItem } from "@/components/ui/sticky-scroll-reveal";
-import { GlobeMap } from "@/components/ui/globe-map";
+import { GlobeHero } from "@/components/ui/globe-hero";
 
 /** Stats narrative for the sticky-scroll reveal. Add `img:"/img/…"` per item
  *  to swap the emoji placeholder for a generated photo. */
@@ -384,6 +384,8 @@ export function Graduation() {
     const scrollTopBtn = $("scrollTop");
     const rsvpFloat = $("rsvpFloat");
     const rsvpSec = $("rsvp");
+    const heroCopy = document.querySelector<HTMLElement>("#hero .hero-copy");
+    const heroGlobe = document.querySelector<HTMLElement>("#hero .ghero");
     let ticking = false;
     const onScroll = () => {
       const y = window.pageYOffset;
@@ -399,6 +401,14 @@ export function Graduation() {
       if (reduceMotion) {
         ticking = false;
         return;
+      }
+      // hero depth: copy drifts up and fades, the globe follows slower
+      if (y < window.innerHeight * 1.5) {
+        if (heroCopy) {
+          heroCopy.style.transform = `translate3d(0, ${y * 0.3}px, 0)`;
+          heroCopy.style.opacity = String(Math.max(0, 1 - y / (window.innerHeight * 0.65)));
+        }
+        if (heroGlobe) heroGlobe.style.transform = `translate3d(0, ${y * 0.14}px, 0)`;
       }
       const mid = window.innerHeight / 2;
       document.querySelectorAll<HTMLElement>("[data-parallax]").forEach((el) => {
@@ -552,18 +562,21 @@ export function Graduation() {
       <main id="main">
         {/* HERO */}
         <section id="hero">
-          <GlobeMap />
           <div className="hero-vignette" aria-hidden="true" />
           <div className="hero-sweep" aria-hidden="true" />
 
-          <div className="hero-label">// invito ufficiale · 2026</div>
-          <p className="hero-invite">Ho il piacere di invitarti a celebrare la mia laurea</p>
-          <h1 className="cine-title">
-            <span className="first">Salvatore Daniel</span>
-            <br />
-            Leocata
-          </h1>
-          <p className="hero-sub">Ingegneria Informatica · Politecnico di Torino</p>
+          <div className="hero-copy">
+            <div className="hero-label">// invito ufficiale · 2026</div>
+            <p className="hero-invite">Ho il piacere di invitarti a celebrare la mia laurea</p>
+            <h1 className="cine-title">
+              <span className="first">Salvatore Daniel</span>
+              <br />
+              Leocata
+            </h1>
+            <p className="hero-sub">Ingegneria Informatica · Politecnico di Torino</p>
+          </div>
+
+          <GlobeHero />
 
           <div className="scroll-hint">
             <div className="scroll-mouse">
