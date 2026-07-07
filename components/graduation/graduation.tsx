@@ -270,6 +270,10 @@ export function Graduation() {
   useEffect(() => {
     const cleanups: (() => void)[] = [];
     const reduceMotion = matchMedia("(prefers-reduced-motion:reduce)").matches;
+    // scroll-linked JS transforms judder on touch devices: scroll events
+    // arrive after the browser has already composited the async scroll,
+    // so the parallax layers visibly lag and shake — skip them entirely
+    const coarsePointer = matchMedia("(pointer:coarse)").matches;
 
     // TERMINAL SPLASH
     const body = $("termBody");
@@ -400,7 +404,7 @@ export function Graduation() {
           : false;
         rsvpFloat.classList.toggle("show", y > window.innerHeight * 0.9 && !rsvpInView);
       }
-      if (reduceMotion) {
+      if (reduceMotion || coarsePointer) {
         ticking = false;
         return;
       }
