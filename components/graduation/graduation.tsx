@@ -37,7 +37,7 @@ const STATS_CONTENT: StickyItem[] = [
     num: "∞",
     title: "Volte che l'AI mi ha salvato",
     description:
-      "Compagni fedeli delle sessioni impossibili. Sì, li ringrazio. No, non me ne vergogno. (Ho comunque studiato, giuro.)",
+      "Presenza fissa nelle nottate pre-esame. Orgogliosamente grato per il supporto tecnico e morale.",
     emoji: "🤖",
     gradient: "linear-gradient(160deg,#16335a 0%,#0c244a 55%,#081320 100%)",
   },
@@ -598,30 +598,26 @@ export function Graduation() {
             <p className="section-desc fade-up delay-2">
               Dati verificati. La tesi meno. (Scorri.)
             </p>
+          </div>
 
-            <div className="fade-up delay-2">
-              <StickyScroll content={STATS_CONTENT} />
-            </div>
+          <StickyScroll content={STATS_CONTENT} />
 
+          <div className="section-inner ss-after">
             <div className="about-terminal fade-up delay-3">
               <div className="at-prompt">$ cat grazie.txt</div>
               <div className="at-output">
-                Grazie per essere qui a festeggiare con me.
+                Grazie per essere qui a festeggiare. Dietro questo traguardo
                 <br />
-                Questo traguardo appartiene anche a voi —
+                ci sono ore di codice, caffè a fiumi e qualche assistente
                 <br />
-                che mi abbiate supportato, sopportato,
+                virtuale a fare il turno di notte... ma nulla di tutto ciò
                 <br />
-                portato un gin tonic o semplicemente detto
+                avrebbe avuto valore senza il vostro supporto, le serate
                 <br />
-                &quot;dai, ce la fai&quot; alle 3 di notte.
+                per staccare la spina e la certezza di avervi sempre dalla mia parte.
                 <br />
                 <br />
-                Un ringraziamento speciale a ChatGPT e Claude,
-                <br />
-                fedeli compagni delle sessioni impossibili.
-                <br />
-                (Sì, li ringrazio. No, non me ne vergogno.)
+                Grazie di cuore.
                 <br />
                 <span className="at-sig">
                   — Salvatore Daniel Leocata, Dott. in Ingegneria Informatica 🎓
