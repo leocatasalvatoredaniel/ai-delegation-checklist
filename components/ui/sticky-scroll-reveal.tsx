@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValueEvent, useScroll } from "motion/react";
 
 export interface StickyItem {
   /** Big number / kicker shown above the title (e.g. "1.847", "∞"). */
@@ -19,69 +18,111 @@ export interface StickyItem {
 const DEFAULT_GRADIENT = "linear-gradient(160deg,#1A3A6B 0%,#0F2347 60%,#0A1628 100%)";
 
 function Visual({ item }: { item: StickyItem }) {
+  return item.img ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={item.img} alt={item.title} />
+  ) : (
+    <span className="ss-emoji" aria-hidden="true">
+      {item.emoji}
+    </span>
+  );
+}
+
+/** Simple stacked layout for small screens and reduced motion. */
+function InlineList({ content }: { content: StickyItem[] }) {
   return (
-    <div className="ss-visual" style={{ background: item.gradient || DEFAULT_GRADIENT }}>
-      {item.img ? (
-        <img src={item.img} alt={item.title} />
-      ) : (
-        <span className="ss-emoji" aria-hidden="true">
-          {item.emoji}
-        </span>
-      )}
+    <div className="ss-inline">
+      {content.map((item, i) => (
+        <div className="ss-block" key={item.title + i}>
+          {item.num && <div className="ss-num">{item.num}</div>}
+          <h3 className="ss-title">{item.title}</h3>
+          <p className="ss-desc">{item.description}</p>
+          <div className="ss-inline-visual" style={{ background: item.gradient || DEFAULT_GRADIENT }}>
+            <Visual item={item} />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
 
+/**
+ * Full-screen sticky scroll: the wrapper is content.length * 100vh tall,
+ * a 100svh pin stays fixed while the page scrolls past, and the active
+ * slide is derived from the wrapper's position (plain rect math —
+ * Motion's useScroll(target) proved unreliable in this layout).
+ */
 export function StickyScroll({ content }: { content: StickyItem[] }) {
+  const wrapRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    container: ref,
-    offset: ["start start", "end start"],
-  });
+  const [pinned, setPinned] = useState<boolean | null>(null);
 
-  const cardLength = content.length;
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    const breakpoints = content.map((_, i) => i / cardLength);
-    const closest = breakpoints.reduce((acc, bp, i) => {
-      return Math.abs(latest - bp) < Math.abs(latest - breakpoints[acc]) ? i : acc;
-    }, 0);
-    setActive(closest);
-  });
-
-  // keep the sticky card gradient in sync with the active block
-  const [gradient, setGradient] = useState(content[0]?.gradient || DEFAULT_GRADIENT);
   useEffect(() => {
-    setGradient(content[active]?.gradient || DEFAULT_GRADIENT);
-  }, [active, content]);
+    const mq = matchMedia("(min-width: 900px)");
+    const rm = matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setPinned(mq.matches && !rm.matches);
+    update();
+    mq.addEventListener("change", update);
+    rm.addEventListener("change", update);
+    return () => {
+      mq.removeEventListener("change", update);
+      rm.removeEventListener("change", update);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!pinned) return;
+    const el = wrapRef.current;
+    if (!el) return;
+    const n = content.length;
+    const onScroll = () => {
+      const r = el.getBoundingClientRect();
+      const total = r.height - window.innerHeight;
+      const p = total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : 0;
+      setActive(Math.min(n - 1, Math.floor(p * n)));
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [pinned, content.length]);
+
+  if (pinned === null) return null;
+  if (!pinned) return <InlineList content={content} />;
 
   return (
-    <div className="ss-wrap" ref={ref}>
-      <div className="ss-left">
-        {content.map((item, i) => (
-          <div className="ss-block" key={item.title + i}>
-            {item.num && (
-              <motion.div className="ss-num" animate={{ opacity: active === i ? 1 : 0.28 }}>
-                {item.num}
-              </motion.div>
-            )}
-            <motion.h3 className="ss-title" animate={{ opacity: active === i ? 1 : 0.28 }}>
-              {item.title}
-            </motion.h3>
-            <motion.p className="ss-desc" animate={{ opacity: active === i ? 1 : 0.28 }}>
-              {item.description}
-            </motion.p>
-            {/* inline visual on small screens (sticky card is hidden there) */}
-            <div className="ss-mobile-visual">
-              <Visual item={item} />
-            </div>
+    <div className="ss-wrap" ref={wrapRef} style={{ height: `${content.length * 100}vh` }}>
+      <div className="ss-pin">
+        <div className="ss-stage">
+          <div className="ss-left">
+            {content.map((item, i) => (
+              <div className={`ss-slide${i === active ? " active" : ""}`} key={item.title + i}>
+                {item.num && <div className="ss-num">{item.num}</div>}
+                <h3 className="ss-title">{item.title}</h3>
+                <p className="ss-desc">{item.description}</p>
+              </div>
+            ))}
           </div>
-        ))}
-        <div style={{ height: "40px" }} />
-      </div>
-
-      <div className="ss-sticky" style={{ background: gradient }}>
-        <Visual item={content[active]} />
+          <div className="ss-visual-side">
+            {content.map((item, i) => (
+              <div
+                className={`ss-visual-slide${i === active ? " active" : ""}`}
+                key={"v" + i}
+                style={{ background: item.gradient || DEFAULT_GRADIENT }}
+              >
+                <Visual item={item} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="ss-dots" aria-hidden="true">
+          {content.map((_, i) => (
+            <span className={i === active ? "on" : ""} key={i} />
+          ))}
+        </div>
       </div>
     </div>
   );

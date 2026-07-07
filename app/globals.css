@@ -164,7 +164,7 @@ nav{
   color:var(--white);letter-spacing:-.01em;
 }
 .nav-logo span{color:var(--blue-l);}
-.nav-links{display:flex;gap:28px;}
+.nav-links{display:flex;gap:28px;align-items:center;}
 .nav-links a{
   font-family:var(--font-inter),sans-serif;
   font-size:13px;font-weight:500;
@@ -974,7 +974,9 @@ footer .footer-wait{
 [data-parallax],.aurora{will-change:transform;}
 
 /* ambient aurora blobs that drift behind dark sections */
-#stats,#countdown,#rsvp{position:relative;overflow:hidden;}
+#stats,#countdown,#rsvp{position:relative;}
+#countdown,#rsvp{overflow:hidden;}
+#stats{clip-path:inset(0 0 0 0 round clamp(24px,5vw,44px) clamp(24px,5vw,44px) 0 0);}
 .section-inner{position:relative;z-index:2;}
 .aurora{
   position:absolute;border-radius:50%;
@@ -1176,33 +1178,33 @@ main>section:not(#hero) .section-inner::before{
 }
 
 /* ═══════════════════════════════════════════════════════
-   STICKY SCROLL REVEAL (stats section)
+   STICKY SCROLL REVEAL — full-screen pinned slides
    ═══════════════════════════════════════════════════════ */
-.ss-wrap{
-  display:flex; justify-content:center;
-  gap:clamp(28px,5vw,72px);
-  position:relative;
-  height:clamp(440px,72vh,640px);
-  overflow-y:auto;
-  border-radius:20px;
-  padding:clamp(28px,4vw,52px);
-  border:1px solid rgba(96,165,250,.12);
-  background:#0A0F1A;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 30px 80px rgba(3,6,12,.45);
-  scrollbar-width:thin;
-  scrollbar-color:rgba(96,165,250,.35) transparent;
+.ss-wrap{position:relative;margin-inline:-24px;}
+.ss-pin{
+  position:sticky;top:0;height:100svh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  overflow:hidden;
 }
-.ss-wrap::-webkit-scrollbar{width:8px;}
-.ss-wrap::-webkit-scrollbar-track{background:transparent;}
-.ss-wrap::-webkit-scrollbar-thumb{background:rgba(96,165,250,.3);border-radius:8px;}
-
-.ss-left{ position:relative; flex:1 1 auto; max-width:520px; }
-.ss-block{ margin:clamp(64px,16vh,150px) 0; }
-.ss-block:first-child{ margin-top:clamp(20px,6vh,60px); }
+.ss-stage{
+  display:grid;grid-template-columns:1fr minmax(300px,440px);
+  gap:clamp(40px,7vw,110px);align-items:center;
+  width:100%;max-width:1160px;
+  padding:0 clamp(24px,6vw,80px);
+}
+.ss-left{position:relative;min-height:320px;}
+.ss-slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:center;
+  opacity:0;transform:translateY(30px);
+  transition:opacity 520ms var(--ease-out),transform 520ms var(--ease-out);
+  pointer-events:none;
+}
+.ss-slide.active{opacity:1;transform:none;}
 
 .ss-num{
   font-family:var(--font-space-grotesk),sans-serif;
-  font-size:clamp(40px,7vw,74px); font-weight:700;
+  font-size:clamp(48px,8vw,92px); font-weight:700;
   color:var(--white); line-height:1;
   letter-spacing:-.03em;
   font-variant-numeric:tabular-nums;
@@ -1210,40 +1212,59 @@ main>section:not(#hero) .section-inner::before{
 }
 .ss-title{
   font-family:var(--font-space-grotesk),sans-serif;
-  font-size:clamp(19px,2.4vw,26px); font-weight:600;
+  font-size:clamp(20px,2.6vw,30px); font-weight:600;
   color:var(--white); letter-spacing:-.02em;
-  margin-top:14px; line-height:1.15;
+  margin-top:16px; line-height:1.15;
 }
 .ss-desc{
   margin-top:16px; max-width:44ch;
-  font-size:15px; line-height:1.7;
+  font-size:clamp(15px,1.3vw,17px); line-height:1.7;
   color:rgba(255,255,255,.66);
 }
 
-.ss-sticky{
-  position:sticky; top:clamp(24px,4vw,48px);
-  align-self:flex-start; flex:0 0 auto;
-  width:clamp(260px,32vw,360px);
-  height:clamp(260px,40vh,360px);
-  border-radius:18px; overflow:hidden;
+.ss-visual-side{
+  position:relative;
+  height:min(56vh,480px);
+  border-radius:22px;overflow:hidden;
   border:1px solid rgba(96,165,250,.25);
   box-shadow:0 24px 60px rgba(37,99,235,.18),inset 0 1px 0 rgba(255,255,255,.12);
 }
-.ss-visual{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
-.ss-visual img{ width:100%; height:100%; object-fit:cover; display:block; }
-.ss-emoji{ font-size:clamp(64px,12vw,112px); line-height:1; filter:drop-shadow(0 12px 30px rgba(0,0,0,.45)); }
-
-.ss-mobile-visual{ display:none; }
-@media(max-width:900px){
-  .ss-wrap{ height:auto; overflow:visible; flex-direction:column; gap:0; padding:clamp(20px,5vw,32px); }
-  .ss-left{ max-width:100%; }
-  .ss-sticky{ display:none; }
-  .ss-block{ margin:clamp(40px,9vh,80px) 0; }
-  .ss-block:first-child{ margin-top:8px; }
-  .ss-mobile-visual{ display:block; height:220px; border-radius:14px; overflow:hidden; margin-top:20px; border:1px solid rgba(96,165,250,.2); }
-  /* on mobile every block is fully readable (no scroll-linked dimming) */
-  .ss-num,.ss-title,.ss-desc{ opacity:1 !important; }
+.ss-visual-slide{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:scale(1.05);
+  transition:opacity 520ms var(--ease-out),transform 650ms var(--ease-out);
 }
+.ss-visual-slide.active{opacity:1;transform:none;}
+.ss-visual-slide img{width:100%;height:100%;object-fit:cover;display:block;}
+.ss-emoji{ font-size:clamp(72px,12vw,128px); line-height:1; filter:drop-shadow(0 12px 30px rgba(0,0,0,.45)); }
+
+/* slide progress dots */
+.ss-dots{
+  position:absolute;right:clamp(16px,3vw,40px);top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:10px;
+}
+.ss-dots span{
+  width:6px;height:6px;border-radius:50%;
+  background:rgba(96,165,250,.25);
+  transition:background 300ms ease,transform 300ms ease;
+}
+.ss-dots span.on{background:var(--gold);transform:scale(1.35);}
+
+/* inline fallback (small screens / reduced motion) */
+.ss-inline{max-width:900px;margin:0 auto;padding:0 24px;}
+.ss-inline .ss-block{margin:clamp(44px,9vh,80px) 0;}
+.ss-inline .ss-block:first-child{margin-top:8px;}
+.ss-inline-visual{
+  display:flex;align-items:center;justify-content:center;
+  height:220px;border-radius:14px;overflow:hidden;margin-top:20px;
+  border:1px solid rgba(96,165,250,.2);
+}
+.ss-inline-visual img{width:100%;height:100%;object-fit:cover;display:block;}
+
+/* the second .section-inner in #stats must not repeat the chapter numeral */
+.ss-after::before{content:none!important;}
+.ss-after{margin-top:clamp(48px,10vh,110px);}
 
 /* respect reduced-motion for every added effect (must stay last) */
 @media(prefers-reduced-motion:reduce){
