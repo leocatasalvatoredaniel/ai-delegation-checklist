@@ -189,68 +189,59 @@ nav{
 #hero{
   min-height:100svh;
   background:linear-gradient(160deg,#060B14 0%,#0A1628 50%,#0E2040 100%);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
   text-align:center;
-  padding:80px 24px 60px;
+  padding:130px 0 0;
   position:relative;
   overflow:hidden;
 }
 
-/* Globe map — stylised satellite backdrop behind the hero content */
-.gmap-wrap{
-  position:absolute;inset:0;
+/* ── Photoreal globe under the hero copy ─────────────── */
+.hero-copy{position:relative;z-index:3;padding:0 24px;}
+
+.ghero{
+  width:100%;
+  margin-top:clamp(20px,4vh,52px);
+  position:relative;z-index:1;
   pointer-events:none;
-  z-index:0;
+  will-change:transform;
 }
-.gmap-wrap svg{width:100%;height:100%;display:block;}
-/* radial scrim behind the centred hero copy so the route reads but never fights the text */
-.gmap-wrap::after{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(56% 50% at 50% 46%,rgba(6,11,20,.74) 0%,rgba(6,11,20,.38) 55%,transparent 80%);
+.ghero-frame{
+  position:relative;width:100%;
+  /* blend the photo's dark top into the hero backdrop */
+  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 16%);
+  mask-image:linear-gradient(180deg,transparent 0,#000 16%);
 }
-.gmap-grid path{
-  fill:none;
-  stroke:rgba(96,165,250,.13);
-  stroke-width:1;
-}
-.gmap-land path{
-  fill:rgba(96,165,250,.10);
-  stroke:rgba(96,165,250,.30);
-  stroke-width:1.1;
-  stroke-linejoin:round;
-}
-.gmap-route{
+.ghero-frame img{width:100%;height:auto;display:block;}
+.ghero-frame svg{position:absolute;inset:0;width:100%;height:100%;}
+
+.ghero-route{
   stroke:var(--gold);
-  stroke-width:2;
+  stroke-width:5;
   stroke-linecap:round;
-  filter:drop-shadow(0 0 5px rgba(196,167,71,.85));
+  filter:drop-shadow(0 0 6px rgba(196,167,71,.9)) drop-shadow(0 0 18px rgba(196,167,71,.45));
   stroke-dasharray:1;stroke-dashoffset:1;
-  transition:stroke-dashoffset 1600ms var(--ease-out) 600ms;
+  transition:stroke-dashoffset 1800ms var(--ease-out) 500ms;
 }
-.gmap-wrap.in .gmap-route{stroke-dashoffset:0;}
-.gmap-marker{opacity:0;transition:opacity 400ms ease;}
-.gmap-wrap.in .gmap-marker-start{opacity:1;transition-delay:500ms;}
-.gmap-wrap.in .gmap-marker-end{opacity:1;transition-delay:2100ms;}
-.m-core.gold{fill:var(--gold);filter:drop-shadow(0 0 6px rgba(196,167,71,.9));}
-.m-ring{
-  fill:rgba(37,99,235,.35);
-  stroke:var(--blue-l);stroke-width:2;
-  filter:drop-shadow(0 0 6px rgba(96,165,250,.8));
-}
-.m-pulse{
-  fill:none;stroke:rgba(196,167,71,.7);stroke-width:1.5;
+.ghero.in .ghero-route{stroke-dashoffset:0;}
+.ghero-marker{opacity:0;transition:opacity 400ms ease;}
+.ghero.in .ghero-marker-start{opacity:1;transition-delay:400ms;}
+.ghero.in .ghero-marker-end{opacity:1;transition-delay:2200ms;}
+.gh-pulse{
+  fill:none;stroke-width:3;
   transform-origin:center;transform-box:fill-box;
-  animation:gmapPulse 2.6s ease-out infinite;
+  animation:gheroPulse 2.6s ease-out infinite;
 }
-.m-pulse.blue{stroke:rgba(96,165,250,.7);}
-@keyframes gmapPulse{
-  0%{transform:scale(1);opacity:.9;}
-  70%{transform:scale(2.4);opacity:0;}
-  100%{transform:scale(2.4);opacity:0;}
+.gh-pulse.gold{stroke:rgba(196,167,71,.75);}
+.gh-pulse.blue{stroke:rgba(96,165,250,.75);}
+@keyframes gheroPulse{
+  0%{transform:scale(.55);opacity:.9;}
+  70%,100%{transform:scale(1.7);opacity:0;}
 }
-/* hero copy sits above the map */
-#hero .hero-label,#hero .hero-invite,#hero .cine-title,#hero .hero-sub{
-  position:relative;z-index:3;
+
+/* mobile: enlarge and re-centre so Italy stays readable */
+@media(max-width:700px){
+  .ghero-frame{width:180%;left:50%;transform:translateX(-58%);}
 }
 
 .hero-label{
@@ -292,10 +283,10 @@ h1 .first{color:var(--blue-xl);}
 }
 
 .scroll-hint{
-  /* the next chapter card overlaps the hero by 48px — keep the cue above it */
-  position:absolute;bottom:72px;left:50%;transform:translateX(-50%);
+  /* pinned near the bottom of the FIRST viewport (the hero can be taller) */
+  position:absolute;top:calc(100svh - 116px);left:50%;transform:translateX(-50%);
   display:flex;flex-direction:column;align-items:center;gap:10px;
-  opacity:.85;
+  opacity:.85;z-index:4;
 }
 .scroll-hint span{
   font-family:var(--font-jetbrains),monospace;
@@ -1263,7 +1254,8 @@ main>section:not(#hero) .section-inner::before{
   .cd-num.tick{animation:none;}
   #scrollTop{transition:opacity 200ms ease;}
   #rsvpFloat{transition:opacity 200ms ease;}
-  .gmap-route{transition:none;stroke-dashoffset:0;}
-  .gmap-marker{transition:none;opacity:1;}
-  .m-pulse{animation:none;opacity:0;}
+  .ghero-route{transition:none;stroke-dashoffset:0;}
+  .ghero-marker{transition:none;opacity:1;}
+  .gh-pulse{animation:none;opacity:0;}
+  .ghero{will-change:auto;}
 }
