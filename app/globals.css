@@ -244,16 +244,61 @@ nav{
   70%,100%{transform:scale(1.7);opacity:0;}
 }
 
-/* mobile: show the whole map (the old 1.8x zoom cropped away Sicilia and
-   half the route) and anchor it to the bottom of the 100svh hero; the
-   scroll hint becomes a flex child in the gap above it, so the free space
-   splits evenly instead of pooling under the globe */
+/* mobile: whole map visible (the old 1.8x zoom cropped away Sicilia and
+   half the route), moderately enlarged from the BOTTOM edge so the planet
+   fills more of the screen while Sicilia and the route stay in frame (the
+   scale crops dark sky at the top and open sea at the sides instead), and
+   anchored to the bottom of the 100svh hero. The hero keeps enough bottom
+   padding that the next section's stacked-card overlap (-48px) covers only
+   backdrop, never Sicilia. The scroll hint becomes a flex child in the gap
+   above the globe. */
 @media(max-width:700px){
   .ghero{order:2;margin-top:auto;}
+  /* window the photo to image-y ~140..770 of 941: everything above the
+     planet's arc apex (~190) and below Sicilia+marker (~730) is dead space,
+     so this is the largest zoom that keeps BOTH the curvature and the whole
+     route in frame. translateY is in % of the element's own height so the
+     crop window scales with viewport width */
+  .ghero-zoom{transform:scale(1.44) translateY(-12.7%);transform-origin:50% 0;}
+  /* the desktop 16% top fade would swallow the arc apex at this zoom */
+  .ghero-frame{
+    -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 6%);
+    mask-image:linear-gradient(180deg,transparent 0,#000 6%);
+  }
+  #hero{padding-bottom:64px;}
   #hero .scroll-hint{
     position:static;order:1;transform:none;
     margin-top:auto;
   }
+}
+
+/* touch parallax, judder-free: the JS version repositions layers after the
+   browser has already composited the async touch scroll (visible shake), so
+   on coarse pointers it's replaced by scroll-driven animations, which run
+   on the compositor thread. Mirrors the desktop JS: copy drifts at 0.3x and
+   fades out by 0.65 viewport, globe follows at 0.14x. Browsers without
+   support (older iOS) simply get a static hero — never the shaky one. */
+@supports (animation-timeline: scroll(root)) {
+  @media (pointer:coarse) and (prefers-reduced-motion:no-preference) {
+    .hero-copy{
+      animation:heroCopyScroll linear both;
+      animation-timeline:scroll(root);
+      animation-range:0 100svh;
+    }
+    .ghero{
+      animation:gheroScroll linear both;
+      animation-timeline:scroll(root);
+      animation-range:0 100svh;
+    }
+  }
+}
+@keyframes heroCopyScroll{
+  0%{transform:translate3d(0,0,0);opacity:1;}
+  65%{opacity:0;}
+  100%{transform:translate3d(0,30svh,0);opacity:0;}
+}
+@keyframes gheroScroll{
+  to{transform:translate3d(0,14svh,0);}
 }
 
 .hero-label{
