@@ -67,6 +67,7 @@ function Visual({ item, active }: { item: StickyItem; active: boolean }) {
 export function StickyScroll({ content }: { content: StickyItem[] }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
+  const activeRef = useRef(0);
   const [pinned, setPinned] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -95,7 +96,19 @@ export function StickyScroll({ content }: { content: StickyItem[] }) {
       const seg = r.height / n;
       const total = r.height - seg;
       const p = total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : 0;
-      setActive(Math.min(n - 1, Math.floor(p * n)));
+      // hysteresis dead-zone: only switch slide once clearly past a boundary,
+      // so iOS Safari's jittery rect reads during inertial scroll don't
+      // flip-flop the index at a boundary (which would flicker the crossfade).
+      const raw = Math.max(0, Math.min(n - 1e-4, p * n));
+      const cur = activeRef.current;
+      const H = 0.12;
+      if (raw > cur + 1 + H || raw < cur - H) {
+        const next = Math.min(n - 1, Math.max(0, Math.floor(raw)));
+        if (next !== cur) {
+          activeRef.current = next;
+          setActive(next);
+        }
+      }
     };
     const onScroll = () => {
       if (ticking) return;
@@ -103,10 +116,21 @@ export function StickyScroll({ content }: { content: StickyItem[] }) {
       requestAnimationFrame(measure);
     };
     measure();
-    window.addEventListener("scroll", onScroll, { passive: true });
+    // Listen on the actual scroll container, not window: the page scrolls
+    // inside a perspective #scene element (for the GPU hero parallax), so
+    // window 'scroll' never fires. Walk up to the nearest scrollable ancestor.
+    let scroller: HTMLElement | Window = window;
+    for (let p = el.parentElement; p; p = p.parentElement) {
+      const oy = getComputedStyle(p).overflowY;
+      if (oy === "auto" || oy === "scroll") {
+        scroller = p;
+        break;
+      }
+    }
+    scroller.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll, { passive: true });
     return () => {
-      window.removeEventListener("scroll", onScroll);
+      scroller.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
   }, [pinned, content.length]);
