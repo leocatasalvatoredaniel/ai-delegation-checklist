@@ -290,13 +290,19 @@ nav{
 /* touch parallax, judder-free: the JS version repositions layers after the
    browser has already composited the async touch scroll (visible shake), so
    on coarse pointers it's replaced by scroll-driven animations, which run
-   on the compositor thread. Mirrors the desktop JS: copy drifts at 0.3x and
-   fades out by 0.65 viewport, globe follows at 0.14x. Browsers without
-   support (older iOS) simply get a static hero — never the shaky one. */
+   on the compositor thread. Mirrors the desktop JS: copy 0.42x fading by
+   0.65 viewport, scroll cue 0.32x fading by 0.45, globe 0.24x. Browsers
+   without support (older iOS) simply get a static hero — never the shaky
+   one. */
 @supports (animation-timeline: scroll(root)) {
   @media (pointer:coarse) and (prefers-reduced-motion:no-preference) {
     .hero-copy{
       animation:heroCopyScroll linear both;
+      animation-timeline:scroll(root);
+      animation-range:0 100svh;
+    }
+    #hero .scroll-hint{
+      animation:heroHintScroll linear both;
       animation-timeline:scroll(root);
       animation-range:0 100svh;
     }
@@ -310,10 +316,15 @@ nav{
 @keyframes heroCopyScroll{
   0%{transform:translate3d(0,0,0);opacity:1;}
   65%{opacity:0;}
-  100%{transform:translate3d(0,30svh,0);opacity:0;}
+  100%{transform:translate3d(0,42svh,0);opacity:0;}
+}
+@keyframes heroHintScroll{
+  0%{transform:translate3d(0,0,0);opacity:1;}
+  45%{opacity:0;}
+  100%{transform:translate3d(0,32svh,0);opacity:0;}
 }
 @keyframes gheroScroll{
-  to{transform:translate3d(0,14svh,0);}
+  to{transform:translate3d(0,24svh,0);}
 }
 
 .hero-label{
@@ -1086,9 +1097,9 @@ footer .footer-wait{
    collapses, which re-lays-out the whole page mid-scroll (visible
    judder on the globe) */
 #hero{min-height:100svh;}
-/* hide the scroll cue only on truly short viewports (landscape phones);
-   the old 720px cutoff was hiding it on common laptop window heights */
-@media(max-height:620px){#hero .scroll-hint{display:none;}}
+/* no max-height hiding for the scroll cue: it's in-flow now, so it can't
+   overlap anything — height cutoffs kept turning it off on laptop windows
+   (620px is a real innerHeight on a 1080p screen at OS scaling) */
 @media(max-height:700px){
   .hero-cta{margin-bottom:12px;}
 }
