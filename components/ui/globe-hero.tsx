@@ -43,7 +43,10 @@ export function GlobeHero() {
             priority
             sizes="100vw"
           />
-          <svg viewBox="0 0 1672 941" preserveAspectRatio="xMidYMid meet">
+          {/* slice (not meet) so the overlay center-crops in lockstep with the
+              photo's object-fit:cover, keeping the route pixel-aligned when the
+              frame is wider than the image (desktop) */}
+          <svg viewBox="0 0 1672 941" preserveAspectRatio="xMidYMid slice">
             {/* quadratic fit of the faint track baked into the photo, so the
                 glowing redraw covers it exactly (it has a ~12px sag) */}
             <path
