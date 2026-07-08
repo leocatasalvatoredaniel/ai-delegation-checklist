@@ -82,13 +82,27 @@ export function StickyScroll({ content }: { content: StickyItem[] }) {
     const el = wrapRef.current;
     if (!el) return;
     const n = content.length;
-    const onScroll = () => {
+    let ticking = false;
+    const measure = () => {
+      ticking = false;
       const r = el.getBoundingClientRect();
-      const total = r.height - window.innerHeight;
+      // per-slide scroll distance = the wrapper's own height / n (each slide
+      // is 100svh). Deriving the denominator from the wrapper — NOT
+      // window.innerHeight — keeps the active index stable while the mobile
+      // URL bar collapses (innerHeight swings between svh and lvh, which
+      // otherwise flip-flops the index at a boundary and makes the crossfade
+      // shudder). rAF-throttled so scroll never forces synchronous layout.
+      const seg = r.height / n;
+      const total = r.height - seg;
       const p = total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : 0;
       setActive(Math.min(n - 1, Math.floor(p * n)));
     };
-    onScroll();
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(measure);
+    };
+    measure();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll, { passive: true });
     return () => {
