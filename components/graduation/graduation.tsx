@@ -60,9 +60,9 @@ const TERMINAL_LINES: { text: string; cls: string; delay: number }[] = [
   { text: "  Compiling 3 years of effort   [OK]", cls: "t-dim", delay: 2100 },
   { text: "  Preparing your invitation     [OK]", cls: "t-dim", delay: 2350 },
   { text: "", cls: "", delay: 2400 },
-  { text: "  ╔═══════════════════════════════╗", cls: "t-title-line", delay: 2500 },
-  { text: "  ║   LAUREA IN INFORMATICA      ║", cls: "t-title-line", delay: 2600 },
-  { text: "  ╚═══════════════════════════════╝", cls: "t-title-line", delay: 2700 },
+  /* CSS-bordered instead of box-drawing chars: ╔═╗ glyphs came from a
+     fallback font with a different advance width and broke the frame */
+  { text: "LAUREA IN INFORMATICA", cls: "t-title-line", delay: 2550 },
   { text: "", cls: "", delay: 2800 },
   { text: "  Student:    Salvatore Daniel Leocata", cls: "t-data", delay: 2900 },
   { text: "  Degree:     Ingegneria Informatica", cls: "t-data", delay: 3050 },
@@ -127,7 +127,7 @@ export function Graduation() {
     const ics =
       type === "proclama"
         ? `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//SDL Laurea//IT\r\nBEGIN:VEVENT\r\nUID:proclama-2026@sdl\r\nDTSTART:20260916T080000Z\r\nDTEND:20260916T120000Z\r\nSUMMARY:Proclamazione di Laurea - Salvatore Daniel Leocata\r\nDESCRIPTION:Cerimonia di proclamazione di laurea in Ingegneria Informatica\r\nLOCATION:Politecnico di Torino\\, Corso Duca degli Abruzzi 24\\, Torino\r\nEND:VEVENT\r\nEND:VCALENDAR`
-        : `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//SDL Laurea//IT\r\nBEGIN:VEVENT\r\nUID:festa-2026@sdl\r\nDTSTART:20261003T190000Z\r\nDTEND:20261004T010000Z\r\nSUMMARY:Festeggiamenti Laurea - Salvatore Daniel Leocata\r\nDESCRIPTION:Cena e festeggiamenti per la laurea\r\nLOCATION:Beauty Garden Banqueting\\, Biancavilla\\, Catania\r\nEND:VEVENT\r\nEND:VCALENDAR`;
+        : `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//SDL Laurea//IT\r\nBEGIN:VEVENT\r\nUID:festa-2026@sdl\r\nDTSTART:20261003T180000Z\r\nDTEND:20261004T010000Z\r\nSUMMARY:Festeggiamenti Laurea - Salvatore Daniel Leocata\r\nDESCRIPTION:Cena e festeggiamenti per la laurea\r\nLOCATION:Beauty Garden Banqueting\\, Biancavilla\\, Catania\r\nEND:VEVENT\r\nEND:VCALENDAR`;
     const a = document.createElement("a");
     a.href = "data:text/calendar;charset=utf-8," + encodeURIComponent(ics);
     a.download = type === "proclama" ? "proclamazione-sdl.ics" : "festa-laurea-sdl.ics";
@@ -305,7 +305,8 @@ export function Graduation() {
     });
 
     // COUNTDOWN
-    const target = new Date("2026-10-03T19:00:00Z");
+    // party starts 20:00 CEST on Oct 3 (matches the program card and the .ics)
+    const target = new Date("2026-10-03T18:00:00Z");
     const updateCD = () => {
       const diff = +target - Date.now();
       const ids = ["cd-d", "cd-h", "cd-m", "cd-s"] as const;
@@ -696,12 +697,11 @@ export function Graduation() {
                     <br />
                     Torino
                   </div>
-                  <div className="event-time">ore 10:00</div>
                 </div>
                 <div className="event-title">Proclamazione</div>
                 <div className="event-desc">
                   La cerimonia ufficiale di laurea presso il Politecnico di Torino. Il momento in cui
-                  anni di studio diventano un titolo.
+                  anni di studio diventano un titolo. Dopo la cerimonia seguirà un aperitivo.
                 </div>
                 <div className="event-badge">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -721,7 +721,7 @@ export function Graduation() {
                     <br />
                     Biancavilla
                   </div>
-                  <div className="event-time">ore 21:00</div>
+                  <div className="event-time">ore 20:00</div>
                 </div>
                 <div className="event-title">Festeggiamenti</div>
                 <div className="event-desc">
