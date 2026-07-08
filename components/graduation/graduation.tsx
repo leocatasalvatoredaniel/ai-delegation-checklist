@@ -392,6 +392,7 @@ export function Graduation() {
     const rsvpFloat = $("rsvpFloat");
     const rsvpSec = $("rsvp");
     const heroCopy = document.querySelector<HTMLElement>("#hero .hero-copy");
+    const heroHint = document.querySelector<HTMLElement>("#hero .scroll-hint");
     const heroGlobe = document.querySelector<HTMLElement>("#hero .ghero");
     let ticking = false;
     const onScroll = () => {
@@ -409,13 +410,19 @@ export function Graduation() {
         ticking = false;
         return;
       }
-      // hero depth: copy drifts up and fades, the globe follows slower
+      // hero depth, three layers at different speeds: copy 0.42x, scroll cue
+      // 0.32x (fades out first — it's done its job once you scroll), globe
+      // 0.24x. Mirrored by the scroll-driven keyframes for touch devices.
       if (y < window.innerHeight * 1.5) {
         if (heroCopy) {
-          heroCopy.style.transform = `translate3d(0, ${y * 0.3}px, 0)`;
+          heroCopy.style.transform = `translate3d(0, ${y * 0.42}px, 0)`;
           heroCopy.style.opacity = String(Math.max(0, 1 - y / (window.innerHeight * 0.65)));
         }
-        if (heroGlobe) heroGlobe.style.transform = `translate3d(0, ${y * 0.14}px, 0)`;
+        if (heroHint) {
+          heroHint.style.transform = `translate3d(0, ${y * 0.32}px, 0)`;
+          heroHint.style.opacity = String(Math.max(0, 1 - y / (window.innerHeight * 0.45)));
+        }
+        if (heroGlobe) heroGlobe.style.transform = `translate3d(0, ${y * 0.24}px, 0)`;
       }
       const mid = window.innerHeight / 2;
       document.querySelectorAll<HTMLElement>("[data-parallax]").forEach((el) => {
