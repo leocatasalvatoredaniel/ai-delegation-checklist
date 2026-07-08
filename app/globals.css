@@ -59,7 +59,7 @@ body{
 #splash.hidden{opacity:0;visibility:hidden;pointer-events:none;}
 
 .terminal{
-  width:min(680px,92vw);
+  width:min(580px,92vw);
   background:#0D1117;
   border:1px solid #1E3A5F;
   border-radius:12px;
@@ -82,15 +82,15 @@ body{
   margin-left:auto;margin-right:auto;
 }
 .terminal-body{
-  padding:24px 28px 28px;
-  min-height:320px;
+  padding:22px 26px 26px;
+  min-height:280px;
   display:flex;flex-direction:column;gap:0;
 }
 .t-line{
   font-family:var(--font-jetbrains),monospace;
   /* fluid: the longest boot line is 47 monospace chars — a fixed size
      overflows the terminal anywhere under ~540px, not just under 430 */
-  font-size:clamp(8px,2.55vw,14px);
+  font-size:clamp(8px,2.55vw,13px);
   line-height:1.8;
   white-space:pre;
   overflow:hidden;
@@ -111,7 +111,19 @@ body{
 .t-cmd{color:#E6EDF3;}
 .t-ok{color:#3FB950;}
 .t-dim{color:#6E7681;}
-.t-title-line{color:#C4A747;font-weight:700;}
+/* CSS double frame around the degree title — the old box-drawing chars
+   (╔═╗) rendered from a fallback font with a different advance width and
+   the frame broke apart on desktop */
+.t-title-line{
+  color:#C4A747;font-weight:700;
+  width:max-content;
+  letter-spacing:.14em;
+  padding:8px 16px;
+  margin:12px 0;
+  border:1px solid rgba(196,167,71,.65);
+  outline:1px solid rgba(196,167,71,.3);
+  outline-offset:3px;
+}
 .t-data{color:#A5D6FF;}
 .t-cursor{
   display:inline-block;width:2px;height:14px;background:#60A5FA;
@@ -343,22 +355,28 @@ h1 .first{color:var(--blue-xl);}
 }
 
 .scroll-hint{
-  /* pinned near the bottom of the FIRST viewport (the hero can be taller) */
-  position:absolute;top:calc(100svh - 116px);left:50%;transform:translateX(-50%);
+  /* pinned near the bottom of the FIRST viewport (the hero can be taller),
+     bottom-LEFT so it never collides with the route markers at the map's
+     center (mirrors the "area riservata" pill bottom-right); it sits on
+     the photo's dark sea, so it needs real contrast */
+  position:absolute;top:calc(100svh - 116px);left:44px;
   display:flex;flex-direction:column;align-items:center;gap:10px;
-  opacity:.85;z-index:4;
+  opacity:1;z-index:4;
 }
 .scroll-hint span{
   font-family:var(--font-jetbrains),monospace;
-  font-size:11px;color:var(--blue-l);letter-spacing:.14em;
+  font-size:11px;color:#A9C9F8;letter-spacing:.14em;
   text-transform:uppercase;
+  text-shadow:0 1px 10px rgba(6,11,20,.9);
 }
 .scroll-mouse{
-  width:22px;height:34px;border:1.5px solid rgba(96,165,250,.5);border-radius:11px;
+  width:22px;height:34px;border:1.5px solid rgba(150,190,250,.85);border-radius:11px;
   display:flex;align-items:flex-start;justify-content:center;padding-top:6px;
+  background:rgba(6,11,20,.38);
+  box-shadow:0 0 18px rgba(37,99,235,.35);
 }
 .scroll-wheel{
-  width:3px;height:6px;background:rgba(96,165,250,.7);border-radius:2px;
+  width:3px;height:6px;background:rgba(170,205,250,.95);border-radius:2px;
   animation:scrollWheel 1.8s ease-in-out infinite;
 }
 @keyframes scrollWheel{0%{transform:translateY(0);opacity:1;}80%{transform:translateY(8px);opacity:0;}100%{transform:translateY(0);opacity:0;}}
@@ -1068,9 +1086,9 @@ footer .footer-wait{
    collapses, which re-lays-out the whole page mid-scroll (visible
    judder on the globe) */
 #hero{min-height:100svh;}
-/* hide the scroll cue when the viewport is too short (landscape / small phones)
-   so it never overlaps the university line */
-@media(max-height:720px){#hero .scroll-hint{display:none;}}
+/* hide the scroll cue only on truly short viewports (landscape phones);
+   the old 720px cutoff was hiding it on common laptop window heights */
+@media(max-height:620px){#hero .scroll-hint{display:none;}}
 @media(max-height:700px){
   .hero-cta{margin-bottom:12px;}
 }
