@@ -254,16 +254,19 @@ nav{
    above the globe. */
 @media(max-width:700px){
   .ghero{order:2;margin-top:auto;}
-  /* window the photo to image-y ~140..770 of 941: everything above the
-     planet's arc apex (~190) and below Sicilia+marker (~730) is dead space,
-     so this is the largest zoom that keeps BOTH the curvature and the whole
-     route in frame. translateY is in % of the element's own height so the
-     crop window scales with viewport width */
-  .ghero-zoom{transform:scale(1.44) translateY(-12.7%);transform-origin:50% 0;}
-  /* the desktop 16% top fade would swallow the arc apex at this zoom */
-  .ghero-frame{
-    -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 6%);
-    mask-image:linear-gradient(180deg,transparent 0,#000 6%);
+  /* portrait crop: on a phone the photo is windowed by cropping the SIDES
+     (open sea), never the top or bottom — the full vertical extent stays
+     visible (sky, the planet's curved horizon, Italy, Sicilia, sea below),
+     so the globe reads as a complete planet instead of a cut-off photo.
+     The layer is sized from the frame height via the photo's aspect ratio,
+     and left:50% + translateX(-60%) pins image-x 60% (the midpoint of the
+     Torino-Sicilia route) to the frame's center. The SVG overlay shares
+     the layer's box, so the route stays pixel-aligned by construction. */
+  .ghero-frame{height:min(48svh,440px);}
+  .ghero-zoom{
+    position:absolute;top:0;bottom:0;left:50%;
+    height:100%;width:auto;aspect-ratio:1672/941;
+    transform:translateX(-60%);
   }
   #hero{padding-bottom:64px;}
   #hero .scroll-hint{
