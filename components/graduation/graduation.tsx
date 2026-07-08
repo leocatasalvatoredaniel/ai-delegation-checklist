@@ -62,7 +62,7 @@ const TERMINAL_LINES: { text: string; cls: string; delay: number }[] = [
   { text: "", cls: "", delay: 2400 },
   /* CSS-bordered instead of box-drawing chars: ╔═╗ glyphs came from a
      fallback font with a different advance width and broke the frame */
-  { text: "LAUREA IN INFORMATICA", cls: "t-title-line", delay: 2550 },
+  { text: "LAUREA IN INGEGNERIA INFORMATICA", cls: "t-title-line", delay: 2550 },
   { text: "", cls: "", delay: 2800 },
   { text: "  Student:    Salvatore Daniel Leocata", cls: "t-data", delay: 2900 },
   { text: "  Degree:     Ingegneria Informatica", cls: "t-data", delay: 3050 },
