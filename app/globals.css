@@ -216,6 +216,7 @@ nav{
 .ghero{
   width:100%;
   margin-top:clamp(20px,4vh,52px);
+  order:2;
   position:relative;z-index:1;
   pointer-events:none;
   will-change:transform;
@@ -281,10 +282,9 @@ nav{
     transform:translateX(-60%);
   }
   #hero{padding-bottom:64px;}
-  #hero .scroll-hint{
-    position:static;order:1;transform:none;
-    margin-top:auto;
-  }
+  /* auto margins on both split the hero's free space evenly:
+     copy / gap / hint / gap / globe pinned to the bottom */
+  #hero .scroll-hint{margin-top:auto;}
 }
 
 /* touch parallax, judder-free: the JS version repositions layers after the
@@ -355,11 +355,11 @@ h1 .first{color:var(--blue-xl);}
 }
 
 .scroll-hint{
-  /* pinned near the bottom of the FIRST viewport (the hero can be taller),
-     bottom-LEFT so it never collides with the route markers at the map's
-     center (mirrors the "area riservata" pill bottom-right); it sits on
-     the photo's dark sea, so it needs real contrast */
-  position:absolute;top:calc(100svh - 116px);left:44px;
+  /* in-flow flex child between the hero copy and the globe (order:
+     copy 0 → hint 1 → globe 2), centered above the planet on every
+     viewport; it sits on dark backdrop/sky, so it needs real contrast */
+  order:1;
+  margin-top:34px;
   display:flex;flex-direction:column;align-items:center;gap:10px;
   opacity:1;z-index:4;
 }
