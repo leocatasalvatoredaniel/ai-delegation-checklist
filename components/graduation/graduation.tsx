@@ -387,36 +387,47 @@ export function Graduation() {
     }
 
     // PARALLAX + SCROLL PROGRESS + SCROLL-TO-TOP
-    // The scroll container is #scene (perspective root for the GPU hero
-    // parallax), NOT the window — read/drive scroll through it.
-    const scene = $("scene");
     const progressEl = $("scrollProgress");
     const scrollTopBtn = $("scrollTop");
     const rsvpFloat = $("rsvpFloat");
     const rsvpSec = $("rsvp");
-    const vh = () => window.innerHeight;
+    const heroCopy = document.querySelector<HTMLElement>("#hero .hero-copy");
+    const heroHint = document.querySelector<HTMLElement>("#hero .scroll-hint");
+    const heroGlobe = document.querySelector<HTMLElement>("#hero .ghero");
     let ticking = false;
     const onScroll = () => {
-      const y = scene ? scene.scrollTop : window.pageYOffset;
-      const max = scene ? scene.scrollHeight - scene.clientHeight : document.documentElement.scrollHeight - vh();
+      const y = window.pageYOffset;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
       if (progressEl) progressEl.style.width = (max > 0 ? (y / max) * 100 : 0) + "%";
-      if (scrollTopBtn) scrollTopBtn.classList.toggle("show", y > vh() * 0.9);
+      if (scrollTopBtn) scrollTopBtn.classList.toggle("show", y > window.innerHeight * 0.9);
       if (rsvpFloat) {
         const rsvpInView = rsvpSec
-          ? rsvpSec.getBoundingClientRect().top < vh() * 0.85
+          ? rsvpSec.getBoundingClientRect().top < window.innerHeight * 0.85
           : false;
-        rsvpFloat.classList.toggle("show", y > vh() * 0.9 && !rsvpInView);
+        rsvpFloat.classList.toggle("show", y > window.innerHeight * 0.9 && !rsvpInView);
       }
-      // hero parallax is pure CSS now (perspective + translateZ on #scene) —
-      // compositor-driven, so it stays smooth on iOS. No JS transform here.
       if (reduceMotion || coarsePointer) {
         ticking = false;
         return;
       }
-      const mid = vh() / 2;
+      // hero depth, three layers at different speeds: copy 0.42x, scroll cue
+      // 0.32x (fades out first — it's done its job once you scroll), globe
+      // 0.24x. Mirrored by the scroll-driven keyframes for touch devices.
+      if (y < window.innerHeight * 1.5) {
+        if (heroCopy) {
+          heroCopy.style.transform = `translate3d(0, ${y * 0.42}px, 0)`;
+          heroCopy.style.opacity = String(Math.max(0, 1 - y / (window.innerHeight * 0.65)));
+        }
+        if (heroHint) {
+          heroHint.style.transform = `translate3d(0, ${y * 0.32}px, 0)`;
+          heroHint.style.opacity = String(Math.max(0, 1 - y / (window.innerHeight * 0.45)));
+        }
+        if (heroGlobe) heroGlobe.style.transform = `translate3d(0, ${y * 0.24}px, 0)`;
+      }
+      const mid = window.innerHeight / 2;
       document.querySelectorAll<HTMLElement>("[data-parallax]").forEach((el) => {
         const r = el.getBoundingClientRect();
-        if (r.bottom < -200 || r.top > vh() + 200) return;
+        if (r.bottom < -200 || r.top > window.innerHeight + 200) return;
         const delta = mid - (r.top + r.height / 2);
         const base = el.classList.contains("aurora") ? "translate(-50%,-50%) " : "";
         el.style.transform = `${base}translate3d(0, ${delta * parseFloat(el.dataset.parallax || "0")}px, 0)`;
@@ -429,15 +440,13 @@ export function Graduation() {
         requestAnimationFrame(onScroll);
       }
     };
-    const scrollTarget: HTMLElement | Window = scene ?? window;
-    scrollTarget.addEventListener("scroll", requestTick, { passive: true });
+    window.addEventListener("scroll", requestTick, { passive: true });
     window.addEventListener("resize", requestTick, { passive: true });
     onScroll();
-    cleanups.push(() => scrollTarget.removeEventListener("scroll", requestTick));
+    cleanups.push(() => window.removeEventListener("scroll", requestTick));
     cleanups.push(() => window.removeEventListener("resize", requestTick));
 
-    const onTop = () =>
-      (scene ?? window).scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+    const onTop = () => window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
     scrollTopBtn?.addEventListener("click", onTop);
     cleanups.push(() => scrollTopBtn?.removeEventListener("click", onTop));
 
@@ -564,10 +573,6 @@ export function Graduation() {
         </div>
       </nav>
 
-      {/* Scroll container + perspective root for the GPU hero parallax.
-          Fixed UI (nav, splash, floating buttons, modal) stays OUTSIDE so it
-          keeps resolving against the viewport, not this perspective box. */}
-      <div className="scene" id="scene">
       <main id="main">
         {/* HERO */}
         <section id="hero">
@@ -935,7 +940,6 @@ export function Graduation() {
         <div className="footer-sub">Ingegneria Informatica · Politecnico di Torino · 2026</div>
         <div className="footer-wait">Ti aspettiamo 🎓</div>
       </footer>
-      </div>
 
       {/* TOAST */}
       <div id="toast" />
