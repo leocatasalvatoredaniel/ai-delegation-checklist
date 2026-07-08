@@ -708,7 +708,7 @@ export function Graduation() {
                 <div className="event-title">Proclamazione</div>
                 <div className="event-desc">
                   La cerimonia ufficiale di laurea presso il Politecnico di Torino. Il momento in cui
-                  anni di studio diventano un titolo. Dopo la cerimonia seguirà un aperitivo.
+                  anni di studio diventano un titolo. Dopo la cerimonia seguirà un bellissimo aperitivo.
                 </div>
                 <div className="event-badge">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -841,7 +841,7 @@ export function Graduation() {
             </h2>
             <p className="section-desc fade-up delay-2">
               Facci sapere entro il{" "}
-              <strong style={{ color: "rgba(255,255,255,.8)" }}>25 settembre 2026</strong>{" "}
+              <strong style={{ color: "rgba(255,255,255,.8)" }}>5 settembre 2026</strong>{" "}
               se potrai essere con noi. L&apos;invito è esteso anche ai tuoi accompagnatori.
             </p>
             <form className="rsvp-form fade-up delay-2" id="rsvpForm" noValidate onSubmit={handleSubmit}>
