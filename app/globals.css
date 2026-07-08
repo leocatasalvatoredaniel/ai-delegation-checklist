@@ -111,18 +111,16 @@ body{
 .t-cmd{color:#E6EDF3;}
 .t-ok{color:#3FB950;}
 .t-dim{color:#6E7681;}
-/* CSS double frame around the degree title — the old box-drawing chars
-   (╔═╗) rendered from a fallback font with a different advance width and
-   the frame broke apart on desktop */
+/* double-line frame around the degree title, like a DOS ╔═╗ box — but as a
+   CSS border-style:double, because the real box-drawing chars rendered from
+   a fallback font with a different advance width and broke apart */
 .t-title-line{
   color:#C4A747;font-weight:700;
   width:max-content;
   letter-spacing:.14em;
-  padding:8px 16px;
+  padding:9px 18px;
   margin:12px 0;
-  border:1px solid rgba(196,167,71,.65);
-  outline:1px solid rgba(196,167,71,.3);
-  outline-offset:3px;
+  border:4px double rgba(196,167,71,.75);
 }
 .t-data{color:#A5D6FF;}
 .t-cursor{
@@ -205,7 +203,9 @@ nav{
   background:linear-gradient(160deg,#060B14 0%,#0A1628 50%,#0E2040 100%);
   display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
   text-align:center;
-  padding:130px 0 0;
+  /* bottom padding keeps the next section's -48px stacked-card overlap on
+     backdrop, never on Sicilia / the sea at the photo's bottom edge */
+  padding:130px 0 64px;
   position:relative;
   overflow:hidden;
 }
@@ -223,24 +223,15 @@ nav{
 }
 .ghero-frame{
   position:relative;width:100%;overflow:hidden;
-  /* height in vw so the crop is a CONSTANT slice of the photo at every
-     desktop width (the image is full-bleed, so its displayed height scales
-     with width; a px/svh height would show a different band per screen).
-     40vw + the -12vw zoom shift below windows image-y ~200..870 — the whole
-     Torino→Sicilia route with a band of open sea beneath Sicilia, so the
-     next section (which overlaps -48px) covers sea, never the marker. */
-  height:40vw;max-height:760px;
+  /* natural aspect: the WHOLE photo is visible top to bottom on desktop
+     (sky, horizon arc, the full route, Sicilia and the sea below it) */
   /* blend the photo's dark top into the hero backdrop */
   -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 10%);
   mask-image:linear-gradient(180deg,transparent 0,#000 10%);
 }
 /* the zoom layer carries the image + the SVG overlay together, so the route
-   stays pixel-aligned through any translate (no object-fit needed) */
-.ghero-zoom{
-  position:absolute;top:0;left:0;width:100%;
-  aspect-ratio:1672/941;
-  transform:translateY(-12vw);transform-origin:50% 0;
-}
+   stays pixel-aligned through any crop/translate */
+.ghero-zoom{position:relative;transform-origin:50% 0;}
 .ghero-frame img{width:100%;height:auto;display:block;}
 .ghero-frame svg{position:absolute;inset:0;width:100%;height:100%;}
 
@@ -292,7 +283,6 @@ nav{
     height:100%;width:auto;aspect-ratio:1672/941;
     transform:translateX(-60%);
   }
-  #hero{padding-bottom:64px;}
   /* fixed gap under the copy (not auto, which collapsed and let the cue
      crowd the subtitle), globe pinned to the bottom with its own auto */
   #hero .scroll-hint{margin-top:clamp(22px,4.5vh,40px);margin-bottom:0;}
