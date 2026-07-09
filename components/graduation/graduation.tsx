@@ -583,9 +583,7 @@ export function Graduation() {
             <div className="hero-label">// invito ufficiale · 2026</div>
             <p className="hero-invite">Ho il piacere di invitarti a celebrare la mia laurea</p>
             <h1 className="cine-title">
-              <span className="first">Daniel</span>
-              <br />
-              Leocata
+              <span className="first">Daniel</span> Leocata
             </h1>
             <p className="hero-sub">Ingegneria Informatica · Politecnico di Torino</p>
           </div>
