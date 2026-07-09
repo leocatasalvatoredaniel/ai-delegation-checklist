@@ -64,7 +64,7 @@ const TERMINAL_LINES: { text: string; cls: string; delay: number }[] = [
      fallback font with a different advance width and broke the frame */
   { text: "LAUREA IN INGEGNERIA INFORMATICA", cls: "t-title-line", delay: 2550 },
   { text: "", cls: "", delay: 2800 },
-  { text: "  Student:    Salvatore Daniel Leocata", cls: "t-data", delay: 2900 },
+  { text: "  Student:    Daniel Leocata", cls: "t-data", delay: 2900 },
   { text: "  Degree:     Ingegneria Informatica", cls: "t-data", delay: 3050 },
   { text: "  University: Politecnico di Torino", cls: "t-data", delay: 3200 },
   { text: "  Date:       16 September 2026", cls: "t-data", delay: 3350 },
@@ -126,8 +126,8 @@ export function Graduation() {
   function downloadICS(type: "proclama" | "festa") {
     const ics =
       type === "proclama"
-        ? `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//SDL Laurea//IT\r\nBEGIN:VEVENT\r\nUID:proclama-2026@sdl\r\nDTSTART:20260916T080000Z\r\nDTEND:20260916T120000Z\r\nSUMMARY:Proclamazione di Laurea - Salvatore Daniel Leocata\r\nDESCRIPTION:Cerimonia di proclamazione di laurea in Ingegneria Informatica\r\nLOCATION:Politecnico di Torino\\, Corso Duca degli Abruzzi 24\\, Torino\r\nEND:VEVENT\r\nEND:VCALENDAR`
-        : `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//SDL Laurea//IT\r\nBEGIN:VEVENT\r\nUID:festa-2026@sdl\r\nDTSTART:20261003T180000Z\r\nDTEND:20261004T010000Z\r\nSUMMARY:Festeggiamenti Laurea - Salvatore Daniel Leocata\r\nDESCRIPTION:Cena e festeggiamenti per la laurea\r\nLOCATION:Beauty Garden Banqueting\\, Biancavilla\\, Catania\r\nEND:VEVENT\r\nEND:VCALENDAR`;
+        ? `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//SDL Laurea//IT\r\nBEGIN:VEVENT\r\nUID:proclama-2026@sdl\r\nDTSTART:20260916T080000Z\r\nDTEND:20260916T120000Z\r\nSUMMARY:Proclamazione di Laurea - Daniel Leocata\r\nDESCRIPTION:Cerimonia di proclamazione di laurea in Ingegneria Informatica\r\nLOCATION:Politecnico di Torino\\, Corso Duca degli Abruzzi 24\\, Torino\r\nEND:VEVENT\r\nEND:VCALENDAR`
+        : `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//SDL Laurea//IT\r\nBEGIN:VEVENT\r\nUID:festa-2026@sdl\r\nDTSTART:20261003T180000Z\r\nDTEND:20261004T010000Z\r\nSUMMARY:Festeggiamenti Laurea - Daniel Leocata\r\nDESCRIPTION:Cena e festeggiamenti per la laurea\r\nLOCATION:Beauty Garden Banqueting\\, Biancavilla\\, Catania\r\nEND:VEVENT\r\nEND:VCALENDAR`;
     const a = document.createElement("a");
     a.href = "data:text/calendar;charset=utf-8," + encodeURIComponent(ics);
     a.download = type === "proclama" ? "proclamazione-sdl.ics" : "festa-laurea-sdl.ics";
@@ -583,7 +583,7 @@ export function Graduation() {
             <div className="hero-label">// invito ufficiale · 2026</div>
             <p className="hero-invite">Ho il piacere di invitarti a celebrare la mia laurea</p>
             <h1 className="cine-title">
-              <span className="first">Salvatore Daniel</span>
+              <span className="first">Daniel</span>
               <br />
               Leocata
             </h1>
@@ -634,7 +634,7 @@ export function Graduation() {
                 Grazie di cuore.
                 <br />
                 <span className="at-sig">
-                  — Salvatore Daniel Leocata, Dott. in Ingegneria Informatica 🎓
+                  — Daniel Leocata, Dott. in Ingegneria Informatica 🎓
                 </span>
               </div>
               <div className="at-prompt">
@@ -840,9 +840,9 @@ export function Graduation() {
               presenza
             </h2>
             <p className="section-desc fade-up delay-2">
-              Facci sapere entro il{" "}
-              <strong style={{ color: "rgba(255,255,255,.8)" }}>5 settembre 2026</strong>{" "}
-              se potrai essere con noi. L&apos;invito è esteso anche ai tuoi accompagnatori.
+              Facci sapere{" "}
+              <strong style={{ color: "rgba(255,255,255,.8)" }}>entro i primi di settembre 2026</strong>{" "}
+              se potrai essere con noi — per entrambi gli eventi. L&apos;invito è esteso anche ai tuoi accompagnatori.
             </p>
             <form className="rsvp-form fade-up delay-2" id="rsvpForm" noValidate onSubmit={handleSubmit}>
               <div className="form-row">
@@ -922,7 +922,7 @@ export function Graduation() {
               </div>
 
               <div className="field">
-                <label>Un messaggio per Salvatore Daniel (opzionale)</label>
+                <label>Un messaggio per Daniel (opzionale)</label>
                 <textarea name="messaggio" placeholder="Scrivi qualcosa di speciale…" />
               </div>
 
@@ -936,7 +936,7 @@ export function Graduation() {
 
       {/* FOOTER */}
       <footer>
-        <div className="footer-name">Salvatore Daniel Leocata</div>
+        <div className="footer-name">Daniel Leocata</div>
         <div className="footer-sub">Ingegneria Informatica · Politecnico di Torino · 2026</div>
         <div className="footer-wait">Ti aspettiamo 🎓</div>
       </footer>

@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     title: OG_TITLE,
     type: "website",
     url: `${SITE_URL}/`,
-    siteName: "Laurea di Salvatore Daniel Leocata",
+    siteName: "Laurea di Daniel Leocata",
     locale: "it_IT",
     images: [
       {
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
         width: 2400,
         height: 1260,
         type: "image/jpeg",
-        alt: "Invito alla laurea di Salvatore Daniel Leocata — Ingegneria Informatica, Politecnico di Torino",
+        alt: "Invito alla laurea di Daniel Leocata — Ingegneria Informatica, Politecnico di Torino",
       },
     ],
   },
