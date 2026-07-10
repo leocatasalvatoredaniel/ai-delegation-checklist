@@ -36,6 +36,14 @@ const STATS_CONTENT: StickyItem[] = [
     gradient: "linear-gradient(160deg,#1d3a5f 0%,#0e2747 60%,#0a1628 100%)",
   },
   {
+    num: "42",
+    title: "Voli tra Catania e Torino",
+    description:
+      "Tre anni da pendolare dei cieli: bagaglio a mano ottimizzato al grammo e carta d'imbarco sempre in tasca. E per un informatico, 42 è la risposta a tutto.",
+    img: `${BASE_PATH}/img/foto_voli.jpg`,
+    gradient: "linear-gradient(160deg,#153761 0%,#0d2a4e 55%,#091626 100%)",
+  },
+  {
     num: "∞",
     title: "Volte che l'AI mi ha salvato",
     description:
