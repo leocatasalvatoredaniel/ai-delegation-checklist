@@ -49,30 +49,6 @@ const SHEETS_URL = RSVP_BACKEND.sheetsUrl;
 const CSV_URL = RSVP_BACKEND.csvUrl;
 const MONO = "var(--font-jetbrains),monospace";
 
-/** Terminal boot sequence shown on the splash screen. */
-const TERMINAL_LINES: { text: string; cls: string; delay: number }[] = [
-  { text: '$ sudo run invito.exe --guest="ospite_speciale"', cls: "t-prompt t-cmd", delay: 0 },
-  { text: "[sudo] password for root: ··········", cls: "t-dim", delay: 600 },
-  { text: "", cls: "", delay: 1000 },
-  { text: "  Booting graduation sequence...", cls: "t-ok", delay: 1100 },
-  { text: "  Loading thesis_defense.pdf    [OK]", cls: "t-dim", delay: 1500 },
-  { text: "  Mounting campus_memories/     [OK]", cls: "t-dim", delay: 1800 },
-  { text: "  Compiling 3 years of effort   [OK]", cls: "t-dim", delay: 2100 },
-  { text: "  Preparing your invitation     [OK]", cls: "t-dim", delay: 2350 },
-  { text: "", cls: "", delay: 2400 },
-  /* CSS-bordered instead of box-drawing chars: ╔═╗ glyphs came from a
-     fallback font with a different advance width and broke the frame */
-  { text: "LAUREA IN INGEGNERIA INFORMATICA", cls: "t-title-line", delay: 2550 },
-  { text: "", cls: "", delay: 2800 },
-  { text: "  Student:    Daniel Leocata", cls: "t-data", delay: 2900 },
-  { text: "  Degree:     Ingegneria Informatica", cls: "t-data", delay: 3050 },
-  { text: "  University: Politecnico di Torino", cls: "t-data", delay: 3200 },
-  { text: "  Date:       16 September 2026", cls: "t-data", delay: 3350 },
-  { text: "", cls: "", delay: 3500 },
-  { text: '$ echo "Sei ufficialmente invitato!" ', cls: "t-prompt t-cmd", delay: 3600 },
-];
-const PROG_LABELS = ["Loading assets", "Mounting memories", "Compiling 3 years", "Almost there...", "Invito pronto!"];
-
 export function Graduation() {
   const splashDone = useRef(false);
 
@@ -88,8 +64,25 @@ export function Graduation() {
 
   function dismissSplash() {
     if (!splashDone.current) return;
+    const v = $("introVideo") as HTMLVideoElement | null;
+    if (v) {
+      try {
+        v.pause();
+      } catch {
+        /* ignore */
+      }
+    }
     $("splash")?.classList.add("hidden");
     $("main")?.classList.add("visible");
+  }
+
+  function toggleMute() {
+    const v = $("introVideo") as HTMLVideoElement | null;
+    const icon = $("introMuteIcon");
+    if (!v) return;
+    v.muted = !v.muted;
+    if (v.muted !== true && v.paused) v.play().catch(() => {});
+    if (icon) icon.textContent = v.muted ? "🔇" : "🔊";
   }
 
   function openModal() {
@@ -275,34 +268,37 @@ export function Graduation() {
     // so the parallax layers visibly lag and shake — skip them entirely
     const coarsePointer = matchMedia("(pointer:coarse)").matches;
 
-    // TERMINAL SPLASH
-    const body = $("termBody");
-    const bar = $("progBar");
-    const lbl = $("progLabel");
-    if (body) body.innerHTML = "";
-    TERMINAL_LINES.forEach((l) => {
-      const el = document.createElement("div");
-      el.className = "t-line " + (l.cls || "");
-      el.textContent = l.text;
-      body?.appendChild(el);
-      const t = window.setTimeout(() => el.classList.add("visible"), l.delay);
-      cleanups.push(() => clearTimeout(t));
-    });
-    const progSteps: [string, number, number][] = [
-      ["20%", 500, 0],
-      ["45%", 1100, 1],
-      ["70%", 2000, 2],
-      ["90%", 3000, 3],
-      ["100%", 3800, 4],
-    ];
-    progSteps.forEach(([w, ms, li]) => {
-      const t = window.setTimeout(() => {
-        if (bar) bar.style.width = w;
-        if (lbl) lbl.textContent = PROG_LABELS[li];
-        if (ms === 3800) splashDone.current = true;
-      }, ms);
-      cleanups.push(() => clearTimeout(t));
-    });
+    // INTRO VIDEO SPLASH — plays the cinematic video, then crossfades into
+    // the site. Skip is available immediately (button); the video also
+    // auto-dismisses when it ends, errors, or (safety) runs long.
+    splashDone.current = true;
+    const intro = $("introVideo") as HTMLVideoElement | null;
+    if (intro) {
+      if (reduceMotion) {
+        // don't force a 10s autoplaying video on reduced-motion users
+        dismissSplash();
+      } else {
+        let safety = 0;
+        const finish = () => {
+          window.clearTimeout(safety);
+          dismissSplash();
+        };
+        intro.addEventListener("ended", finish);
+        intro.addEventListener("error", finish);
+        cleanups.push(() => {
+          intro.removeEventListener("ended", finish);
+          intro.removeEventListener("error", finish);
+        });
+        // attempt autoplay (muted → allowed everywhere incl. iOS); if blocked,
+        // the poster + skip button still let the user in. muted is set
+        // imperatively because React's muted prop isn't a reliable attribute.
+        intro.muted = true;
+        intro.play().catch(() => {});
+        // backstop so a stalled/undecodable video never traps the visitor
+        safety = window.setTimeout(finish, 15000);
+        cleanups.push(() => window.clearTimeout(safety));
+      }
+    }
 
     // COUNTDOWN
     // party starts 20:00 CEST on Oct 3 (matches the program card and the .ics)
@@ -534,28 +530,25 @@ export function Graduation() {
       <div id="scrollProgress" aria-hidden="true" />
       <div id="grain" aria-hidden="true" />
 
-      {/* SPLASH */}
-      <div id="splash" onClick={dismissSplash}>
-        <div className="terminal">
-          <div className="terminal-bar">
-            <div className="t-dot" />
-            <div className="t-dot" />
-            <div className="t-dot" />
-            <span className="t-title">invito.exe — zsh</span>
-          </div>
-          <div className="terminal-body" id="termBody" />
-          <div style={{ padding: "0 28px 24px" }}>
-            <div className="progress-wrap">
-              <div className="progress-label" id="progLabel">
-                Initializing...
-              </div>
-              <div className="progress-bar-bg">
-                <div className="progress-bar-fill" id="progBar" />
-              </div>
-            </div>
-            <div className="splash-hint">[ tocca per aprire l&apos;invito ]</div>
-          </div>
-        </div>
+      {/* SPLASH — cinematic intro video that crossfades into the site at its end */}
+      <div id="splash">
+        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+        <video
+          id="introVideo"
+          className="intro-video"
+          src={`${BASE_PATH}/video/intro.mp4`}
+          poster={`${BASE_PATH}/img/intro_poster.jpg`}
+          muted
+          autoPlay
+          playsInline
+          preload="auto"
+        />
+        <button className="intro-btn intro-mute" onClick={toggleMute} aria-label="Attiva o disattiva audio">
+          <span id="introMuteIcon">🔇</span>
+        </button>
+        <button className="intro-btn intro-skip" onClick={dismissSplash}>
+          salta <span aria-hidden="true">›</span>
+        </button>
       </div>
 
       {/* NAV */}
