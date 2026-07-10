@@ -1366,6 +1366,11 @@ main>section:not(#hero) .section-inner::before{
 }
 .ss-visual-slide.active{opacity:1;transform:none;}
 .ss-visual-slide img,.ss-visual-slide video{width:100%;height:100%;object-fit:cover;display:block;}
+.ss-photo{position:relative;width:100%;height:100%;}
+/* blurred duplicate that fills the frame when the photo is letterboxed on
+   narrow screens; hidden on desktop where the photo covers the whole frame */
+.ss-photo-bg{position:absolute;inset:0;filter:blur(26px) saturate(1.1);transform:scale(1.18);display:none;}
+.ss-photo img:not(.ss-photo-bg){position:relative;}
 .ss-emoji{ font-size:clamp(72px,12vw,128px); line-height:1; filter:drop-shadow(0 12px 30px rgba(0,0,0,.45)); }
 
 /* slide progress dots */
@@ -1389,8 +1394,11 @@ main>section:not(#hero) .section-inner::before{
     gap:18px;
     padding:0 24px;
   }
-  .ss-visual-side{order:-1;height:36svh;max-height:320px;}
+  .ss-visual-side{order:-1;height:46svh;max-height:420px;}
   .ss-left{min-height:190px;}
+  /* photos: never crop on mobile — contain + blurred fill behind */
+  .ss-photo-bg{display:block;}
+  .ss-photo img:not(.ss-photo-bg){object-fit:contain;}
   .ss-num{font-size:clamp(34px,11vw,52px);}
   .ss-title{font-size:clamp(18px,5vw,22px);margin-top:8px;}
   .ss-desc{font-size:14px;margin-top:8px;}
