@@ -128,7 +128,7 @@ export function Graduation() {
     const ics =
       type === "proclama"
         ? `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//SDL Laurea//IT\r\nBEGIN:VEVENT\r\nUID:proclama-2026@sdl\r\nDTSTART:20260916T080000Z\r\nDTEND:20260916T120000Z\r\nSUMMARY:Proclamazione di Laurea - Daniel Leocata\r\nDESCRIPTION:Cerimonia di proclamazione di laurea in Ingegneria Informatica\r\nLOCATION:Politecnico di Torino\\, Corso Duca degli Abruzzi 24\\, Torino\r\nEND:VEVENT\r\nEND:VCALENDAR`
-        : `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//SDL Laurea//IT\r\nBEGIN:VEVENT\r\nUID:festa-2026@sdl\r\nDTSTART:20261003T180000Z\r\nDTEND:20261004T010000Z\r\nSUMMARY:Festeggiamenti Laurea - Daniel Leocata\r\nDESCRIPTION:Cena e festeggiamenti per la laurea\r\nLOCATION:Beauty Garden Banqueting\\, Biancavilla\\, Catania\r\nEND:VEVENT\r\nEND:VCALENDAR`;
+        : `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//SDL Laurea//IT\r\nBEGIN:VEVENT\r\nUID:festa-2026@sdl\r\nDTSTART:20261003T180000Z\r\nDTEND:20261004T010000Z\r\nSUMMARY:Festeggiamenti Laurea - Daniel Leocata\r\nDESCRIPTION:Cena e festeggiamenti per la laurea\r\nLOCATION:Beauty Garden Banqueting\\, Contrada Don Assenzio\\, 95033 Biancavilla CT\r\nEND:VEVENT\r\nEND:VCALENDAR`;
     const a = document.createElement("a");
     a.href = "data:text/calendar;charset=utf-8," + encodeURIComponent(ics);
     a.download = type === "proclama" ? "proclamazione-sdl.ics" : "festa-laurea-sdl.ics";
@@ -604,12 +604,12 @@ export function Graduation() {
           <div className="section-inner">
             <div className="section-tag fade-up">// 3 anni in numeri</div>
             <h2 className="fade-up delay-1">
-              Le statistiche che
+              I veri numeri dei
               <br />
-              non mette nella laurea
+              miei ultimi 3 anni.
             </h2>
             <p className="section-desc fade-up delay-2">
-              Dati verificati. La tesi meno. (Scorri.)
+              Molto più onesto di un profilo LinkedIn. (Scorri)
             </p>
           </div>
 
@@ -689,8 +689,8 @@ export function Graduation() {
               un solo traguardo
             </h2>
             <p className="section-desc fade-up delay-2">
-              Due appuntamenti speciali per celebrare questo percorso. Saremo felici di averti con
-              noi.
+              Due appuntamenti speciali per celebrare questo percorso. Sarò felice di averti con
+              me.
             </p>
             <div className="program-grid">
               <div className="event-card fade-up delay-1">
@@ -776,8 +776,8 @@ export function Graduation() {
               <div className="loc-card">
                 <iframe
                   className="loc-map"
-                  title="Mappa: Beauty Garden Banqueting, Biancavilla (Catania)"
-                  src="https://maps.google.com/maps?q=Beauty+Garden+Banqueting+Biancavilla&output=embed&z=15"
+                  title="Mappa: Beauty Garden Banqueting, Contrada Don Assenzio, Biancavilla (Catania)"
+                  src="https://maps.google.com/maps?q=Beauty+Garden+Banqueting,+Contrada+Don+Assenzio,+95033+Biancavilla+CT&output=embed&z=15"
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
@@ -788,9 +788,16 @@ export function Graduation() {
                     Beauty Garden Banqueting
                   </div>
                   <div className="loc-addr">
-                    Biancavilla, Catania
-                    <br />
-                    Sicilia
+                    <a
+                      href="https://maps.app.goo.gl/RzbRiNPZ4aUJuWq2A"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: "inherit", textDecoration: "underline", textUnderlineOffset: "3px" }}
+                    >
+                      Contrada Don Assenzio
+                      <br />
+                      95033 Biancavilla CT
+                    </a>
                   </div>
                 </div>
               </div>
