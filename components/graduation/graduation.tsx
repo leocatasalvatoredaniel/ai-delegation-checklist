@@ -197,11 +197,11 @@ export function Graduation() {
             .map((r) => {
               const ok = isSi(r.Presenza);
               return `<tr>
-            <td><div class="rsvp-nome">${r.Nome || "—"}</div><div class="rsvp-email">${r.Email || ""}</div></td>
-            <td><span class="rsvp-pill ${ok ? "si" : "no"}">${ok ? "✓ Sì" : "✗ No"}</span></td>
-            <td style="color:rgba(255,255,255,.6)">${isSi(r.Proclamazione) ? "✓ Sì" : "✗ No"}</td>
-            <td style="max-width:160px;word-break:break-word;color:rgba(255,255,255,.5);font-size:12px">${r.Note || "—"}</td>
-            <td style="white-space:nowrap;font-size:11px;font-family:${MONO};color:rgba(255,255,255,.25)">${fmtDate(r.Timestamp)}</td>
+            <td class="rsvp-td-guest"><div class="rsvp-nome">${r.Nome || "—"}</div><div class="rsvp-email">${r.Email || ""}</div></td>
+            <td class="rsvp-td-pres"><span class="rsvp-pill ${ok ? "si" : "no"}">${ok ? "✓ Sì" : "✗ No"}</span></td>
+            <td class="rsvp-td-proc">${isSi(r.Proclamazione) ? "✓ Sì" : "✗ No"}</td>
+            <td class="rsvp-td-note">${r.Note || "—"}</td>
+            <td class="rsvp-td-date">${fmtDate(r.Timestamp)}</td>
           </tr>`;
             })
             .join("")}</tbody>
