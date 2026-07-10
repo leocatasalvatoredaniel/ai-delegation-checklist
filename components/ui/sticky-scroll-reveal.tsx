@@ -47,8 +47,16 @@ function Visual({ item, active }: { item: StickyItem; active: boolean }) {
     );
   }
   if (item.img) {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={item.img} alt={item.title} />;
+    // blur-fill: on narrow screens the photo switches to object-fit:contain
+    // and the blurred copy behind fills the leftover frame (see .ss-photo CSS)
+    return (
+      <div className="ss-photo">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="ss-photo-bg" src={item.img} alt="" aria-hidden="true" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={item.img} alt={item.title} />
+      </div>
+    );
   }
   return (
     <span className="ss-emoji" aria-hidden="true">

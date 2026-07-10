@@ -36,7 +36,7 @@ const STATS_CONTENT: StickyItem[] = [
     gradient: "linear-gradient(160deg,#1d3a5f 0%,#0e2747 60%,#0a1628 100%)",
   },
   {
-    num: "42",
+    num: "50+",
     title: "Voli tra Catania e Torino",
     description:
       "Tre anni da pendolare dei cieli: valigia sempre mezza pronta, bagaglio a mano ottimizzato al grammo e il check-in ormai a occhi chiusi.",
