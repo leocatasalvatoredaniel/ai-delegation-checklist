@@ -1026,6 +1026,9 @@ footer .footer-wait{
   font-family:var(--font-jetbrains),monospace;
   font-weight:500;
 }
+/* between 600px and ~760px the table may still be wider than the modal:
+   let it scroll inside the wrap instead of stretching the whole modal */
+#rsvpTableWrap{overflow-x:auto;}
 .rsvp-table{
   width:100%;border-collapse:collapse;
   font-size:13px;margin-top:4px;
@@ -1046,6 +1049,9 @@ footer .footer-wait{
   vertical-align:top;
 }
 .rsvp-table tr:last-child td{border-bottom:none;}
+.rsvp-td-proc{color:rgba(255,255,255,.6);}
+.rsvp-td-note{max-width:160px;word-break:break-word;color:rgba(255,255,255,.5);font-size:12px;}
+.rsvp-td-date{white-space:nowrap;font-size:11px;font-family:var(--font-jetbrains),monospace;color:rgba(255,255,255,.25);}
 .rsvp-pill{
   display:inline-flex;align-items:center;gap:4px;
   font-size:11px;font-weight:600;letter-spacing:.02em;
@@ -1135,9 +1141,37 @@ footer .footer-wait{
 @media(max-height:520px){#hero{justify-content:flex-start;padding-top:88px;}}
 
 /* modal: dynamic viewport height + safe-area so the close button is reachable */
-.modal{max-height:90dvh;}
+.modal{max-height:90dvh;max-width:100%;}
 @media(max-width:600px){
   .modal{max-height:88dvh;padding:24px 20px;}
+}
+
+/* RSVP admin panel on phones: the 5-column table can't fit, so each row
+   becomes a stacked card and the stat tiles wrap to a 2×2 grid */
+@media(max-width:600px){
+  .rsvp-stats{grid-template-columns:repeat(2,1fr);}
+  .rsvp-table{display:block;}
+  .rsvp-table thead{display:none;}
+  .rsvp-table tbody{display:flex;flex-direction:column;gap:10px;}
+  .rsvp-table tr{
+    display:grid;grid-template-columns:1fr auto;
+    align-items:start;column-gap:12px;
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:12px;padding:14px;
+  }
+  .rsvp-table td{display:block;padding:0;border-bottom:none;}
+  .rsvp-td-guest{grid-column:1;grid-row:1;}
+  .rsvp-td-pres{grid-column:2;grid-row:1;justify-self:end;}
+  .rsvp-td-proc{grid-column:1/-1;margin-top:10px;font-size:12px;}
+  .rsvp-td-proc::before{
+    content:"Proclamazione ";
+    font-family:var(--font-jetbrains),monospace;
+    font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+    color:rgba(96,165,250,.7);
+  }
+  .rsvp-td-note{grid-column:1/-1;max-width:none;margin-top:6px;line-height:1.5;}
+  .rsvp-td-date{grid-column:1/-1;margin-top:10px;}
 }
 .modal-overlay{padding:16px;padding-bottom:max(16px,env(safe-area-inset-bottom));}
 
