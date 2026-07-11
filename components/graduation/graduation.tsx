@@ -689,8 +689,8 @@ export function Graduation() {
               un solo traguardo
             </h2>
             <p className="section-desc fade-up delay-2">
-              Due appuntamenti speciali per celebrare questo percorso. Sarò felice di averti con
-              me.
+              Due appuntamenti speciali per celebrare questo percorso. Saremo felici di averti con
+              noi.
             </p>
             <div className="program-grid">
               <div className="event-card fade-up delay-1">
