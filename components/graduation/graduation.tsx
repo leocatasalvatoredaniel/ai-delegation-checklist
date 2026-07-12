@@ -1,53 +1,34 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import emailjs from "@emailjs/browser";
 import { RSVP_BACKEND } from "@/lib/config";
 import { StickyScroll, type StickyItem } from "@/components/ui/sticky-scroll-reveal";
 import { GlobeHero } from "@/components/ui/globe-hero";
+import { COPY, type Lang } from "./copy";
 
 const BASE_PATH = process.env.NODE_ENV === "production" ? "/ai-delegation-checklist" : "";
 
-/** Stats narrative for the sticky-scroll reveal. */
-const STATS_CONTENT: StickyItem[] = [
+/** Media for the sticky-scroll slides; text comes from COPY[lang].stats (same order). */
+const STATS_MEDIA: Omit<StickyItem, "title" | "description">[] = [
   {
-    num: "1.847",
-    title: "Ore di sonno sacrificate",
-    description:
-      "Notti in bianco tra progetti consegnati all'ultimo secondo e sveglie all'alba. Il caffè ringrazia, le occhiaie un po' meno.",
     img: `${BASE_PATH}/img/foto_sonno.jpg`,
     gradient: "linear-gradient(160deg,#1A3A6B 0%,#0F2347 60%,#0A1628 100%)",
   },
   {
-    num: "312",
-    title: "Gin tonic di sopravvivenza",
-    description:
-      "Stima cautelativa. Ogni esame superato meritava un brindisi — e anche qualcuno di quelli andati male, per consolazione.",
     video: `${BASE_PATH}/video/video_gin.mp4`,
     videoPoster: `${BASE_PATH}/img/video_gin_poster.jpg`,
     gradient: "linear-gradient(160deg,#10243f 0%,#13314f 55%,#091522 100%)",
   },
   {
-    num: "12k+",
-    title: "Ore fissando uno schermo",
-    description:
-      "Tra IDE aperti, slide infinite e bug che esistevano solo sul mio portatile. La vista non è più quella di prima.",
     img: `${BASE_PATH}/img/foto_studio.jpg`,
     gradient: "linear-gradient(160deg,#1d3a5f 0%,#0e2747 60%,#0a1628 100%)",
   },
   {
-    num: "50+",
-    title: "Voli tra Catania e Torino",
-    description:
-      "Tre anni da pendolare dei cieli: valigia sempre mezza pronta, bagaglio a mano ottimizzato al grammo e il check-in ormai a occhi chiusi.",
     img: `${BASE_PATH}/img/foto_voli.jpg`,
     gradient: "linear-gradient(160deg,#153761 0%,#0d2a4e 55%,#091626 100%)",
   },
   {
-    num: "∞",
-    title: "Volte che l'AI mi ha salvato",
-    description:
-      "Presenza fissa nelle nottate pre-esame. Orgogliosamente grato per il supporto tecnico e morale.",
     img: `${BASE_PATH}/img/foto_ai.jpg`,
     gradient: "linear-gradient(160deg,#16335a 0%,#0c244a 55%,#081320 100%)",
   },
@@ -59,6 +40,32 @@ const MONO = "var(--font-jetbrains),monospace";
 
 export function Graduation() {
   const splashDone = useRef(false);
+  const [lang, setLang] = useState<Lang>("it");
+  const t = COPY[lang];
+  const statsContent: StickyItem[] = t.stats.map((s, i) => ({ ...STATS_MEDIA[i], ...s }));
+
+  // Language: ?lang=en in the URL wins (lets Daniel send English guests a
+  // direct link), then the guest's stored choice. Runs after mount so the
+  // server-rendered Italian markup always matches the first client render.
+  useEffect(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get("lang");
+    const stored = window.localStorage.getItem("sdl-lang");
+    const initial = fromUrl === "en" || fromUrl === "it" ? fromUrl : stored === "en" ? "en" : null;
+    if (initial && initial !== "it") setLang(initial as Lang);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = t.docLang;
+  }, [t.docLang]);
+
+  function switchLang(next: Lang) {
+    setLang(next);
+    try {
+      window.localStorage.setItem("sdl-lang", next);
+    } catch {
+      /* private mode */
+    }
+  }
 
   const $ = (id: string) => document.getElementById(id);
 
@@ -120,15 +127,15 @@ export function Graduation() {
     } else {
       input.style.borderColor = "#EF4444";
       window.setTimeout(() => (input.style.borderColor = ""), 800);
-      showToast("Password errata.");
+      showToast(t.toastWrongPwd);
     }
   }
 
   function downloadICS(type: "proclama" | "festa") {
     const ics =
       type === "proclama"
-        ? `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//SDL Laurea//IT\r\nBEGIN:VEVENT\r\nUID:proclama-2026@sdl\r\nDTSTART:20260916T080000Z\r\nDTEND:20260916T120000Z\r\nSUMMARY:Proclamazione di Laurea - Daniel Leocata\r\nDESCRIPTION:Cerimonia di proclamazione di laurea in Ingegneria Informatica\r\nLOCATION:Politecnico di Torino\\, Corso Duca degli Abruzzi 24\\, Torino\r\nEND:VEVENT\r\nEND:VCALENDAR`
-        : `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//SDL Laurea//IT\r\nBEGIN:VEVENT\r\nUID:festa-2026@sdl\r\nDTSTART:20261003T180000Z\r\nDTEND:20261004T010000Z\r\nSUMMARY:Festeggiamenti Laurea - Daniel Leocata\r\nDESCRIPTION:Cena e festeggiamenti per la laurea\r\nLOCATION:Beauty Garden Banqueting\\, Contrada Don Assenzio\\, 95033 Biancavilla CT\r\nEND:VEVENT\r\nEND:VCALENDAR`;
+        ? `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//SDL Laurea//IT\r\nBEGIN:VEVENT\r\nUID:proclama-2026@sdl\r\nDTSTART:20260916T080000Z\r\nDTEND:20260916T120000Z\r\nSUMMARY:${t.icsProclamaSummary}\r\nDESCRIPTION:${t.icsProclamaDesc}\r\nLOCATION:Politecnico di Torino\\, Corso Duca degli Abruzzi 24\\, Torino\r\nEND:VEVENT\r\nEND:VCALENDAR`
+        : `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//SDL Laurea//IT\r\nBEGIN:VEVENT\r\nUID:festa-2026@sdl\r\nDTSTART:20261003T180000Z\r\nDTEND:20261004T010000Z\r\nSUMMARY:${t.icsFestaSummary}\r\nDESCRIPTION:${t.icsFestaDesc}\r\nLOCATION:Beauty Garden Banqueting\\, Contrada Don Assenzio\\, 95033 Biancavilla CT\r\nEND:VEVENT\r\nEND:VCALENDAR`;
     const a = document.createElement("a");
     a.href = "data:text/calendar;charset=utf-8," + encodeURIComponent(ics);
     a.download = type === "proclama" ? "proclamazione-sdl.ics" : "festa-laurea-sdl.ics";
@@ -219,13 +226,13 @@ export function Graduation() {
     const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
 
     if (!data.nome || !data.cognome || !data.email_ospite || !data.partecipa) {
-      showToast("Compila tutti i campi obbligatori.");
+      showToast(t.toastMissing);
       return;
     }
 
     if (btn) {
       btn.disabled = true;
-      btn.textContent = "Invio in corso…";
+      btn.textContent = t.sending;
     }
 
     const params = {
@@ -259,11 +266,11 @@ export function Graduation() {
     } catch (err) {
       console.warn("EmailJS:", err);
     }
-    showToast("Risposta inviata! A presto 🎓", 5000);
+    showToast(t.toastSent, 5000);
     form.reset();
     if (btn) {
       btn.disabled = false;
-      btn.textContent = "Invia conferma";
+      btn.textContent = t.submit;
     }
   }
 
@@ -551,26 +558,46 @@ export function Graduation() {
           playsInline
           preload="auto"
         />
-        <button className="intro-btn intro-mute" onClick={toggleMute} aria-label="Attiva o disattiva audio">
+        <button className="intro-btn intro-mute" onClick={toggleMute} aria-label={t.muteAria}>
           <span id="introMuteIcon">🔇</span>
         </button>
         <button className="intro-btn intro-skip" onClick={dismissSplash}>
-          salta <span aria-hidden="true">›</span>
+          {t.skip} <span aria-hidden="true">›</span>
         </button>
       </div>
 
       {/* NAV */}
       <nav>
         <div className="nav-logo">
-          SDL <span>// invito</span>
+          SDL <span>{t.navLogoSuffix}</span>
         </div>
-        <div className="nav-links">
-          <a href="#stats">// stats</a>
-          <a href="#program">Programma</a>
-          <a href="#locations">Luoghi</a>
-          <a href="#rsvp" className="nav-cta">
-            Conferma →
-          </a>
+        <div className="nav-right">
+          <div className="nav-links">
+            <a href="#stats">{t.navStats}</a>
+            <a href="#program">{t.navProgram}</a>
+            <a href="#locations">{t.navPlaces}</a>
+            <a href="#rsvp" className="nav-cta">
+              {t.navRsvp}
+            </a>
+          </div>
+          <div className="lang-toggle" role="group" aria-label="Lingua / Language">
+            <button
+              type="button"
+              className={lang === "it" ? "on" : ""}
+              aria-pressed={lang === "it"}
+              onClick={() => switchLang("it")}
+            >
+              IT
+            </button>
+            <button
+              type="button"
+              className={lang === "en" ? "on" : ""}
+              aria-pressed={lang === "en"}
+              onClick={() => switchLang("en")}
+            >
+              EN
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -581,12 +608,12 @@ export function Graduation() {
           <div className="hero-sweep" aria-hidden="true" />
 
           <div className="hero-copy">
-            <div className="hero-label">// invito ufficiale · 2026</div>
-            <p className="hero-invite">Ho il piacere di invitarti a celebrare la mia laurea</p>
+            <div className="hero-label">{t.heroLabel}</div>
+            <p className="hero-invite">{t.heroInvite}</p>
             <h1 className="cine-title">
               <span className="first">Daniel</span> Leocata
             </h1>
-            <p className="hero-sub">Ingegneria Informatica · Politecnico di Torino</p>
+            <p className="hero-sub">{t.heroSub}</p>
           </div>
 
           <GlobeHero />
@@ -595,46 +622,35 @@ export function Graduation() {
             <div className="scroll-mouse">
               <div className="scroll-wheel" />
             </div>
-            <span>scorri per scoprire</span>
+            <span>{t.scrollHint}</span>
           </div>
         </section>
 
         {/* STATS */}
         <section id="stats">
           <div className="section-inner">
-            <div className="section-tag fade-up">// 3 anni in numeri</div>
+            <div className="section-tag fade-up">{t.statsTag}</div>
             <h2 className="fade-up delay-1">
-              I veri numeri dei
+              {t.statsTitle[0]}
               <br />
-              miei ultimi 3 anni.
+              {t.statsTitle[1]}
             </h2>
-            <p className="section-desc fade-up delay-2">
-              Molto più onesto di un profilo LinkedIn. (Scorri)
-            </p>
+            <p className="section-desc fade-up delay-2">{t.statsDesc}</p>
           </div>
 
-          <StickyScroll content={STATS_CONTENT} />
+          <StickyScroll content={statsContent} />
 
           <div className="section-inner ss-after">
             <div className="about-terminal fade-up delay-3">
-              <div className="at-prompt">$ cat grazie.txt</div>
+              <div className="at-prompt">{t.termPrompt}</div>
               <div className="at-output">
-                Grazie per essere qui a festeggiare. Dietro questo traguardo
-                <br />
-                ci sono ore di codice, caffè a fiumi e qualche assistente
-                <br />
-                virtuale a fare il turno di notte... ma nulla di tutto ciò
-                <br />
-                avrebbe avuto valore senza il vostro supporto, le serate
-                <br />
-                per staccare la spina e la certezza di avervi sempre dalla mia parte.
-                <br />
-                <br />
-                Grazie di cuore.
-                <br />
-                <span className="at-sig">
-                  — Daniel Leocata, Dott. in Ingegneria Informatica 🎓
-                </span>
+                {t.termLines.map((line, i) => (
+                  <span key={i}>
+                    {line}
+                    <br />
+                  </span>
+                ))}
+                <span className="at-sig">{t.termSig}</span>
               </div>
               <div className="at-prompt">
                 ${" "}
@@ -647,33 +663,33 @@ export function Graduation() {
         {/* COUNTDOWN */}
         <section id="countdown">
           <div className="section-inner">
-            <div className="section-tag fade-up">// count down</div>
-            <h2 className="fade-up delay-1">Mancano ancora</h2>
-            <p className="section-desc fade-up delay-2">Al gran festeggiamento del 3 ottobre 2026</p>
+            <div className="section-tag fade-up">{t.cdTag}</div>
+            <h2 className="fade-up delay-1">{t.cdTitle}</h2>
+            <p className="section-desc fade-up delay-2">{t.cdDesc}</p>
             <div className="cd-grid fade-up delay-2">
               <div className="cd-box">
                 <div className="cd-num" id="cd-d">
                   --
                 </div>
-                <div className="cd-label">Giorni</div>
+                <div className="cd-label">{t.cdDays}</div>
               </div>
               <div className="cd-box">
                 <div className="cd-num" id="cd-h">
                   --
                 </div>
-                <div className="cd-label">Ore</div>
+                <div className="cd-label">{t.cdHours}</div>
               </div>
               <div className="cd-box">
                 <div className="cd-num" id="cd-m">
                   --
                 </div>
-                <div className="cd-label">Minuti</div>
+                <div className="cd-label">{t.cdMinutes}</div>
               </div>
               <div className="cd-box">
                 <div className="cd-num" id="cd-s">
                   --
                 </div>
-                <div className="cd-label">Secondi</div>
+                <div className="cd-label">{t.cdSeconds}</div>
               </div>
             </div>
           </div>
@@ -682,16 +698,13 @@ export function Graduation() {
         {/* PROGRAM */}
         <section id="program">
           <div className="section-inner">
-            <div className="section-tag fade-up">// programma</div>
+            <div className="section-tag fade-up">{t.programTag}</div>
             <h2 className="fade-up delay-1">
-              Due momenti,
+              {t.programTitle[0]}
               <br />
-              un solo traguardo
+              {t.programTitle[1]}
             </h2>
-            <p className="section-desc fade-up delay-2">
-              Due appuntamenti speciali per celebrare questo percorso. Saremo felici di averti con
-              noi.
-            </p>
+            <p className="section-desc fade-up delay-2">{t.programDesc}</p>
             <div className="program-grid">
               <div className="event-card fade-up delay-1">
                 <div className="event-idx" data-parallax="0.06">
@@ -699,22 +712,19 @@ export function Graduation() {
                 </div>
                 <div className="event-header">
                   <div className="event-date">
-                    16 Settembre 2026
+                    {t.ev1Date}
                     <br />
-                    Torino
+                    {t.ev1City}
                   </div>
                 </div>
-                <div className="event-title">Proclamazione</div>
-                <div className="event-desc">
-                  La cerimonia ufficiale di laurea presso il Politecnico di Torino. Il momento in cui
-                  anni di studio diventano un titolo. Dopo la cerimonia seguirà un bellissimo aperitivo.
-                </div>
+                <div className="event-title">{t.ev1Title}</div>
+                <div className="event-desc">{t.ev1Desc}</div>
                 <div className="event-badge">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
                     <path d="M6 12v5c3 3 9 3 12 0v-5" />
                   </svg>
-                  Cerimonia Accademica
+                  {t.ev1Badge}
                 </div>
               </div>
               <div className="event-card fade-up delay-2">
@@ -723,22 +733,19 @@ export function Graduation() {
                 </div>
                 <div className="event-header">
                   <div className="event-date">
-                    3 Ottobre 2026
+                    {t.ev2Date}
                     <br />
-                    Biancavilla
+                    {t.ev2City}
                   </div>
-                  <div className="event-time">ore 20:00</div>
+                  <div className="event-time">{t.ev2Time}</div>
                 </div>
-                <div className="event-title">Festeggiamenti</div>
-                <div className="event-desc">
-                  La festa per celebrare insieme questo traguardo. Una serata speciale al Beauty
-                  Garden Banqueting, tra cibo, musica e affetti.
-                </div>
+                <div className="event-title">{t.ev2Title}</div>
+                <div className="event-desc">{t.ev2Desc}</div>
                 <div className="event-badge">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                   </svg>
-                  Cena di Gala
+                  {t.ev2Badge}
                 </div>
               </div>
             </div>
@@ -748,21 +755,21 @@ export function Graduation() {
         {/* LOCATIONS */}
         <section id="locations">
           <div className="section-inner">
-            <div className="section-tag fade-up">// luoghi</div>
-            <h2 className="fade-up delay-1">Dove ci troviamo</h2>
-            <p className="section-desc fade-up delay-2">Due luoghi, due momenti da non perdere.</p>
+            <div className="section-tag fade-up">{t.locTag}</div>
+            <h2 className="fade-up delay-1">{t.locTitle}</h2>
+            <p className="section-desc fade-up delay-2">{t.locDesc}</p>
             <div className="loc-grid fade-up delay-2">
               <div className="loc-card">
                 <iframe
                   className="loc-map"
-                  title="Mappa: Politecnico di Torino, Corso Duca degli Abruzzi 24"
+                  title={t.loc1MapTitle}
                   src="https://maps.google.com/maps?q=Politecnico+di+Torino,+Corso+Duca+degli+Abruzzi+24,+Torino&output=embed&z=15"
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                 />
                 <div className="loc-info">
-                  <div className="loc-tag">16 Settembre · 10:00</div>
+                  <div className="loc-tag">{t.loc1Tag}</div>
                   <div className="loc-name" style={{ marginTop: "10px" }}>
                     Politecnico di Torino
                   </div>
@@ -776,14 +783,14 @@ export function Graduation() {
               <div className="loc-card">
                 <iframe
                   className="loc-map"
-                  title="Mappa: Beauty Garden Banqueting, Contrada Don Assenzio, Biancavilla (Catania)"
+                  title={t.loc2MapTitle}
                   src="https://maps.google.com/maps?q=Beauty+Garden+Banqueting,+Contrada+Don+Assenzio,+95033+Biancavilla+CT&output=embed&z=15"
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                 />
                 <div className="loc-info">
-                  <div className="loc-tag">3 Ottobre · 21:00</div>
+                  <div className="loc-tag">{t.loc2Tag}</div>
                   <div className="loc-name" style={{ marginTop: "10px" }}>
                     Beauty Garden Banqueting
                   </div>
@@ -809,7 +816,7 @@ export function Graduation() {
               <button
                 className="cal-btn"
                 onClick={() => downloadICS("proclama")}
-                aria-label="Aggiungi Proclamazione al calendario"
+                aria-label={t.calBtn1Aria}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="3" y="4" width="18" height="18" rx="2" />
@@ -817,12 +824,12 @@ export function Graduation() {
                   <line x1="8" y1="2" x2="8" y2="6" />
                   <line x1="3" y1="10" x2="21" y2="10" />
                 </svg>
-                Aggiungi Proclamazione
+                {t.calBtn1}
               </button>
               <button
                 className="cal-btn"
                 onClick={() => downloadICS("festa")}
-                aria-label="Aggiungi Festeggiamenti al calendario"
+                aria-label={t.calBtn2Aria}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="3" y="4" width="18" height="18" rx="2" />
@@ -830,7 +837,7 @@ export function Graduation() {
                   <line x1="8" y1="2" x2="8" y2="6" />
                   <line x1="3" y1="10" x2="21" y2="10" />
                 </svg>
-                Aggiungi Festeggiamenti
+                {t.calBtn2}
               </button>
             </div>
           </div>
@@ -839,65 +846,66 @@ export function Graduation() {
         {/* RSVP */}
         <section id="rsvp">
           <div className="section-inner">
-            <div className="section-tag fade-up">// rsvp</div>
+            <div className="section-tag fade-up">{t.rsvpTag}</div>
             <h2 className="fade-up delay-1">
-              Conferma la tua
+              {t.rsvpTitle[0]}
               <br />
-              presenza
+              {t.rsvpTitle[1]}
             </h2>
             <p className="section-desc fade-up delay-2">
-              Facci sapere{" "}
-              <strong style={{ color: "rgba(255,255,255,.8)" }}>entro i primi di settembre 2026</strong>{" "}
-              se potrai essere con noi — per entrambi gli eventi. L&apos;invito è esteso anche ai tuoi accompagnatori.
+              {t.rsvpDescPre}
+              <strong style={{ color: "rgba(255,255,255,.8)" }}>{t.rsvpDescStrong}</strong>
+              {t.rsvpDescPost}
             </p>
             <form className="rsvp-form fade-up delay-2" id="rsvpForm" noValidate onSubmit={handleSubmit}>
               <div className="form-row">
                 <div className="field">
-                  <label>Nome</label>
-                  <input type="text" name="nome" placeholder="Mario" required />
+                  <label>{t.fFirstName}</label>
+                  <input type="text" name="nome" placeholder={t.fFirstNamePh} required />
                 </div>
                 <div className="field">
-                  <label>Cognome</label>
-                  <input type="text" name="cognome" placeholder="Rossi" required />
+                  <label>{t.fLastName}</label>
+                  <input type="text" name="cognome" placeholder={t.fLastNamePh} required />
                 </div>
               </div>
 
               <div className="field">
-                <label>Email</label>
-                <input type="email" name="email_ospite" placeholder="mario@esempio.it" required />
+                <label>{t.fEmail}</label>
+                <input type="email" name="email_ospite" placeholder={t.fEmailPh} required />
               </div>
 
               <div className="field">
-                <label>Parteciperai alla festa del 3 ottobre?</label>
+                <label>{t.fPartyQ}</label>
                 <div className="radio-group">
+                  {/* values stay Italian: the admin panel and the sheet count on them */}
                   <label className="radio-opt">
                     <input type="radio" name="partecipa" value="Sì, ci sarò!" required />
-                    <span>Sì, ci sarò!</span>
+                    <span>{t.fPartyYes}</span>
                   </label>
                   <label className="radio-opt">
                     <input type="radio" name="partecipa" value="Purtroppo no" />
-                    <span>Purtroppo no</span>
+                    <span>{t.fPartyNo}</span>
                   </label>
                 </div>
               </div>
 
               <div className="field">
-                <label>Verrai anche alla proclamazione (16 sett.)?</label>
+                <label>{t.fCeremonyQ}</label>
                 <div className="radio-group">
                   <label className="radio-opt">
                     <input type="radio" name="proclamazione" value="Sì" />
-                    <span>Sì</span>
+                    <span>{t.fCeremonyYes}</span>
                   </label>
                   <label className="radio-opt">
                     <input type="radio" name="proclamazione" value="No" />
-                    <span>No</span>
+                    <span>{t.fCeremonyNo}</span>
                   </label>
                 </div>
               </div>
 
               <div className="form-row">
                 <div className="field">
-                  <label>Adulti</label>
+                  <label>{t.fAdults}</label>
                   <div className="select-wrap">
                     <select name="adulti" defaultValue="1">
                       <option value="1">1</option>
@@ -909,7 +917,7 @@ export function Graduation() {
                   </div>
                 </div>
                 <div className="field">
-                  <label>Bambini</label>
+                  <label>{t.fChildren}</label>
                   <div className="select-wrap">
                     <select name="bambini" defaultValue="0">
                       <option value="0">0</option>
@@ -923,17 +931,17 @@ export function Graduation() {
               </div>
 
               <div className="field">
-                <label>Note alimentari / allergie</label>
-                <input type="text" name="dieta" placeholder="Vegetariano, celiaco, ecc. (opzionale)" />
+                <label>{t.fDiet}</label>
+                <input type="text" name="dieta" placeholder={t.fDietPh} />
               </div>
 
               <div className="field">
-                <label>Un messaggio per Daniel (opzionale)</label>
-                <textarea name="messaggio" placeholder="Scrivi qualcosa di speciale…" />
+                <label>{t.fMessage}</label>
+                <textarea name="messaggio" placeholder={t.fMessagePh} />
               </div>
 
               <button type="submit" className="submit-btn" id="submitBtn">
-                Invia conferma
+                {t.submit}
               </button>
             </form>
           </div>
@@ -943,20 +951,20 @@ export function Graduation() {
       {/* FOOTER */}
       <footer>
         <div className="footer-name">Daniel Leocata</div>
-        <div className="footer-sub">Ingegneria Informatica · Politecnico di Torino · 2026</div>
-        <div className="footer-wait">Ti aspettiamo 🎓</div>
+        <div className="footer-sub">{t.footerSub}</div>
+        <div className="footer-wait">{t.footerWait}</div>
       </footer>
 
       {/* TOAST */}
       <div id="toast" />
 
       {/* FLOATING RSVP (mobile) */}
-      <a id="rsvpFloat" href="#rsvp" aria-label="Vai alla conferma di presenza">
+      <a id="rsvpFloat" href="#rsvp" aria-label={t.rsvpFloatAria}>
         RSVP →
       </a>
 
       {/* SCROLL TO TOP */}
-      <button id="scrollTop" aria-label="Torna su">
+      <button id="scrollTop" aria-label={t.scrollTopAria}>
         <svg
           width="18"
           height="18"
@@ -972,15 +980,15 @@ export function Graduation() {
       </button>
 
       {/* AREA RISERVATA */}
-      <button className="reserved-btn" onClick={openModal} aria-label="Area riservata — conferme RSVP">
-        // area riservata
+      <button className="reserved-btn" onClick={openModal} aria-label={t.reservedBtnAria}>
+        {t.reservedBtn}
       </button>
 
       <div className="modal-overlay" id="modalOverlay" onClick={closeModalOutside}>
         <div className="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
           <div id="loginSection">
-            <h3 id="modalTitle">Area Riservata</h3>
-            <p>Inserisci la password per accedere alle conferme ricevute.</p>
+            <h3 id="modalTitle">{t.loginTitle}</h3>
+            <p>{t.loginDesc}</p>
             <input
               type="password"
               className="modal-input"
@@ -990,10 +998,10 @@ export function Graduation() {
             />
             <div className="modal-actions">
               <button className="modal-cancel" onClick={closeModal}>
-                Annulla
+                {t.loginCancel}
               </button>
               <button className="modal-send" onClick={checkPwd}>
-                Accedi
+                {t.loginSubmit}
               </button>
             </div>
           </div>
@@ -1028,7 +1036,7 @@ export function Graduation() {
               <p className="reserved-msg">Caricamento...</p>
             </div>
             <button className="modal-cancel" onClick={closeModal} style={{ marginTop: "20px", width: "100%" }}>
-              Chiudi
+              {t.loginClose}
             </button>
           </div>
         </div>

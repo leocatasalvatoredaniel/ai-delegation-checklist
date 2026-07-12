@@ -220,6 +220,33 @@ nav{
   .nav-links a.nav-cta:hover{color:var(--white);background:#1D4ED8;box-shadow:0 4px 18px rgba(37,99,235,.45);}
 }
 @media(max-width:600px){.nav-links{display:none;}}
+.nav-right{display:flex;align-items:center;gap:24px;}
+
+/* language toggle: stays visible on phones even when the nav links hide */
+.lang-toggle{
+  display:flex;gap:2px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(96,165,250,.25);
+  border-radius:100px;
+  padding:3px;
+}
+.lang-toggle button{
+  font-family:var(--font-jetbrains),monospace;
+  font-size:11px;font-weight:500;letter-spacing:.06em;
+  color:rgba(255,255,255,.45);
+  background:transparent;border:none;
+  padding:4px 10px;border-radius:100px;
+  cursor:pointer;
+  transition:color 130ms var(--ease-out),background 130ms var(--ease-out);
+  touch-action:manipulation;
+}
+.lang-toggle button.on{
+  background:var(--blue);
+  color:var(--white);
+}
+@media(hover:hover) and (pointer:fine){
+  .lang-toggle button:not(.on):hover{color:var(--blue-l);}
+}
 
 /* ─── HERO ─────────────────────────────────────────────── */
 #hero{
