@@ -190,16 +190,22 @@ export function Graduation() {
         const n = parseInt(s || "", 10);
         return isNaN(n) ? null : n;
       };
-      const yesRows = rows.filter((r) => isSi(r.Presenza));
-      const noCount = rows.length - yesRows.length;
-      const proc = rows.filter((r) => isSi(r.Proclamazione)).length;
-      // headcount for the venue: adults+children when the row has them,
+      // someone who skips the party but attends the ceremony (and its
+      // aperitivo) is still a guest: "not coming" means declined BOTH events
+      const attending = (r: Record<string, string>) => isSi(r.Presenza) || isSi(r.Proclamazione);
+      const festaYes = rows.filter((r) => isSi(r.Presenza));
+      const procYes = rows.filter((r) => isSi(r.Proclamazione));
+      const noneCount = rows.filter((r) => !attending(r)).length;
+      // headcount per event: adults+children when the row has them,
       // at least 1 for older rows submitted before the columns existed
-      const people = yesRows.reduce((tot, r) => {
-        const a = num(r.Adulti);
-        const b = num(r.Bambini);
-        return tot + (a === null && b === null ? 1 : (a ?? 0) + (b ?? 0));
-      }, 0);
+      const headcount = (rs: Record<string, string>[]) =>
+        rs.reduce((tot, r) => {
+          const a = num(r.Adulti);
+          const b = num(r.Bambini);
+          return tot + (a === null && b === null ? 1 : (a ?? 0) + (b ?? 0));
+        }, 0);
+      const peopleFesta = headcount(festaYes);
+      const peopleProc = headcount(procYes);
       const fmtDate = (s: string) => {
         if (!s) return "—";
         const parts = s.split(", ");
@@ -233,7 +239,7 @@ export function Graduation() {
         const pr = isSi(r.Proclamazione);
         const { diet, msg } = noteParts(r.Note);
         const guests = guestsLabel(r);
-        return `<article class="rsvp-card${ok ? "" : " is-no"}">
+        return `<article class="rsvp-card${attending(r) ? "" : " is-no"}">
           <header class="rsvp-card-top">
             <div><div class="rsvp-nome">${esc(r.Nome) || "—"}</div><div class="rsvp-email">${esc(r.Email)}</div></div>
             ${guests ? `<div class="rsvp-guests">${esc(guests)}</div>` : ""}
@@ -247,21 +253,24 @@ export function Graduation() {
           <div class="rsvp-when">${esc(fmtDate(r.Timestamp))}</div>
         </article>`;
       };
-      // sheet order is chronological (append-only): reverse for newest-first,
-      // confirmed guests on top, declines dimmed at the bottom
+      // sheet order is chronological (append-only): reverse for newest-first;
+      // anyone attending at least one event on top, full declines at the bottom
       const newestFirst = [...rows].reverse();
-      const yesCards = newestFirst.filter((r) => isSi(r.Presenza)).map(card).join("");
-      const noCards = newestFirst.filter((r) => !isSi(r.Presenza)).map(card).join("");
+      const yesCards = newestFirst.filter(attending).map(card).join("");
+      const noCards = newestFirst
+        .filter((r) => !attending(r))
+        .map(card)
+        .join("");
       wrap.innerHTML = `
         <div class="rsvp-stats">
           <div class="rsvp-stat"><span class="rsvp-stat-n">${rows.length}</span><span class="rsvp-stat-l">Risposte</span></div>
-          <div class="rsvp-stat"><span class="rsvp-stat-n" style="color:#3FB950">${yesRows.length}</span><span class="rsvp-stat-l">Confermati</span></div>
-          <div class="rsvp-stat"><span class="rsvp-stat-n" style="color:#E3B341">${people}</span><span class="rsvp-stat-l">Persone attese</span></div>
-          <div class="rsvp-stat"><span class="rsvp-stat-n" style="color:#F87171">${noCount}</span><span class="rsvp-stat-l">Non vengono</span></div>
-          <div class="rsvp-stat"><span class="rsvp-stat-n" style="color:#93C5FD">${proc}</span><span class="rsvp-stat-l">Proclamazione</span></div>
+          <div class="rsvp-stat"><span class="rsvp-stat-n" style="color:#3FB950">${festaYes.length}</span><span class="rsvp-stat-l">Sì festa</span></div>
+          <div class="rsvp-stat"><span class="rsvp-stat-n" style="color:#E3B341">${peopleFesta}</span><span class="rsvp-stat-l">Persone festa</span></div>
+          <div class="rsvp-stat"><span class="rsvp-stat-n" style="color:#93C5FD">${peopleProc}</span><span class="rsvp-stat-l">Persone proclamaz.</span></div>
+          <div class="rsvp-stat"><span class="rsvp-stat-n" style="color:#F87171">${noneCount}</span><span class="rsvp-stat-l">Non vengono</span></div>
         </div>
         <div class="rsvp-cards">${yesCards}</div>
-        ${noCards ? `<div class="rsvp-divider">Non vengono</div><div class="rsvp-cards">${noCards}</div>` : ""}`;
+        ${noCards ? `<div class="rsvp-divider">Non vengono a nessuno dei due</div><div class="rsvp-cards">${noCards}</div>` : ""}`;
     } catch {
       wrap.innerHTML =
         '<p class="reserved-msg">Errore nel caricamento.<br>Assicurati che il foglio sia condiviso come <strong>Visualizzatore per chiunque con il link</strong>.</p>';
