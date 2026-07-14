@@ -176,13 +176,30 @@ export function Graduation() {
         wrap.innerHTML = '<p class="reserved-msg">Nessuna conferma ancora ricevuta.</p>';
         return;
       }
+      const esc = (s: string) =>
+        (s || "").replace(
+          /[&<>"']/g,
+          (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!,
+        );
       const isSi = (p: string) => {
         const l = (p || "").toLowerCase();
         return l.includes("sì") || l.includes("si");
       };
-      const si = rows.filter((r) => isSi(r.Presenza)).length;
-      const no = rows.length - si;
+      // "5+" / "4+" parse as 5 / 4; blank or missing column → null
+      const num = (s: string | undefined) => {
+        const n = parseInt(s || "", 10);
+        return isNaN(n) ? null : n;
+      };
+      const yesRows = rows.filter((r) => isSi(r.Presenza));
+      const noCount = rows.length - yesRows.length;
       const proc = rows.filter((r) => isSi(r.Proclamazione)).length;
+      // headcount for the venue: adults+children when the row has them,
+      // at least 1 for older rows submitted before the columns existed
+      const people = yesRows.reduce((tot, r) => {
+        const a = num(r.Adulti);
+        const b = num(r.Bambini);
+        return tot + (a === null && b === null ? 1 : (a ?? 0) + (b ?? 0));
+      }, 0);
       const fmtDate = (s: string) => {
         if (!s) return "—";
         const parts = s.split(", ");
@@ -191,28 +208,60 @@ export function Graduation() {
         const mesi = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
         return `${parseInt(d)} ${mesi[parseInt(m) - 1]} · ${parts[1].slice(0, 5)}`;
       };
+      // the sheet stores "Dieta: X | message" in one Note cell: split it back
+      const noteParts = (note: string) => {
+        let diet = "";
+        let msg = (note || "").trim();
+        const m = msg.match(/^Dieta:\s*([^|]*)(?:\|\s*([\s\S]*))?$/);
+        if (m) {
+          diet = m[1].trim();
+          msg = (m[2] || "").trim();
+        }
+        return { diet, msg };
+      };
+      const guestsLabel = (r: Record<string, string>) => {
+        const a = num(r.Adulti);
+        const b = num(r.Bambini);
+        if (a === null && b === null) return "";
+        const parts: string[] = [];
+        if (a) parts.push(a === 1 ? "1 adulto" : `${a} adulti`);
+        if (b) parts.push(b === 1 ? "1 bambino" : `${b} bambini`);
+        return parts.join(" · ");
+      };
+      const card = (r: Record<string, string>) => {
+        const ok = isSi(r.Presenza);
+        const pr = isSi(r.Proclamazione);
+        const { diet, msg } = noteParts(r.Note);
+        const guests = guestsLabel(r);
+        return `<article class="rsvp-card${ok ? "" : " is-no"}">
+          <header class="rsvp-card-top">
+            <div><div class="rsvp-nome">${esc(r.Nome) || "—"}</div><div class="rsvp-email">${esc(r.Email)}</div></div>
+            ${guests ? `<div class="rsvp-guests">${esc(guests)}</div>` : ""}
+          </header>
+          <div class="rsvp-flags">
+            <span class="rsvp-flag"><span class="rsvp-flag-l">Festa</span><span class="rsvp-pill ${ok ? "si" : "no"}">${ok ? "✓ Sì" : "✗ No"}</span></span>
+            <span class="rsvp-flag"><span class="rsvp-flag-l">Proclamaz.</span><span class="rsvp-pill ${pr ? "si" : "mut"}">${pr ? "✓ Sì" : "✗ No"}</span></span>
+          </div>
+          ${diet ? `<div class="rsvp-diet"><span class="rsvp-flag-l">Dieta</span>${esc(diet)}</div>` : ""}
+          ${msg ? `<div class="rsvp-msg">“${esc(msg)}”</div>` : ""}
+          <div class="rsvp-when">${esc(fmtDate(r.Timestamp))}</div>
+        </article>`;
+      };
+      // sheet order is chronological (append-only): reverse for newest-first,
+      // confirmed guests on top, declines dimmed at the bottom
+      const newestFirst = [...rows].reverse();
+      const yesCards = newestFirst.filter((r) => isSi(r.Presenza)).map(card).join("");
+      const noCards = newestFirst.filter((r) => !isSi(r.Presenza)).map(card).join("");
       wrap.innerHTML = `
         <div class="rsvp-stats">
           <div class="rsvp-stat"><span class="rsvp-stat-n">${rows.length}</span><span class="rsvp-stat-l">Risposte</span></div>
-          <div class="rsvp-stat"><span class="rsvp-stat-n" style="color:#3FB950">${si}</span><span class="rsvp-stat-l">Confermati</span></div>
-          <div class="rsvp-stat"><span class="rsvp-stat-n" style="color:#F87171">${no}</span><span class="rsvp-stat-l">Non vengono</span></div>
+          <div class="rsvp-stat"><span class="rsvp-stat-n" style="color:#3FB950">${yesRows.length}</span><span class="rsvp-stat-l">Confermati</span></div>
+          <div class="rsvp-stat"><span class="rsvp-stat-n" style="color:#E3B341">${people}</span><span class="rsvp-stat-l">Persone attese</span></div>
+          <div class="rsvp-stat"><span class="rsvp-stat-n" style="color:#F87171">${noCount}</span><span class="rsvp-stat-l">Non vengono</span></div>
           <div class="rsvp-stat"><span class="rsvp-stat-n" style="color:#93C5FD">${proc}</span><span class="rsvp-stat-l">Proclamazione</span></div>
         </div>
-        <table class="rsvp-table">
-          <thead><tr><th>Ospite</th><th>Presenza</th><th>Proclamaz.</th><th>Note</th><th>Data</th></tr></thead>
-          <tbody>${rows
-            .map((r) => {
-              const ok = isSi(r.Presenza);
-              return `<tr>
-            <td class="rsvp-td-guest"><div class="rsvp-nome">${r.Nome || "—"}</div><div class="rsvp-email">${r.Email || ""}</div></td>
-            <td class="rsvp-td-pres"><span class="rsvp-pill ${ok ? "si" : "no"}">${ok ? "✓ Sì" : "✗ No"}</span></td>
-            <td class="rsvp-td-proc">${isSi(r.Proclamazione) ? "✓ Sì" : "✗ No"}</td>
-            <td class="rsvp-td-note">${r.Note || "—"}</td>
-            <td class="rsvp-td-date">${fmtDate(r.Timestamp)}</td>
-          </tr>`;
-            })
-            .join("")}</tbody>
-        </table>`;
+        <div class="rsvp-cards">${yesCards}</div>
+        ${noCards ? `<div class="rsvp-divider">Non vengono</div><div class="rsvp-cards">${noCards}</div>` : ""}`;
     } catch {
       wrap.innerHTML =
         '<p class="reserved-msg">Errore nel caricamento.<br>Assicurati che il foglio sia condiviso come <strong>Visualizzatore per chiunque con il link</strong>.</p>';
@@ -256,6 +305,8 @@ export function Graduation() {
       presenza: data.partecipa,
       proclamazione: data.proclamazione || "Non specificato",
       note: [data.dieta ? `Dieta: ${data.dieta}` : "", data.messaggio || ""].filter(Boolean).join(" | "),
+      adulti: data.adulti || "",
+      bambini: data.bambini || "",
     });
     new Image().src = `${SHEETS_URL}?${writeParams}`;
 
